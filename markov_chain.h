@@ -332,7 +332,7 @@ public:
 
 	}
 
-	template<class A, class B = A>
+	template<class A, class B>
 	friend class mc_analyzer;
 
 	//using analyzer = mc_analyzer<_ProbabilityType, _RewardType>;
