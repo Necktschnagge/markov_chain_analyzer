@@ -19,7 +19,7 @@ add_executable(MC_Analyzer
 	main.cpp
 	
 	regxc.h
-	regxc.cpp
+	#regxc.cpp
 	
 	loghelper.h
 	markov_chain.h
