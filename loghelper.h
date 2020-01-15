@@ -2,10 +2,12 @@
 
 #include <iostream>
 #include <chrono>
+#include <string>
 
-inline static const auto interprete_bool_n = [](const bool& success) { return success ? "okay\n" : "failed\n"; };
+inline std::string interprete_bool_n(const bool& success) { return success ? "okay\n" : "failed\n"; };
 
-inline static const auto surround_log = [](const auto& doc, const auto& task) { std::cout << doc << "...\n"; task(); std::cout << doc << "  DONE!\n"; };
+template <class _Doc, class _Function>
+void surround_log(const _Doc& doc, const _Function& task) { std::cout << doc << "...\n"; task(); std::cout << doc << "  DONE!\n"; };
 
 template<class _Duration>
 inline void printDuration(const _Duration& duration) {
