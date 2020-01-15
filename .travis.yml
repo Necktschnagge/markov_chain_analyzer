@@ -24,6 +24,7 @@ script:
     - sudo ln -s /usr/bin/g++-6 /usr/local/bin/g++
     - gcc -v
     - g++ -v
+    - /usr/local/bin/g++ -v
     - cmake --version
     - git clone 'https://github.com/ddemidov/amgcl.git' '../amgcl/'
     - ls ..
