@@ -30,6 +30,6 @@ script:
     - echo Create Project...
     - cmake -DCMAKE_RULE_MESSAGES:BOOL=OFF -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ..
     - echo Build Project...
-    - cmake --debug-output --build .
+    - cmake --build .
 
     
