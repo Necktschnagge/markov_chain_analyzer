@@ -29,4 +29,7 @@ script:
     - echo Create Project...
     - cmake ..
     - echo Build Project...
-    - cmake
+    - cmake --build .
+    - cd ..
+    - ls
+    
