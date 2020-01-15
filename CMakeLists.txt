@@ -27,7 +27,7 @@ add_executable(MC_Analyzer
 #add_executable(MC_Analyzer )
 
 target_include_directories(MC_Analyzer PUBLIC "${PROJECT_BINARY_DIR}")
-configure_file(ProjectConfig.h.in ProjectConfig.h)
+#configure_file(ProjectConfig.h.in ProjectConfig.h)
 
 
 TARGET_LINK_LIBRARIES(MC_Analyzer LINK_PUBLIC ${Boost_LIBRARIES} )

@@ -5,7 +5,7 @@
 template<class _ProbabilityType, class _RewardType = _ProbabilityType>
 struct mc_analyzer {
 
-	using mc_type = markov_chain<_ProbabilityType, _RewardType>;
+	using mc_type = markov_chain<_ProbabilityType>;
 	using set_type = std::unordered_set<unsigned long>;
 
 	/** @

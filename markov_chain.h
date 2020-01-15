@@ -14,11 +14,11 @@
 #include <boost/algorithm/string.hpp>
 
 
-template <class _ProbabilityType, class _RewardType = _ProbabilityType>
+template <class _ProbabilityType>
 class markov_chain
 {
 public:
-	using Reward = _RewardType;
+	using Reward = _ProbabilityType;
 private:
 	using regx_it = boost::regex_iterator<std::string::const_iterator>;
 
@@ -29,13 +29,13 @@ private:
 		edge(const _ProbabilityType& probability, std::size_t n_rewards = 0) : probability(probability), rewards(n_rewards, 0) {}
 
 		_ProbabilityType probability;
-		std::vector<_RewardType> rewards;
+		std::vector<_ProbabilityType> rewards;
 	};
 
 	struct state {
 		state(std::size_t n_decorations) : decorations(n_decorations, 0) {}
 
-		std::vector<_RewardType> decorations;
+		std::vector<_ProbabilityType> decorations;
 	};
 
 	std::unordered_map<unsigned long, std::unordered_map<unsigned long, edge*>> forward_transitions; // hardcoded unsigned long###
@@ -335,8 +335,6 @@ public:
 	template<class A, class B>
 	friend class mc_analyzer;
 
-	//using analyzer = mc_analyzer<_ProbabilityType, _RewardType>;
-
-	friend std::chrono::steady_clock::duration generate_herman_f(markov_chain<double>& mc, unsigned int size, std::unique_ptr<std::unordered_set<unsigned long>>& target_set);
+	friend std::chrono::nanoseconds generate_herman_f(markov_chain<double>& mc, unsigned int size, std::unique_ptr<std::unordered_set<unsigned long>>& target_set);
 };
 

@@ -1,4 +1,0 @@
-// the configured options and settings for MCAnalyzer
-
-#define MCAnalyzer_VERSION @CMAKE_PROJECT_VERSION@
-#define MCAnalyzer_VERSION_MINOR @MCAnalyzer_VERSION_MINOR@
