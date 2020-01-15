@@ -28,8 +28,8 @@ script:
     - mkdir cmake-build
     - cd cmake-build
     - echo Create Project...
-    - cmake ..
+    - cmake -DCMAKE_RULE_MESSAGES:BOOL=OFF -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ..
     - echo Build Project...
-    - cmake --build .
+    - cmake --debug-output --build .
 
     
