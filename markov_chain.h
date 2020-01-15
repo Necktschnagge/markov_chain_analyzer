@@ -332,10 +332,10 @@ public:
 
 	}
 
-	template<class _ProbabilityType, class _RewardType = _ProbabilityType>
+	template<class A, class B = A>
 	friend class mc_analyzer;
 
-	using analyzer = mc_analyzer<_ProbabilityType, _RewardType>;
+	//using analyzer = mc_analyzer<_ProbabilityType, _RewardType>;
 
 	friend std::chrono::steady_clock::duration generate_herman_f(markov_chain<double>& mc, unsigned int size, std::unique_ptr<std::unordered_set<unsigned long>>& target_set);
 };
