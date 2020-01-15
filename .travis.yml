@@ -23,17 +23,13 @@ script:
     - sudo ln -s /usr/bin/gcc-6 /usr/local/bin/gcc
     - sudo ln -s /usr/bin/g++-6 /usr/local/bin/g++
     - gcc -v && g++ -v && cmake --version
-    - mkdir clone
-    - cd clone
-    - git clone 'https://github.com/ddemidov/amgcl.git' '.'
-    - cd ..
-    - ls
+    - git clone 'https://github.com/ddemidov/amgcl.git' '../amgcl/'
+    - ls ..
     - mkdir cmake-build
     - cd cmake-build
     - echo Create Project...
     - cmake ..
     - echo Build Project...
     - cmake --build .
-    - cd ../..
-    - ls
+
     
