@@ -15,7 +15,12 @@ INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 include_directories(../amgcl)
 
 
-add_executable(MC_Analyzer main.cpp)
+add_executable(MC_Analyzer
+	main.cpp
+	regxc.h
+	regxc.cpp
+	)
+#add_executable(MC_Analyzer )
 
 target_include_directories(MC_Analyzer PUBLIC "${PROJECT_BINARY_DIR}")
 configure_file(ProjectConfig.h.in ProjectConfig.h)

@@ -6,37 +6,36 @@
 
 class regex_strings {
 public:
-	inline static const auto nonnegative_integer{ std::string(R"(([1-9][0-9]*|0))") };
-	inline static const auto nonnegative_float{ std::string(R"(([0-9]*\.)?[0-9]+)") };
-
-	inline static const auto spaces0{ std::string(R"(\s*)") };
-	inline static const auto spaces1{ std::string(R"(\s+)") };
-	inline static const auto new_line{ std::string(R"((\r\n|\r|\n))") };
-
-	inline static const auto prism_file_header{ spaces0 + nonnegative_integer + spaces1 + nonnegative_integer + spaces0 + new_line };
-	inline static const auto prism_file_value_line{ spaces0 + nonnegative_integer + spaces1 + nonnegative_integer + spaces1 + nonnegative_float + spaces0 };
-	inline static const auto prism_file_format{ prism_file_header + "((\\s*|" + prism_file_value_line + ")(" + new_line + "|$))*" };
-
-	inline static const auto gmc_column_name{ std::string(R"(\$\w+)") };
-	inline static const auto native_ignored{ std::string(R"(\#.*)") };
-	inline static const auto gmc_semantics_definition{ std::string(R"(\$\w+(,\$\w+)*)") }; // use gmc column name here!
-	// use with ECMAScript mode -> not anymore, removed ^ and $
-
-	inline static const auto gmc_general{ std::string("^(") + native_ignored + new_line + ")*" +
-		gmc_semantics_definition + "(" + new_line + ".*)*$" };
+	const static std::string nonnegative_integer;
+	const static std::string nonnegative_float;
+	
+	const static std::string spaces0;
+	const static std::string spaces1;
+	const static std::string new_line;
+	
+	const static std::string prism_file_header;
+	const static std::string prism_file_value_line;
+	const static std::string prism_file_format;
+	
+	const static std::string gmc_column_name;
+	const static std::string native_ignored;
+	const static std::string gmc_semantics_definition; // use gmc column name here! 	// use with ECMAScript mode -> not anymore, removed ^ and $
+	
+	
+	const static std::string gmc_general;
 	
 
 };
 
 class regxc {
 public:
-	inline static const auto nonnegative_integer{ boost::regex(regex_strings::nonnegative_integer) };
-	inline static const auto prism_file_format{ boost::regex(regex_strings::prism_file_format) };
-	inline static const auto prism_header{ boost::regex(regex_strings::prism_file_header) };
-	inline static const auto prism_value_line{ boost::regex(regex_strings::prism_file_value_line) };
-	inline static const auto nn_float{ boost::regex(regex_strings::nonnegative_float) };
-
-	inline static const auto gmc_general{ boost::regex(regex_strings::gmc_general) };
-	inline static const auto gmc_semantics_definition{ boost::regex(regex_strings::gmc_semantics_definition) };
-	inline static const auto gmc_column_name{ boost::regex(regex_strings::gmc_column_name) };
+	const static boost::regex nonnegative_integer;
+	const static boost::regex prism_file_format;
+	const static boost::regex prism_header;
+	const static boost::regex prism_value_line;
+	const static boost::regex nn_float;
+	
+	const static boost::regex gmc_general;
+	const static boost::regex gmc_semantics_definition;
+	const static boost::regex gmc_column_name;
 };
