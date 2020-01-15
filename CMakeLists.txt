@@ -18,11 +18,11 @@ include_directories(../amgcl)
 add_executable(MC_Analyzer
 	main.cpp
 	
-	regxc.h
+	#regxc.h
 	regxc.cpp
 	
-	loghelper.h
-	markov_chain.h
+	#loghelper.h
+	#markov_chain.h
 	)
 #add_executable(MC_Analyzer )
 
