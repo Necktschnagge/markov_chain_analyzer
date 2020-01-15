@@ -13,8 +13,8 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - gcc-8
-      - g++-8
+      - gcc-9
+      - g++-9
       - cmake
       - libboost-all-dev
       
@@ -34,6 +34,5 @@ script:
     - cmake -DCMAKE_RULE_MESSAGES:BOOL=OFF -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ..
     - echo Build Project...
     - cmake --build .
-    - /usr/local/bin/g++   -I/home/travis/build/Necktschnagge/markov_chain_analyzer/../amgcl -I/home/travis/build/Necktschnagge/markov_chain_analyzer/cmake-build  -std=c++17 -o CMakeFiles/MC_Analyzer.dir/main.cpp.o -c /home/travis/build/Necktschnagge/markov_chain_analyzer/main.cpp
-
+   
     
