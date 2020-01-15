@@ -4,11 +4,8 @@ project(MC_Analyzer VERSION 1.0)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-set_target_properties(
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED ON
-    CXX_EXTENSIONS OFF
-)
+set(CMAKE_CXX_EXTENSIONS False)
+
 
 set(Boost_USE_STATIC_LIBS ON)
 
