@@ -23,3 +23,9 @@ script:
     - sudo ln -s /usr/bin/g++-6 /usr/local/bin/g++
     - gcc -v && g++ -v && cmake --version
     - ls
+    - mkdir cmake-build
+    - cd cmake-build
+    - ECHO Create Project...
+    - cmake ..
+    - ECHO Build Project...
+    - cmake
