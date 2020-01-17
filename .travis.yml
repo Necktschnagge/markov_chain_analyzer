@@ -35,4 +35,4 @@ script:
     - echo Build Project...
     - cmake --build .
     - cd ..
-    -doxygen Doxyfile
+    - doxygen Doxyfile
