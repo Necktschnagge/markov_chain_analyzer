@@ -36,9 +36,8 @@ script:
 
    
 deploy:
-    provider: pages
+    provider: pages:git
     skip_cleanup: true
     local_dir: docs/html
-    github_token: $GH_REPO_TOKEN
-    on:
-        branch: old
+    token: $GH_REPO_TOKEN
+    target_branch: github-pages
