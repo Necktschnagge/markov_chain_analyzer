@@ -26,7 +26,7 @@ add_executable(MC_Analyzer
 	)
 #add_executable(MC_Analyzer )
 
-target_include_directories(MC_Analyzer PUBLIC "${PROJECT_BINARY_DIR}")
+#target_include_directories(MC_Analyzer PUBLIC "${PROJECT_BINARY_DIR}")
 #configure_file(ProjectConfig.h.in ProjectConfig.h)
 
 
