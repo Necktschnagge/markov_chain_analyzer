@@ -5,17 +5,18 @@
 #include <chrono>
 
 
-std::chrono::nanoseconds generate_herman_f(markov_chain<double>& mc, unsigned int size, std::unique_ptr<std::unordered_set<unsigned long>>& target_set) {
-	if (!(size % 2)) throw std::invalid_argument("size of herman must be odd");
-	if (size > 63) throw std::invalid_argument("size of herman must not be greater than 63");
-	if (mc.n_decorations == 0) throw std::invalid_argument("decoration 0 needed for target set");
-	if (mc.n_rewards == 0) throw std::invalid_argument("reward 0 needed for costs.");
+std::chrono::nanoseconds generate_herman(markov_chain<double>& mc, unsigned int size, std::unique_ptr<std::unordered_set<unsigned long>>& target_set) {
+	// Check constraints:
+	if (!(size % 2)) throw std::invalid_argument("Size of herman must be odd.");
+	if (size > 63) throw std::invalid_argument("Size of herman must not be greater than 63.");
+	if (mc.n_node_decorations == 0) throw std::invalid_argument("decoration 0 needed for target set");
+	if (mc.n_edge_decorations == 0) throw std::invalid_argument("reward 0 needed for costs.");
 
 	std::chrono::steady_clock::time_point before_ns{ std::chrono::steady_clock::now() };
 
 	// conflict with state enumeration type here ### unsigned long vs std::size_t:
 	for (std::size_t state{ 0 }; (state >> size) == 0; ++state) {
-		mc.states.emplace(state, mc.n_decorations);
+		mc.states.emplace(state, mc.n_node_decorations);
 	}
 
 	// enumerates all states that are target
@@ -80,10 +81,10 @@ std::chrono::nanoseconds generate_herman_f(markov_chain<double>& mc, unsigned in
 				c_next_state |= static_cast<unsigned long long>(bit_to_map) << non_deterministic_positions[pos_it];
 			}
 			// create edge:
-			const auto pEdge{ new markov_chain<double>::edge(prob, mc.n_rewards) };
+			const auto pEdge{ new markov_chain<double>::edge(prob, mc.n_edge_decorations) };
 			mc.forward_transitions[state][c_next_state] = pEdge;
 			mc.inverse_transitions[c_next_state][state] = pEdge;
-			pEdge->rewards[0] = 1;
+			pEdge->decorations[0] = 1;
 		}
 	}
 	auto after_ns{ std::chrono::steady_clock::now() };

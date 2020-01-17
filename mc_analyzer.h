@@ -2,10 +2,10 @@
 
 #include "sparse_amtrix.h"
 
-template<class _ProbabilityType, class _RewardType = _ProbabilityType>
+template<class _RationalT, class _RewardType = _RationalT>
 struct mc_analyzer {
 
-	using mc_type = markov_chain<_ProbabilityType>;
+	using mc_type = markov_chain<_RationalT>;
 	using set_type = std::unordered_set<unsigned long>;
 
 	/** @
@@ -27,13 +27,13 @@ struct mc_analyzer {
 	}
 
 	static std::vector<_RewardType> rewarded_image_vector(const sparse_matrix& target_adjusted_matrix, const mc_type& mc, const std::size_t& reward_selector) {
-		if (!(reward_selector < mc.n_rewards)) throw std::invalid_argument("Given markov chain has to few rewards.");
+		if (!(reward_selector < mc.n_edge_decorations)) throw std::invalid_argument("Given markov chain has to few rewards.");
 		auto result{ std::vector<_RewardType>(target_adjusted_matrix.size_m(), 0) };
 		for (sparse_matrix::size_t state_s{ 0 }; state_s != target_adjusted_matrix.size_m(); ++state_s) {
 			result[state_s] = -std::accumulate(target_adjusted_matrix[state_s].cbegin(), target_adjusted_matrix[state_s].cend(), double(0.0),
 				[&](const _RewardType& val, const auto& appendee /*pointing to state "t"*/) {
 					try {
-						return val + appendee.second /*P_{-> A} */ * mc.forward_transitions.at(state_s).at(appendee.first)->rewards[reward_selector];
+						return val + appendee.second /*P_{-> A} */ * mc.forward_transitions.at(state_s).at(appendee.first)->decorations[reward_selector];
 					}
 					catch (const std::out_of_range&) {
 						return val;
@@ -46,39 +46,39 @@ struct mc_analyzer {
 	/** Stores a new reward function for variance
 	*/
 	static void calculate_variance_reward(mc_type& mc, std::size_t index_basic_reward, std::size_t index_basic_decoration, std::size_t index_destination_reward){
-		if (!(index_basic_reward < mc.n_rewards)) throw std::out_of_range("Basic reward out of range.");
-		if (!(index_destination_reward < mc.n_rewards)) throw std::out_of_range("Destination reward out of range.");
-		if (!(index_basic_decoration < mc.n_decorations)) throw std::out_of_range("Basic decoration out of range.");
+		if (!(index_basic_reward < mc.n_edge_decorations)) throw std::out_of_range("Basic reward out of range.");
+		if (!(index_destination_reward < mc.n_edge_decorations)) throw std::out_of_range("Destination reward out of range.");
+		if (!(index_basic_decoration < mc.n_node_decorations)) throw std::out_of_range("Basic decoration out of range.");
 		for (auto it{ mc.forward_transitions.begin() }; it != mc.forward_transitions.end(); ++it) {
 			for (auto jt{ it->second.begin() }; jt != it->second.end(); ++jt) {
 				double factor{ mc.states.at(jt->first).decorations[index_basic_decoration]
-					+ jt->second->rewards[index_basic_reward]
+					+ jt->second->decorations[index_basic_reward]
 					- mc.states.at(it->first).decorations[index_basic_decoration]
 				};
-				jt->second->rewards[index_destination_reward] = factor * factor;
+				jt->second->decorations[index_destination_reward] = factor * factor;
 			}
 		}
 	}
 
 	static void calculate_covariance_reward(mc_type& mc, std::size_t index_basic_reward_1, std::size_t index_basic_reward_2, std::size_t index_basic_decoration_1, std::size_t index_basic_decoration_2, std::size_t index_destination_reward) {
-		if (!(index_basic_reward_1 < mc.n_rewards)) throw std::out_of_range("Basic reward out of range.");
-		if (!(index_basic_reward_2 < mc.n_rewards)) throw std::out_of_range("Basic reward out of range.");
-		if (!(index_destination_reward < mc.n_rewards)) throw std::out_of_range("Destination reward out of range.");
-		if (!(index_basic_decoration_1 < mc.n_decorations)) throw std::out_of_range("Basic decoration out of range.");
-		if (!(index_basic_decoration_2 < mc.n_decorations)) throw std::out_of_range("Basic decoration out of range.");
+		if (!(index_basic_reward_1 < mc.n_edge_decorations)) throw std::out_of_range("Basic reward out of range.");
+		if (!(index_basic_reward_2 < mc.n_edge_decorations)) throw std::out_of_range("Basic reward out of range.");
+		if (!(index_destination_reward < mc.n_edge_decorations)) throw std::out_of_range("Destination reward out of range.");
+		if (!(index_basic_decoration_1 < mc.n_node_decorations)) throw std::out_of_range("Basic decoration out of range.");
+		if (!(index_basic_decoration_2 < mc.n_node_decorations)) throw std::out_of_range("Basic decoration out of range.");
 		for (auto it{ mc.forward_transitions.begin() }; it != mc.forward_transitions.end(); ++it) {
 			for (auto jt{ it->second.begin() }; jt != it->second.end(); ++jt) {
 				double factor1{
 					mc.states.at(jt->first).decorations[index_basic_decoration_1]
-					+ jt->second->rewards[index_basic_reward_1]
+					+ jt->second->decorations[index_basic_reward_1]
 					- mc.states.at(it->first).decorations[index_basic_decoration_1]
 				};
 				double factor2{
 					mc.states.at(jt->first).decorations[index_basic_decoration_2]
-					+ jt->second->rewards[index_basic_reward_2]
+					+ jt->second->decorations[index_basic_reward_2]
 					- mc.states.at(it->first).decorations[index_basic_decoration_2]
 				};
-				jt->second->rewards[index_destination_reward] = factor1 * factor2;
+				jt->second->decorations[index_destination_reward] = factor1 * factor2;
 			}
 		}
 	}

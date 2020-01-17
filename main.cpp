@@ -48,7 +48,7 @@ void cli(std::istream& commands, global& g) {
 	const auto write_gmc{ "write_gmc" }; //##not impl
 	const auto write_deco{ "write_deco" }; /// ##not impl
 	//cov calc
-	const auto generate_herman{ "generate_herman" }; // id mc, n
+	const auto GENERATE_HERMAN{ "generate_herman" }; // id mc, n
 
 
 	commands.unsetf(std::ios_base::skipws);
@@ -193,7 +193,7 @@ void cli(std::istream& commands, global& g) {
 			continue;
 		}
 
-		if (instruction == generate_herman) { // id mc, n, target_set_id
+		if (instruction == GENERATE_HERMAN) { // id mc, n, target_set_id
 			if (items.size() != 4) throw std::invalid_argument("Wrong number of parameters.");
 			std::size_t mc_id{ 0 }, target_set_id{ 0 };
 			unsigned long size{ 0 };
@@ -205,7 +205,7 @@ void cli(std::istream& commands, global& g) {
 			catch (...) { throw std::invalid_argument("Could not parse parameter"); }
 			if (g.markov_chains[mc_id] == nullptr) throw std::logic_error("No mc with given ID");
 		
-			auto time = generate_herman_f(*g.markov_chains[mc_id], size,g.target_sets[target_set_id]);
+			auto time = generate_herman(*g.markov_chains[mc_id], size,g.target_sets[target_set_id]);
 			printDuration(time);
 			continue;
 		}
