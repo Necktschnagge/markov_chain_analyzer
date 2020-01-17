@@ -3,7 +3,6 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <istream>
-#include "bijective_unordered_map.h"
 #include <regex>
 
 #include "regxc.h"
