@@ -13,7 +13,7 @@
       "variables": [
         {
           "name": "Boost_INCLUDE_DIR",
-          "value": "Boost_INCLUDE_DIR-NOTFOUND",
+          "value": "C:\\Program Files\\boost\\boost_1_71_0\\boost",
           "type": "PATH"
         },
         {
