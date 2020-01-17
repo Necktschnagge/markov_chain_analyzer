@@ -25,7 +25,7 @@ add_executable(MC_Analyzer
 	markov_chain.h
 	)
 	
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MC_ANALYZER)
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MC_Analyzer)
 
 #add_executable(MC_Analyzer )
 
