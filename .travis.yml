@@ -16,6 +16,7 @@ addons:
       - g++-8
       - cmake
       - libboost-all-dev
+      - doxygen
       
 
 script:
@@ -27,11 +28,22 @@ script:
     - cmake --version
     - git clone 'https://github.com/ddemidov/amgcl.git' '../amgcl/'
     - ls ..
+# build project
     - mkdir cmake-build
     - cd cmake-build
     - echo Create Project...
     - cmake -DCMAKE_RULE_MESSAGES:BOOL=OFF -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ..
     - echo Build Project...
     - cmake --build .
+    - cd ..
+# build doxymentation
+    -doxygen Doxyfile
+
    
-    
+ deploy:
+  provider: pages
+  skip_cleanup: true
+  local_dir: docs/html
+  github_token: $GH_REPO_TOKEN
+  on:
+    branch: old

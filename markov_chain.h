@@ -85,6 +85,7 @@ public:
 		\details Checks whether the markov chain is empty before reading file.
 	*/
 	void read_transitions_from_prism_file(std::istream& transitions) {
+		// TODO ## CHeck sanity
 		if (!transitions.good()) throw std::invalid_argument("Bad stream.");
 		surround_log("Building markov chain from prism transitions file", [&]() {
 			// check for empty
