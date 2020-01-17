@@ -28,7 +28,6 @@ script:
     - cmake --version
     - git clone 'https://github.com/ddemidov/amgcl.git' '../amgcl/'
     - ls ..
-# build project
     - mkdir cmake-build
     - cd cmake-build
     - echo Create Project...
@@ -36,7 +35,6 @@ script:
     - echo Build Project...
     - cmake --build .
     - cd ..
-# build doxymentation
     -doxygen Doxyfile
 
    
