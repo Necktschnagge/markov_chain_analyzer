@@ -24,6 +24,8 @@ bld/
 [Ll]og/
 [Cc]MakeFiles/
 CMakeCache.txt
+html/
+latex/
 
 *.vcxproj
 *.vcxproj.filters
