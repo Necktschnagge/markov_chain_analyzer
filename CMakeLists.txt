@@ -28,7 +28,13 @@ add_executable(MC_Analyzer
 
 #target_include_directories(MC_Analyzer PUBLIC "${PROJECT_BINARY_DIR}")
 #configure_file(ProjectConfig.h.in ProjectConfig.h)
+find_program(THRIFT_COMPILER NAMES thrift thrift.exe HINTS ${THRIFT_COMPILER_ROOT} ${THRIFT_ROOT}/compiler/cpp/bin ${THRIFT_ROOT}/bin ${THRIFT_ROOT}/bin/Release /usr/local /opt/local PATH_SUFFIXES bin bin64)
 
+   exec_program(${THRIFT_COMPILER}
+                  ARGS -version 
+                  OUTPUT_VARIABLE __thrift_OUT 
+                  RETURN_VALUE THRIFT_RETURN)
+   message( STATUS "Thrift compiler version: ${__thrift_OUT}" )
 
 TARGET_LINK_LIBRARIES(MC_Analyzer LINK_PUBLIC ${Boost_LIBRARIES} )
 #target_link_libraries(MC_Analyzer Boost::regex)
