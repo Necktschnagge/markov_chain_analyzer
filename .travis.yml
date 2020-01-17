@@ -1,12 +1,11 @@
+os: linux 
 dist: bionic
 sudo: require
 
 language: cpp
-compiler: gcc
-
-#compiler:
-#  - clang
-#  - gcc
+compiler:
+  - clang
+  - gcc
 
 addons:
   apt:
