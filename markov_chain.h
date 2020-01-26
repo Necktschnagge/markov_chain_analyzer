@@ -13,17 +13,24 @@
 #include <chrono>
 #include <sstream>
 
-template <class _RationalT, class _IntegralT = unsigned long>
+/**
+	\brief Represents a morkov chain by storing edges with probabilities, with the possibility to store edge and state decorations.
+*/
+template <class _RationalT, class _IntegralT = unsigned long>// ##remove default!
 class markov_chain
 {
 public:
+	/** \brief Type to store probabilities, edge-wise decorations (rewards) and state-wise decorations. */
 	using rational_type = _RationalT;
+	/** \brief Type to enumerate states. */
 	using integral_type = _IntegralT;
 
 private:
 
+	/** \biref This is the regex iterator for internal use. Always use boost::regex rather than  std::regex. */
 	using regex_iterator = boost::regex_iterator<std::string::const_iterator>;
 
+	/** \brief Structure for storing one edge (markov chain transition). */
 	struct edge {
 		_RationalT probability;
 		std::vector<_RationalT> decorations;
@@ -31,17 +38,38 @@ private:
 		edge(const _RationalT& probability, std::size_t n_edge_decorations) : probability(probability), decorations(n_edge_decorations, 0) {}
 	};
 
+	/** \brief Structure for storing one node (markov chain state). */
 	struct node {
 		std::vector<_RationalT> decorations;
 
 		node(std::size_t n_node_decorations) : decorations(n_node_decorations, 0) {}
 	};
 
-	std::size_t n_edge_decorations; // number of rational_type values for each edge (i.e. markov chain transition)
-	std::size_t n_node_decorations; // number of rational_type decorations for each node (i.e. markov chain state)
+	/** \brief Number of decoration values of rational_type for each edge (i.e. markov chain transition).
+		\details For achieving better access performance vectors in all edges are requried to have this size.
+	*/
+	std::size_t n_edge_decorations; 
+	/** \brief Number of decoration values of rational_type for each node (i.e. markov chain state).
+		\details For achieving better access performance vectors in all nodes are requried to have this size.
+	*/
+	std::size_t n_node_decorations;
 
+	/**
+		\brief Map to access transitions partitioned after first node.
+		\details Use semantics forward_transitions[from][to] to get a pointer to the desired edge.
+		When adding new edges, it is required to keep forward_transitions and inverse_transitions consistent.
+	*/
 	std::unordered_map<_IntegralT, std::unordered_map<_IntegralT, edge*>> forward_transitions;
+	/**
+		\brief Map to access transitions partitioned after second node.
+		\details Use semantics forward_transitions[to][from] to get a pointer to the desired edge.
+		When adding new edges, it is required to keep forward_transitions and inverse_transitions consistent.
+	*/
 	std::unordered_map<_IntegralT, std::unordered_map<_IntegralT, edge*>> inverse_transitions;
+
+	/**
+		\brief Maps state id to associated node object containing decorations.
+	*/
 	std::unordered_map<_IntegralT, node> states;
 
 	/**
