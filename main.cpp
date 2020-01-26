@@ -1,7 +1,6 @@
 // grosser_beleg.cpp : Diese Datei enthält die Funktion "main". Hier beginnt und endet die Ausführung des Programms.
 //
 
-#include "pch.h"
 #include "markov_chain.h"
 #include "intset.h"
 #include "mc_analyzer.h"

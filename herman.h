@@ -5,7 +5,13 @@
 #include <chrono>
 
 
-std::chrono::nanoseconds generate_herman(markov_chain<double>& mc, unsigned int size, std::unique_ptr<std::unordered_set<unsigned long>>& target_set) {
+/**
+	@brief Takes an empty markov chain object and creates transitions for herman's self-stabilizing algorithm.
+	@param mc The markov chain object to modify.
+	@param 
+*/
+template<class _Rationals, class _Integers>
+std::chrono::nanoseconds generate_herman(markov_chain<_Rationals,_Integers>& mc, unsigned int size, std::unique_ptr<std::unordered_set<unsigned long>>& target_set) {
 	// Check constraints:
 	if (!(size % 2)) throw std::invalid_argument("Size of herman must be odd.");
 	if (size > 63) throw std::invalid_argument("Size of herman must not be greater than 63.");

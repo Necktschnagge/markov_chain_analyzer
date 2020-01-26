@@ -19,12 +19,12 @@ add_executable(MC_Analyzer
 	main.cpp
 	
 	herman.h
-	loghelper.h
-	regxc.h
 	intset.h
-	
 	loghelper.h
 	markov_chain.h
+	mc_analyzer.h
+	mc_calc.h
+	regxc.h
 	)
 	
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MC_Analyzer)

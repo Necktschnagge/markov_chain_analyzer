@@ -14,78 +14,78 @@
 #include <sstream>
 
 /**
-	\brief Represents a morkov chain by storing edges with probabilities, with the possibility to store edge and state decorations.
+	@brief Represents a morkov chain by storing edges with probabilities, with the possibility to store edge and state decorations.
 */
 template <class _RationalT, class _IntegralT = unsigned long>// ##remove default!
 class markov_chain
 {
 public:
-	/** \brief Type to store probabilities, edge-wise decorations (rewards) and state-wise decorations. */
+	/// @brief Type to store probabilities, edge-wise decorations (rewards) and state-wise decorations.
 	using rational_type = _RationalT;
-	/** \brief Type to enumerate states. */
+	/// @brief Type to enumerate states.
 	using integral_type = _IntegralT;
 
 private:
 
-	/** \biref This is the regex iterator for internal use. Always use boost::regex rather than  std::regex. */
+	/// @brief This is the regex iterator for internal use. Always use boost::regex rather than  std::regex.
 	using regex_iterator = boost::regex_iterator<std::string::const_iterator>;
 
-	/** \brief Structure for storing one edge (markov chain transition). */
+	/// @brief Structure for storing one edge (markov chain transition).
 	struct edge {
 		_RationalT probability;
 		std::vector<_RationalT> decorations;
 
-		edge(const _RationalT& probability, std::size_t n_edge_decorations) : probability(probability), decorations(n_edge_decorations, 0) {}
+		edge(const _RationalT& probability, const std::size_t& n_edge_decorations) : probability(probability), decorations(n_edge_decorations, 0) {}
 	};
 
-	/** \brief Structure for storing one node (markov chain state). */
+	/// @brief Structure for storing one node (markov chain state).
 	struct node {
 		std::vector<_RationalT> decorations;
 
-		node(std::size_t n_node_decorations) : decorations(n_node_decorations, 0) {}
+		node(const std::size_t& n_node_decorations) : decorations(n_node_decorations, 0) {}
 	};
 
-	/** \brief Number of decoration values of rational_type for each edge (i.e. markov chain transition).
-		\details For achieving better access performance vectors in all edges are requried to have this size.
+	/** @brief Number of decoration values of rational_type for each edge (i.e. markov chain transition).
+		@details For achieving better access performance vectors in all edges are requried to have this size.
 	*/
-	std::size_t n_edge_decorations; 
-	/** \brief Number of decoration values of rational_type for each node (i.e. markov chain state).
-		\details For achieving better access performance vectors in all nodes are requried to have this size.
+	std::size_t n_edge_decorations;
+	/** @brief Number of decoration values of rational_type for each node (i.e. markov chain state).
+		@details For achieving better access performance vectors in all nodes are requried to have this size.
 	*/
 	std::size_t n_node_decorations;
 
 	/**
-		\brief Map to access transitions partitioned after first node.
-		\details Use semantics forward_transitions[from][to] to get a pointer to the desired edge.
-		When adding new edges, it is required to keep forward_transitions and inverse_transitions consistent.
+		@brief Map to access transitions partitioned after first node.
+		@details Use semantics \a forward_transitions[from][to] to get a pointer to the desired edge.
+		When adding new edges, it is required to keep \a forward_transitions and \a inverse_transitions consistent.
 	*/
 	std::unordered_map<_IntegralT, std::unordered_map<_IntegralT, edge*>> forward_transitions;
 	/**
-		\brief Map to access transitions partitioned after second node.
-		\details Use semantics forward_transitions[to][from] to get a pointer to the desired edge.
-		When adding new edges, it is required to keep forward_transitions and inverse_transitions consistent.
+		@brief Map to access transitions partitioned after second node.
+		@details Use semantics \a forward_transitions[to][from] to get a pointer to the desired edge.
+		When adding new edges, it is required to keep \a forward_transitions and \a inverse_transitions consistent.
 	*/
 	std::unordered_map<_IntegralT, std::unordered_map<_IntegralT, edge*>> inverse_transitions;
 
-	/**
-		\brief Maps state id to associated node object containing decorations.
-	*/
+	/// @brief Maps state id to associated node object containing decorations.
 	std::unordered_map<_IntegralT, node> states;
 
 	/**
-		\brief Initializes a state with a decoration vector containing zeros. If the state with given ID is already intialized, nothing happens.
+		@brief Initializes a state with a decoration vector containing zeros.
+		@details The node's decoration vector uses size defined by \a n_node_decorations.
+		If the state with given ID is already intialized, nothing happens.
 	*/
 	inline void init_state(const _IntegralT& id) {
-		states.emplace(id, n_node_decorations);
+		states.emplace(id, n_node_decorations); // emplace does nothing if id already exists
 	}
 
 public:
 
 	/**
-	\brief Creates an empty markov chain.
-	@details Memory will be allocated for given number of node (state) decorations and edge (transition) decorations.
+		@brief Creates an empty markov chain.
+		@details Memory will be allocated for given number of node (state) decorations and edge (transition) decorations.
 	*/
-	markov_chain(std::size_t n_edge_decorations, std::size_t n_node_decorations) : 
+	markov_chain(const std::size_t& n_edge_decorations, const std::size_t& n_node_decorations) noexcept :
 		n_edge_decorations(n_edge_decorations),
 		n_node_decorations(n_node_decorations),
 		forward_transitions(),
@@ -94,142 +94,151 @@ public:
 	{
 	}
 
-	/**
-	 \brief Returns true if and only if there are no states and no transitions.
-	*/
-	bool empty() const {
-		return forward_transitions.empty() && states.empty();
+	/// @brief Returns true if and only if there are no states and no transitions.
+	bool empty() const noexcept {
+		// Consistency implies that both transition operands are the same:
+		return forward_transitions.empty() && inverse_transitions.empty() && states.empty();
 	}
 
-	/**
-		\brief Returns the number of states in the markov chain.
-	*/
-	auto size_states() const -> decltype(states.size()) {
+	/// @brief Returns the number of states in the markov chain.
+	auto size_states() const noexcept -> decltype(states.size()) {
 		return states.size();
 	}
 
-	/** 
-		\brief Reads a prism transitions file to build up a markov chain.
-		\details Checks whether the markov chain is empty before reading file.
+	/**
+		@brief Reads a prism transitions file to build up a markov chain.
+		@details The markov chain must be empty before reading file.
+		@exception std::invalid_argument Bad stream.
+		@exception std::logic_error Forbidden to read transitions from file if markov chain is not empty.
+		@exception std::invalid_argument The input is maleformed.
+		@exception std::logic_error Could not find end of the header line.
+		@expetion std::logic_error Could not find number of states in header line.
+		@exception std::logic_error Could not find number of transitions in header line.
+		@details some excpetions not yet documented. ###
 	*/
 	void read_transitions_from_prism_file(std::istream& transitions) {
-		// TODO ## CHeck sanity
+		auto d = make_surr_log("Building markov chain from prism transitions file");
 		if (!transitions.good()) throw std::invalid_argument("Bad stream.");
-		surround_log("Building markov chain from prism transitions file", [&]() {
-			// check for empty
-			if (!empty()) throw std::logic_error("Forbidden to read transitions from file if markov chain is not empty.");
+		if (!empty()) throw std::logic_error("Forbidden to read transitions from file if markov chain is not empty.");
 
-			// read input to string
-			transitions.unsetf(std::ios_base::skipws); // also recognize new lines and spaces
-			const auto input_s{ std::string(std::istream_iterator<char>(transitions),std::istream_iterator<char>()) };
+		// Read the whole input into a string
+		transitions.unsetf(std::ios_base::skipws); // also recognize new lines and spaces
+		const auto input_s{ std::string(std::istream_iterator<char>(transitions),std::istream_iterator<char>()) };
 
-			// check overall file format
-			const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) };
-			std::cout << "Check for well-formed file format: " << interprete_bool_n(valid_file_format);
-			if (!valid_file_format) throw std::invalid_argument("The file is not well-formed.");
+		// check overall file format
+		const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) };
+		std::cout << "Check for well-formed file format: " << interprete_bool_n(valid_file_format);
+		if (!valid_file_format) throw std::invalid_argument("The input is maleformed.");
 
-			// find end of header line
-			const auto regx_it_prism_header_transitions{ regex_iterator(input_s.cbegin(),input_s.cend(),regxc::prism_header) };
-			const auto exists_header_line{ regx_it_prism_header_transitions != regex_iterator() };
-			if (!exists_header_line) throw std::logic_error("Could not find end of the header line.");
-			const std::string::const_iterator transitions_header_begin{ regx_it_prism_header_transitions->operator[](0).first };
-			const std::string::const_iterator transitions_header_end{ regx_it_prism_header_transitions->operator[](0).second };
+		// find end of header line
+		const auto regx_it_prism_header_transitions{ regex_iterator(input_s.cbegin(),input_s.cend(),regxc::prism_header) };
+		const auto exists_header_line{ regx_it_prism_header_transitions != regex_iterator() };
+		if (!exists_header_line) throw std::logic_error("Could not find end of the header line.");
+		const std::string::const_iterator transitions_header_begin{ regx_it_prism_header_transitions->operator[](0).first };
+		const std::string::const_iterator transitions_header_end{ regx_it_prism_header_transitions->operator[](0).second };
 
-			// store number of states and number of transitions
-			// do the same also for the rewards fiel!!!!!#####
-			regex_iterator header_iterator{ regex_iterator(transitions_header_begin, transitions_header_end, regxc::nonnegative_integer) };
-			auto s = std::string(transitions_header_begin, transitions_header_end);
-			if (header_iterator == regex_iterator()) throw std::logic_error("Could not find number of states in header line.");
-			unsigned long count_states{ std::stoul(header_iterator->str()) };
-			++header_iterator;
-			if (header_iterator == regex_iterator()) throw std::logic_error("Could not find number of transitions in header line.");
-			unsigned long count_transitions{ std::stoul(header_iterator->str()) };
+		// store number of states and number of transitions
+		regex_iterator header_iterator{ regex_iterator(transitions_header_begin, transitions_header_end, regxc::nonnegative_integer) };
+		auto s = std::string(transitions_header_begin, transitions_header_end);
+		if (header_iterator == regex_iterator()) throw std::logic_error("Could not find number of states in header line.");
+		const auto n_states{ std::stoull(header_iterator->str()) };
+		++header_iterator;
+		if (header_iterator == regex_iterator()) throw std::logic_error("Could not find number of transitions in header line.");
+		const auto n_transitions{ std::stoull(header_iterator->str()) };
+		//using c = std::remove_const<decltype(n_transitions)>::type;
+		std::size_t count_transitions{ 0 }; //### use type c!
 
+		// iterate all lines that define edges of the markov chain
+		for (auto it = regex_iterator(transitions_header_end, input_s.cend(), regxc::prism_value_line); it != regex_iterator(); ++it) {
+			auto jt = regex_iterator(it->operator[](0).first, it->operator[](0).second, regxc::nn_float);
+			const auto wrong_number{ "Found a transition line which does not contain exactly 3 numbers." };
 
-			// iterate all lines that define edges of the markov chain
-			for (auto it = regex_iterator(transitions_header_end, input_s.cend(), regxc::prism_value_line); it != regex_iterator(); ++it) {
-				auto jt = regex_iterator(it->operator[](0).first, it->operator[](0).second, regxc::nn_float);
-				const auto wrong_number{ "Found a transition line which does not contain exactly 3 numbers." };
+			if (jt == regex_iterator()) throw std::invalid_argument(wrong_number);
+			const auto from{ std::stoull(jt->str(0)) };
 
-				if (jt == regex_iterator()) throw std::invalid_argument(wrong_number);
-				const unsigned long from{ std::stoul(jt->str(0)) }; //hardcoded type for cast!!!#### // also check that it is an int literal?, same case in rewards function
+			++jt;
+			if (jt == regex_iterator()) throw std::invalid_argument(wrong_number);
+			const auto to{ std::stoull(jt->str(0)) };
 
-				++jt;
-				if (jt == regex_iterator()) throw std::invalid_argument(wrong_number);
-				const unsigned long to{ std::stoul(jt->str(0)) };
+			++jt;
+			if (jt == regex_iterator()) throw std::invalid_argument(wrong_number);
+			const double probability{ std::stod(jt->str(0)) };
 
-				++jt;
-				if (jt == regex_iterator()) throw std::invalid_argument(wrong_number);
-				const double probability{ std::stod(jt->str(0)) };
+			++jt;
+			if (jt != regex_iterator()) throw std::invalid_argument(wrong_number);
 
-				++jt;
-				if (jt != regex_iterator()) throw std::invalid_argument(wrong_number);
+			if (forward_transitions[from].find(to) != forward_transitions[from].end())
+				throw std::invalid_argument("Trying to add a transition that already exists.");
 
-				if (forward_transitions[from].find(to) != forward_transitions[from].end())
-					throw std::invalid_argument("Trying to add a transition that already exists.");
+			//## cast prob here!! We need custom striung to int/double in case someone chooses custom types.
+			auto ptr{ new edge(probability, n_edge_decorations) };
+			inverse_transitions[to][from] = forward_transitions[from][to] = ptr;
+			++count_transitions;
 
-				auto ptr{ new edge(probability, n_edge_decorations) }; //##!! cast prob here!!
-				inverse_transitions[to][from] = forward_transitions[from][to] = ptr;
-
-				init_state(from);
-				init_state(to);
-			}
-			if (empty()) std::cout << "WARNING: Created markov chain is still empty.\n";
-			if (count_states != states.size()) std::cout << "WARNING: Number of states in header line is wrong.\n";
-			// check also number of transitions.##
-			});
+			init_state(from);
+			init_state(to);
+		}
+		if (empty()) std::cout << "WARNING: Created markov chain is still empty.\n";
+		if (n_states != states.size())
+			std::cout << "WARNING: Number of states in header line is wrong.\n";
+		if (n_transitions != count_transitions)
+			std::cout << "WARNING: Number of transitions in header line is wrong.\n";
 	}
 
-	/** Reads a prism rewards file to build up a markov chain.
-	@details Checks whether the markov chain has all the transitions that rewards are defined for in given file. */
-	void read_rewards_from_prism_file(std::istream& rewards, std::size_t index_of_reward = 0) {
+	/**
+		@brief Reads a prism rewards file to build up a markov chain.
+		@details Checks whether the markov chain has all the transitions that rewards are defined for in given file.
+		@details Not all exceptions deocumented yet ###
+	*/
+	void read_rewards_from_prism_file(std::istream& rewards, const std::size_t& index_of_reward = 0) {
 		if (!rewards.good()) throw std::invalid_argument("Bad stream.");
 		if (!(index_of_reward < n_edge_decorations)) throw std::logic_error("Markov chain has not enough space for rewards. You need to specify number of rewards at construction. Adding more rewards dynamically is not yet implemented.");
-		surround_log("Adding rewards to markov chain, reading from prism rewards file", [&]() {
-			// read input to string
-			rewards.unsetf(std::ios_base::skipws);
-			const auto input_s{ std::string(std::istream_iterator<char>(rewards),std::istream_iterator<char>()) };
+		auto d = make_surr_log("Adding rewards to markov chain, reading from prism rewards file");
+		// read input to string
+		rewards.unsetf(std::ios_base::skipws);
+		const auto input_s{ std::string(std::istream_iterator<char>(rewards),std::istream_iterator<char>()) };
 
-			// check overall file format
-			const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) };
-			std::cout << "Check for well-formed file format: " << interprete_bool_n(valid_file_format);
-			if (!valid_file_format) throw std::invalid_argument("The file is not well-formed.");
+		// check overall file format
+		const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) };
+		std::cout << "Check for well-formed file format: " << interprete_bool_n(valid_file_format);
+		if (!valid_file_format) throw std::invalid_argument("The file is not well-formed.");
 
-			// find end of header line
-			const auto regx_it_prism_header_rewards{ regex_iterator(input_s.cbegin(),input_s.cend(),regxc::prism_header) };
-			const auto exists_header_line{ regx_it_prism_header_rewards != regex_iterator() };
-			if (!exists_header_line) throw std::logic_error("Could not find end of the header line.");
-			std::string::const_iterator rewards_header_end{ regx_it_prism_header_rewards->operator[](0).second };
+		// find end of header line
+		const auto regx_it_prism_header_rewards{ regex_iterator(input_s.cbegin(),input_s.cend(),regxc::prism_header) };
+		const auto exists_header_line{ regx_it_prism_header_rewards != regex_iterator() };
+		if (!exists_header_line) throw std::logic_error("Could not find end of the header line.");
+		std::string::const_iterator rewards_header_end{ regx_it_prism_header_rewards->operator[](0).second };
 
-			// iterate all lines that define rewards of the markov chain
-			for (auto it = regex_iterator(rewards_header_end, input_s.cend(), regxc::prism_value_line); it != regex_iterator(); ++it) {
-				auto jt = regex_iterator(it->operator[](0).first, it->operator[](0).second, regxc::nn_float);
-				const auto wrong_number{ "Found a reward line which does not contain exactly 3 numbers." };
+		// iterate all lines that define rewards of the markov chain
+		for (auto it = regex_iterator(rewards_header_end, input_s.cend(), regxc::prism_value_line); it != regex_iterator(); ++it) {
+			auto jt = regex_iterator(it->operator[](0).first, it->operator[](0).second, regxc::nn_float);
+			const auto wrong_number{ "Found a reward line which does not contain exactly 3 numbers." };
 
-				if (jt == regex_iterator()) throw std::invalid_argument(wrong_number);
-				const unsigned long from{ std::stoul(jt->str(0)) };
+			if (jt == regex_iterator()) throw std::invalid_argument(wrong_number);
+			const unsigned long from{ std::stoul(jt->str(0)) };
 
-				++jt;
-				if (jt == regex_iterator()) throw std::invalid_argument(wrong_number);
-				unsigned long to{ std::stoul(jt->str(0)) };
+			++jt;
+			if (jt == regex_iterator()) throw std::invalid_argument(wrong_number);
+			unsigned long to{ std::stoul(jt->str(0)) };
 
-				++jt;
-				if (jt == regex_iterator()) throw std::invalid_argument(wrong_number);
-				double reward{ std::stod(jt->str(0)) };
+			++jt;
+			if (jt == regex_iterator()) throw std::invalid_argument(wrong_number);
+			double reward{ std::stod(jt->str(0)) };
 
-				++jt;
-				if (jt != regex_iterator()) throw std::invalid_argument(wrong_number);
+			++jt;
+			if (jt != regex_iterator()) throw std::invalid_argument(wrong_number);
 
-				if (forward_transitions[from].find(to) == forward_transitions[from].end())
-					throw std::invalid_argument("File defines reward for some non-existent edge.");
+			if (forward_transitions[from].find(to) == forward_transitions[from].end())
+				throw std::invalid_argument("File defines reward for some non-existent edge.");
 
-				if (forward_transitions[from][to]->decorations[index_of_reward])
-					std::cout << "WARNING: Reward gets replaced.\n";
-				forward_transitions[from][to]->decorations[index_of_reward] = reward; //##!! cast here!!
-				// attention: requires each edge to appear once
-			}
-			});
+			if (forward_transitions[from][to]->decorations[index_of_reward])
+				std::cout << "WARNING: Reward gets replaced.\n";
+			forward_transitions[from][to]->decorations[index_of_reward] = reward; //##!! cast here!!
+			// attention: requires each edge to appear once
+		}
 	}
+
+	//### sanity check for probabilitiy functions
 
 	void read_from_gmc_file(std::istream& input) {
 		/// rename all identifiers here!
@@ -237,10 +246,10 @@ public:
 		if (!input.good()) throw std::invalid_argument("Bad stream.");
 		test_file_stream.unsetf(std::ios_base::skipws); // also recognize new lines and spaces
 		surround_log("Building markov chain from gmc file", [&]() {
-		
-			//rebname::
+
+			//rename::
 			const auto test_file_string{ std::string(std::istream_iterator<char>(static_cast<std::istream&>(test_file_stream)),std::istream_iterator<char>()) };
-			
+
 			// describing formal "general markov chain"
 			const auto gmc_s_new_line{ regex_strings::new_line };
 			const auto gmc_s_irgnored_line{ regex_strings::native_ignored };
@@ -258,7 +267,7 @@ public:
 			if (std::distance(regx_it_semantics_definition, regex_iterator()) != 1) throw std::invalid_argument("Syntax error: did not find exactly one semantics defintion.");
 			std::string::const_iterator semantics_definition_begin{ regx_it_semantics_definition->operator[](0).first };
 			std::string::const_iterator semantics_definition_end{ regx_it_semantics_definition->operator[](0).second };
-			
+
 			// Extract column names:
 			auto column_names_vector{ std::vector<std::pair<std::string::const_iterator,std::string::const_iterator>>() };
 			for (auto col_name_it{ regex_iterator(semantics_definition_begin, semantics_definition_end, regxc::gmc_column_name) };
@@ -273,14 +282,14 @@ public:
 			const auto sfrom{ std::string("$from") };
 			const auto sto{ std::string("$to") };
 			const auto sprob{ std::string("$prob") };
-			
+
 			std::vector<std::string> cnv;
 			std::transform(column_names_vector.cbegin(), column_names_vector.cend(), std::back_inserter(cnv), [](auto pair) {return std::string(pair.first, pair.second); });
-			
+
 			const auto cfrom{ std::find(cnv.cbegin(), cnv.cend(), sfrom) };
 			const auto cto{ std::find(cnv.cbegin(), cnv.cend(), sto) };
 			const auto cprob{ std::find(cnv.cbegin(), cnv.cend(), sprob) };
-			
+
 			if (cfrom == cnv.cend()) throw std::invalid_argument("No $from column");
 			if (cto == cnv.cend()) throw std::invalid_argument("No $to column");
 			if (cprob == cnv.cend()) throw std::invalid_argument("No $prob column");
@@ -292,7 +301,7 @@ public:
 
 			throw std::logic_error("Not yet fully implemented.");
 			// from here on recheck the code!
-			
+
 			//check all other lines for being in right format (wellformed body)
 			const auto gmc_s_value_format{ std::string(R"([+-]?([0-9]*[.])?[0-9]+)") };
 			const auto gmc_s_separator{ std::string(R"(\s*,\s*)") };
@@ -303,7 +312,7 @@ public:
 				for (std::size_t i = 0; i < column_names_vector.size() - 1; ++i) (result += gmc_s_value_format) += gmc_s_separator;
 				return result += gmc_s_value_format;
 			}() };
-			
+
 			const auto gmc_value_definition_body{ boost::regex(
 				std::string("((") + gmc_s_irgnored_line + "|" + gmc_s_value_definition_line + ")?(" + gmc_s_new_line + "|$))*"
 			) };
@@ -314,19 +323,19 @@ public:
 
 			//read all lines of body:
 			if (!empty()) throw std::logic_error("Forbidden to read transitions from file if markov chain is not empty.");
-			
+
 			for (
 				auto def_line_it{ regex_iterator(semantics_definition_end, test_file_string.cend(), boost::regex(gmc_s_value_definition_line)) };
 				def_line_it != regex_iterator();
 				++def_line_it) {
-				
+
 				// for each line defining some edge
-				std::vector<std::string> row_items; 
+				std::vector<std::string> row_items;
 				const std::string line{ def_line_it->str() };
 				boost::split(row_items, line, boost::is_any_of(",")); // split the line at the commata
 				if (row_items.size() != cnv.size()) throw std::logic_error("This should be already catched by regex match.");
 				for (auto& item : row_items) item = boost::regex_replace(item, boost::regex("\\s"), "");
-				
+
 				unsigned long from{ 0 }, to{ 0 };
 				_RationalT p{ 0 };
 				try {
@@ -335,8 +344,8 @@ public:
 					p = std::stod(row_items[pprob]);
 
 					//create edge:
-					auto e = new edge(p,n_edge_decorations);
-					
+					auto e = new edge(p, n_edge_decorations);
+
 					// check if edge alr4eady exists!!!
 					forward_transitions[from][to] = e;
 					inverse_transitions[to][from] = e;
@@ -346,7 +355,7 @@ public:
 					//set rewards
 					for (std::size_t i = 0; i < cnv.size(); ++i) {
 						if (ppositions.find(i) != ppositions.cend()) continue;
-						std::size_t reward_index{ std::stoull(cnv[i])};
+						std::size_t reward_index{ std::stoull(cnv[i]) };
 						double reward{ std::stod(row_items[i]) };
 						e->decorations.at(reward_index) = reward;
 					}
@@ -354,9 +363,9 @@ public:
 				catch (...) {
 					throw std::invalid_argument("Could not read some parameter");
 				}
-				
+
 			}
-		
+
 			});
 	}
 
@@ -382,6 +391,7 @@ public:
 	template<class A, class B>
 	friend class mc_analyzer;
 
-	friend std::chrono::nanoseconds generate_herman(markov_chain<double>& mc, unsigned int size, std::unique_ptr<std::unordered_set<unsigned long>>& target_set);
+	template<class _Rationals, class _Integers>
+	friend std::chrono::nanoseconds generate_herman(markov_chain<_Rationals,_Integers>& mc, unsigned int size, std::unique_ptr<std::unordered_set<unsigned long>>& target_set);
 };
 
