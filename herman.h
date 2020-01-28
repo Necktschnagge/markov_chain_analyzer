@@ -25,6 +25,7 @@ template<class _Rationals, class _Integers, class _Set, bool disable_checks = fa
 std::chrono::nanoseconds generate_herman(markov_chain<_Rationals, _Integers>& mc, const _Integers& size, std::unique_ptr<_Set>& target_set) {
 	//### get rid of unique ptr ? // -> then make unique must be replace set must be cleared.
 
+	using mc_type = markov_chain<_Rationals, _Integers>;
 	const _Integers INT1{ 1 };
 
 	// Compile-time checks:
@@ -56,7 +57,7 @@ std::chrono::nanoseconds generate_herman(markov_chain<_Rationals, _Integers>& mc
 	}
 
 	// Store timepoint:
-	std::chrono::steady_clock::time_point before_ns{ std::chrono::steady_clock::now() };
+	std::chrono::steady_clock::time_point time_stamp_before{ std::chrono::steady_clock::now() };
 
 	// Do the actual calculation:
 
@@ -127,20 +128,22 @@ std::chrono::nanoseconds generate_herman(markov_chain<_Rationals, _Integers>& mc
 			bits_for_nondet_positions < INT1 << non_deterministic_positions.size();
 			++bits_for_nondet_positions)
 		{
-			//map bits to the non_deterministic_positions:
+			// Map bits to the non_deterministic_positions:
 			_Integers next_state_copy{ next_state };
 			for (_Integers pos_it{ 0 }; pos_it < non_deterministic_positions.size(); ++pos_it) {
 				bool bit_to_map = (bits_for_nondet_positions & INT1 << pos_it);
-				next_state_copy |= static_cast<unsigned long long>(bit_to_map) << non_deterministic_positions[pos_it];
+				next_state_copy |= _Integers(bit_to_map) << non_deterministic_positions[pos_it];
 			}
-			// create edge:
-			const auto pEdge{ new markov_chain<double>::edge(unique_outgoing_edge_probability, mc.n_edge_decorations) };
+			// Create edge:
+			const auto pEdge{ new mc_type::edge(unique_outgoing_edge_probability, mc.n_edge_decorations) };
 			mc.forward_transitions[state][next_state_copy] = pEdge;
 			mc.inverse_transitions[next_state_copy][state] = pEdge;
-			pEdge->decorations[0] = 1;
+			pEdge->decorations[0] = _Rationals(1);
 		}
 	}
-	auto after_ns{ std::chrono::steady_clock::now() };
-	auto dif = after_ns - before_ns;
-	return dif;
+	
+	// Record time consumption:
+	auto time_stamp_after{ std::chrono::steady_clock::now() };
+	auto difference = time_stamp_after - time_stamp_before;
+	return difference;
 }
