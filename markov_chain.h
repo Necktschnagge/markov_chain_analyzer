@@ -388,10 +388,10 @@ public:
 
 	}
 
-	template<class A, class B>
+	template<class, class>
 	friend class mc_analyzer;
 
-	template<class _Rationals, class _Integers>
-	friend std::chrono::nanoseconds generate_herman(markov_chain<_Rationals,_Integers>& mc, unsigned int size, std::unique_ptr<std::unordered_set<unsigned long>>& target_set);
+	template<class _Rationals, class _Integers, class _Set, bool>
+	friend std::chrono::nanoseconds generate_herman(markov_chain<_Rationals, _Integers>& mc, const _Integers& size, std::unique_ptr<_Set>& target_set);
 };
 

@@ -204,7 +204,7 @@ void cli(std::istream& commands, global& g) {
 			catch (...) { throw std::invalid_argument("Could not parse parameter"); }
 			if (g.markov_chains[mc_id] == nullptr) throw std::logic_error("No mc with given ID");
 		
-			auto time = generate_herman(*g.markov_chains[mc_id], size,g.target_sets[target_set_id]);
+			auto time = generate_herman(*g.markov_chains[mc_id], size, g.target_sets[target_set_id]);
 			printDuration(time);
 			continue;
 		}
