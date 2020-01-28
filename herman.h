@@ -11,23 +11,23 @@
 #include <chrono>
 
 
-/**
-	@brief Takes markov chain object and creates transitions for herman's self-stabilizing algorithm.
-	@details Uses edge decoration (reward) at index 0 to store unique costs of 1 for each transition.
-	@param mc The markov chain object to modify, must be \a markov_chain::empty().
-	@param size The size of the herman problem for which the states and transitions will be created. Must be odd and (_Integers << size) must not exceed limits of _Integers.
-	@exception std::invalid_argument Markov chain must be empty.
-	@exception std::invalid_argument Size of herman must be odd.
-	@exception std::invalid_argument Size of herman is too big for storing all states in _Integers type.
-	// @excpetion std::invalid_argument Decoration 0 needed for target set. ###
-	@exception std::invalid_argument Reward 0 needed for costs.
-*/
+ /**
+	 @brief Takes markov chain object and creates transitions for herman's self-stabilizing algorithm.
+	 @details Uses edge decoration (reward) at index 0 to store unique costs of 1 for each transition.
+	 @param mc The markov chain object to modify, must be \a markov_chain::empty().
+	 @param size The size of the herman problem for which the states and transitions will be created. Must be odd and (_Integers << size) must not exceed limits of _Integers.
+	 @exception std::invalid_argument Markov chain must be empty.
+	 @exception std::invalid_argument Size of herman must be odd.
+	 @exception std::invalid_argument Size of herman is too big for storing all states in _Integers type.
+	 // @excpetion std::invalid_argument Decoration 0 needed for target set. ###
+	 @exception std::invalid_argument Reward 0 needed for costs.
+ */
 template<class _Rationals, class _Integers, class _Set, bool disable_checks = false>
 std::chrono::nanoseconds generate_herman(markov_chain<_Rationals, _Integers>& mc, const _Integers& size, std::unique_ptr<_Set>& target_set) {
 	//### get rid of unique ptr
 
 	// Compile-time checks:
-	static_assert(std::is_same<typename _Set::value_type,_Integers>::value,
+	static_assert(std::is_same<typename _Set::value_type, _Integers>::value,
 		"typename _Set does not agree with typename _Integers. Values in _Set must be of type _Integers");
 
 	// Runtime checks:
@@ -68,36 +68,42 @@ std::chrono::nanoseconds generate_herman(markov_chain<_Rationals, _Integers>& mc
 	}
 
 	// Enumerates all states that are target:
-	const auto enumerator = [&](unsigned int herman_size, auto tell) -> void {
-		const auto helper = [&](unsigned int max_pos, uint64_t node, unsigned int pos, bool option, bool last_bit, auto tell, auto self) -> void {
-			{ // dont use option (to not alter the bit)
-				///debug:
-				bool check = node < 8;
-				bool this_bit{ !last_bit };
-				uint64_t node2 = node | ((1ULL << pos) * this_bit);
-				if (pos == max_pos) {
-					if (!option) tell(node2);
-				}
-				else self(max_pos, node2, pos + 1, option, this_bit, tell, self);
-			}
-			if (option) { // use option
-				bool check = node < 8;
-				const bool& this_bit{ last_bit };
-				node |= (1ULL << pos) * this_bit;
-				bool check2 = node < 8;
-				if (pos == max_pos) {
-					tell(node); // do not check option because option was used in current step.
-				}
-				else self(max_pos, node, pos + 1, false, this_bit, tell, self);
-			}
-		};
-		for (auto x : { true, false }) helper(herman_size - 1, 0, 0, true, x, tell, helper);
+	const auto enumerator = [&](
+		const _Integers& herman_size,
+		auto tell /* Callback function that is used to lof final states: tell(const _Integers&)*/
+		) -> void {
+			const auto helper = [&](
+				const _Integers& max_pos /* max bit position that can be 1*/,
+				_Integers node /* containing bits until pos */,
+				const _Integers& pos /* position tobe considered whether set 0 or 1 */,
+				bool option /* true iff there is still the option to not alter the bit */,
+				bool last_bit /* previous bit */,
+				auto tell /* function to log a final state */,
+				auto self /* ptr to function itself */
+				) -> void {
+					{ // dont use option (to not alter the bit)
+						bool this_bit{ !last_bit };
+						const _Integers node2 = node | ((1ULL << pos) * this_bit);
+						if (pos == max_pos) {
+							if (!option) tell(
+								static_cast<typename std::add_const<decltype(node2)>::type> // just ensure function call on const reference or copy.
+								(node2));
+						}
+						else self(max_pos, node2, pos + 1, option, this_bit, tell, self);
+					}
+					if (option) { // use option (to not alter the bit)
+						const bool& this_bit{ last_bit };
+						node |= (1ULL << pos) * this_bit;
+						if (pos == max_pos) tell(static_cast<typename std::add_const<decltype(node)>::type>(node)); // do not need to check option because option was used in current step.
+						else self(max_pos, node, pos + 1, false, this_bit, tell, self);
+					}
+			};
+			for (auto most_significant_bit : { true, false }) helper(herman_size - 1, 0, 0, true, most_significant_bit, tell, helper);
 	};
 
 	// save target states
 	target_set = std::make_unique<std::unordered_set<unsigned long>>();
-	enumerator(size, [&](uint64_t value) {
-		//mc.states.at(value).decorations[0] = 1;
+	enumerator(size, [&](const _Integers& value) {
 		target_set->insert(value);
 		});
 
