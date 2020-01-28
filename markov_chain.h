@@ -245,128 +245,126 @@ public:
 		auto& test_file_stream{ input };
 		if (!input.good()) throw std::invalid_argument("Bad stream.");
 		test_file_stream.unsetf(std::ios_base::skipws); // also recognize new lines and spaces
-		surround_log("Building markov chain from gmc file", [&]() {
+		auto d = make_surr_log("Building markov chain from gmc file");
 
-			//rename::
-			const auto test_file_string{ std::string(std::istream_iterator<char>(static_cast<std::istream&>(test_file_stream)),std::istream_iterator<char>()) };
+		//rename::
+		const auto test_file_string{ std::string(std::istream_iterator<char>(static_cast<std::istream&>(test_file_stream)),std::istream_iterator<char>()) };
 
-			// describing formal "general markov chain"
-			const auto gmc_s_new_line{ regex_strings::new_line };
-			const auto gmc_s_irgnored_line{ regex_strings::native_ignored };
-			auto gmc_general{ regxc::gmc_general };
+		// describing formal "general markov chain"
+		const auto gmc_s_new_line{ regex_strings::new_line };
+		const auto gmc_s_irgnored_line{ regex_strings::native_ignored };
+		auto gmc_general{ regxc::gmc_general };
 
-			// Check for overall format:
-			if (!boost::regex_match(test_file_string, regxc::gmc_general))
-				throw std::invalid_argument("No valid GENERAL MARKOV CHAIN format");
-			std::cout << "General syntax: okay.\n";
+		// Check for overall format:
+		if (!boost::regex_match(test_file_string, regxc::gmc_general))
+			throw std::invalid_argument("No valid GENERAL MARKOV CHAIN format");
+		std::cout << "General syntax: okay.\n";
 
-			// Locate semantics defintion line:
-			const auto regx_it_semantics_definition{
-				regex_iterator(test_file_string.begin(),test_file_string.end(),regxc::gmc_semantics_definition)
-			};
-			if (std::distance(regx_it_semantics_definition, regex_iterator()) != 1) throw std::invalid_argument("Syntax error: did not find exactly one semantics defintion.");
-			std::string::const_iterator semantics_definition_begin{ regx_it_semantics_definition->operator[](0).first };
-			std::string::const_iterator semantics_definition_end{ regx_it_semantics_definition->operator[](0).second };
+		// Locate semantics defintion line:
+		const auto regx_it_semantics_definition{
+			regex_iterator(test_file_string.begin(),test_file_string.end(),regxc::gmc_semantics_definition)
+		};
+		if (std::distance(regx_it_semantics_definition, regex_iterator()) != 1) throw std::invalid_argument("Syntax error: did not find exactly one semantics defintion.");
+		std::string::const_iterator semantics_definition_begin{ regx_it_semantics_definition->operator[](0).first };
+		std::string::const_iterator semantics_definition_end{ regx_it_semantics_definition->operator[](0).second };
 
-			// Extract column names:
-			auto column_names_vector{ std::vector<std::pair<std::string::const_iterator,std::string::const_iterator>>() };
-			for (auto col_name_it{ regex_iterator(semantics_definition_begin, semantics_definition_end, regxc::gmc_column_name) };
-				col_name_it != regex_iterator(); ++col_name_it) {
-				column_names_vector.emplace_back(col_name_it->operator[](0).first, col_name_it->operator[](0).second);
-			}
-			std::cout << "Column names: " << column_names_vector.size() << std::endl; // necessary? <- and next lines:
-			for (const auto& pair : column_names_vector) {
-				for (auto it = pair.first; it != pair.second; ++it) std::cout << *it;
-				std::cout << "\n";
-			}
-			const auto sfrom{ std::string("$from") };
-			const auto sto{ std::string("$to") };
-			const auto sprob{ std::string("$prob") };
+		// Extract column names:
+		auto column_names_vector{ std::vector<std::pair<std::string::const_iterator,std::string::const_iterator>>() };
+		for (auto col_name_it{ regex_iterator(semantics_definition_begin, semantics_definition_end, regxc::gmc_column_name) };
+			col_name_it != regex_iterator(); ++col_name_it) {
+			column_names_vector.emplace_back(col_name_it->operator[](0).first, col_name_it->operator[](0).second);
+		}
+		std::cout << "Column names: " << column_names_vector.size() << std::endl; // necessary? <- and next lines:
+		for (const auto& pair : column_names_vector) {
+			for (auto it = pair.first; it != pair.second; ++it) std::cout << *it;
+			std::cout << "\n";
+		}
+		const auto sfrom{ std::string("$from") };
+		const auto sto{ std::string("$to") };
+		const auto sprob{ std::string("$prob") };
 
-			std::vector<std::string> cnv;
-			std::transform(column_names_vector.cbegin(), column_names_vector.cend(), std::back_inserter(cnv), [](auto pair) {return std::string(pair.first, pair.second); });
+		std::vector<std::string> cnv;
+		std::transform(column_names_vector.cbegin(), column_names_vector.cend(), std::back_inserter(cnv), [](auto pair) {return std::string(pair.first, pair.second); });
 
-			const auto cfrom{ std::find(cnv.cbegin(), cnv.cend(), sfrom) };
-			const auto cto{ std::find(cnv.cbegin(), cnv.cend(), sto) };
-			const auto cprob{ std::find(cnv.cbegin(), cnv.cend(), sprob) };
+		const auto cfrom{ std::find(cnv.cbegin(), cnv.cend(), sfrom) };
+		const auto cto{ std::find(cnv.cbegin(), cnv.cend(), sto) };
+		const auto cprob{ std::find(cnv.cbegin(), cnv.cend(), sprob) };
 
-			if (cfrom == cnv.cend()) throw std::invalid_argument("No $from column");
-			if (cto == cnv.cend()) throw std::invalid_argument("No $to column");
-			if (cprob == cnv.cend()) throw std::invalid_argument("No $prob column");
+		if (cfrom == cnv.cend()) throw std::invalid_argument("No $from column");
+		if (cto == cnv.cend()) throw std::invalid_argument("No $to column");
+		if (cprob == cnv.cend()) throw std::invalid_argument("No $prob column");
 
-			const std::size_t pfrom = cfrom - cnv.cbegin();
-			const std::size_t pto = cto - cnv.cbegin();
-			const std::size_t pprob = cprob - cnv.cbegin();
-			std::set<std::size_t> ppositions{ pfrom, pto, pprob };
+		const std::size_t pfrom = cfrom - cnv.cbegin();
+		const std::size_t pto = cto - cnv.cbegin();
+		const std::size_t pprob = cprob - cnv.cbegin();
+		std::set<std::size_t> ppositions{ pfrom, pto, pprob };
 
-			throw std::logic_error("Not yet fully implemented.");
-			// from here on recheck the code!
+		throw std::logic_error("Not yet fully implemented.");
+		// from here on recheck the code!
 
-			//check all other lines for being in right format (wellformed body)
-			const auto gmc_s_value_format{ std::string(R"([+-]?([0-9]*[.])?[0-9]+)") };
-			const auto gmc_s_separator{ std::string(R"(\s*,\s*)") };
+		//check all other lines for being in right format (wellformed body)
+		const auto gmc_s_value_format{ std::string(R"([+-]?([0-9]*[.])?[0-9]+)") };
+		const auto gmc_s_separator{ std::string(R"(\s*,\s*)") };
 
-			const auto gmc_s_value_definition_line{ [&]() {
-				auto result{ std::string() };
-				result.reserve(gmc_s_separator.size() * (column_names_vector.size() - 1) + gmc_s_value_format.size() * column_names_vector.size() + 1);
-				for (std::size_t i = 0; i < column_names_vector.size() - 1; ++i) (result += gmc_s_value_format) += gmc_s_separator;
-				return result += gmc_s_value_format;
-			}() };
+		const auto gmc_s_value_definition_line{ [&]() {
+			auto result{ std::string() };
+			result.reserve(gmc_s_separator.size() * (column_names_vector.size() - 1) + gmc_s_value_format.size() * column_names_vector.size() + 1);
+			for (std::size_t i = 0; i < column_names_vector.size() - 1; ++i) (result += gmc_s_value_format) += gmc_s_separator;
+			return result += gmc_s_value_format;
+		}() };
 
-			const auto gmc_value_definition_body{ boost::regex(
-				std::string("((") + gmc_s_irgnored_line + "|" + gmc_s_value_definition_line + ")?(" + gmc_s_new_line + "|$))*"
-			) };
+		const auto gmc_value_definition_body{ boost::regex(
+			std::string("((") + gmc_s_irgnored_line + "|" + gmc_s_value_definition_line + ")?(" + gmc_s_new_line + "|$))*"
+		) };
 
-			std::cout << "Check for wellformed body: " <<
-				interprete_bool_n(boost::regex_match(semantics_definition_end, test_file_string.cend(), gmc_value_definition_body));
+		std::cout << "Check for wellformed body: " <<
+			interprete_bool_n(boost::regex_match(semantics_definition_end, test_file_string.cend(), gmc_value_definition_body));
 
 
-			//read all lines of body:
-			if (!empty()) throw std::logic_error("Forbidden to read transitions from file if markov chain is not empty.");
+		//read all lines of body:
+		if (!empty()) throw std::logic_error("Forbidden to read transitions from file if markov chain is not empty.");
 
-			for (
-				auto def_line_it{ regex_iterator(semantics_definition_end, test_file_string.cend(), boost::regex(gmc_s_value_definition_line)) };
-				def_line_it != regex_iterator();
-				++def_line_it) {
+		for (
+			auto def_line_it{ regex_iterator(semantics_definition_end, test_file_string.cend(), boost::regex(gmc_s_value_definition_line)) };
+			def_line_it != regex_iterator();
+			++def_line_it) {
 
-				// for each line defining some edge
-				std::vector<std::string> row_items;
-				const std::string line{ def_line_it->str() };
-				boost::split(row_items, line, boost::is_any_of(",")); // split the line at the commata
-				if (row_items.size() != cnv.size()) throw std::logic_error("This should be already catched by regex match.");
-				for (auto& item : row_items) item = boost::regex_replace(item, boost::regex("\\s"), "");
+			// for each line defining some edge
+			std::vector<std::string> row_items;
+			const std::string line{ def_line_it->str() };
+			boost::split(row_items, line, boost::is_any_of(",")); // split the line at the commata
+			if (row_items.size() != cnv.size()) throw std::logic_error("This should be already catched by regex match.");
+			for (auto& item : row_items) item = boost::regex_replace(item, boost::regex("\\s"), "");
 
-				unsigned long from{ 0 }, to{ 0 };
-				_RationalT p{ 0 };
-				try {
-					from = std::stoull(row_items[pfrom]);
-					to = std::stoull(row_items[pto]);
-					p = std::stod(row_items[pprob]);
+			unsigned long from{ 0 }, to{ 0 };
+			_RationalT p{ 0 };
+			try {
+				from = std::stoull(row_items[pfrom]);
+				to = std::stoull(row_items[pto]);
+				p = std::stod(row_items[pprob]);
 
-					//create edge:
-					auto e = new edge(p, n_edge_decorations);
+				//create edge:
+				auto e = new edge(p, n_edge_decorations);
 
-					// check if edge alr4eady exists!!!
-					forward_transitions[from][to] = e;
-					inverse_transitions[to][from] = e;
-					if (states.find(from) == states.cend()) states.emplace(from, n_node_decorations);
-					if (states.find(to) == states.cend()) states.emplace(to, n_node_decorations);
+				// check if edge alr4eady exists!!!
+				forward_transitions[from][to] = e;
+				inverse_transitions[to][from] = e;
+				if (states.find(from) == states.cend()) states.emplace(from, n_node_decorations);
+				if (states.find(to) == states.cend()) states.emplace(to, n_node_decorations);
 
-					//set rewards
-					for (std::size_t i = 0; i < cnv.size(); ++i) {
-						if (ppositions.find(i) != ppositions.cend()) continue;
-						std::size_t reward_index{ std::stoull(cnv[i]) };
-						double reward{ std::stod(row_items[i]) };
-						e->decorations.at(reward_index) = reward;
-					}
+				//set rewards
+				for (std::size_t i = 0; i < cnv.size(); ++i) {
+					if (ppositions.find(i) != ppositions.cend()) continue;
+					std::size_t reward_index{ std::stoull(cnv[i]) };
+					double reward{ std::stod(row_items[i]) };
+					e->decorations.at(reward_index) = reward;
 				}
-				catch (...) {
-					throw std::invalid_argument("Could not read some parameter");
-				}
-
+			}
+			catch (...) {
+				throw std::invalid_argument("Could not read some parameter");
 			}
 
-			});
+		}
 	}
 
 	markov_chain& operator=(const markov_chain&) = delete;

@@ -6,9 +6,6 @@
 
 inline std::string interprete_bool_n(const bool& success) { return success ? "okay\n" : "failed\n"; };
 
-template <class _Doc, class _Function>
-void surround_log(const _Doc& doc, const _Function& task) { std::cout << doc << "...\n"; task(); std::cout << doc << "  DONE!\n"; };
-
 template< class _Doc>
 class surr_log {
 	const _Doc* doc;
