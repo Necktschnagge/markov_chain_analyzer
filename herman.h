@@ -23,7 +23,7 @@
  */
 template<class _Rationals, class _Integers, class _Set, bool disable_checks = false>
 std::chrono::nanoseconds generate_herman(markov_chain<_Rationals, _Integers>& mc, const _Integers& size, std::unique_ptr<_Set>& target_set) {
-	//### get rid of unique ptr ? // -> then make unique must be replace set must be cleared.
+	//### get rid of unique ptr ? // -> then make unique must be replace set must be cleared. (just drop it or use inserter iterator???)
 
 	using mc_type = markov_chain<_Rationals, _Integers>;
 	const _Integers INT1{ 1 };
