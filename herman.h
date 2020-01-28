@@ -135,7 +135,7 @@ std::chrono::nanoseconds generate_herman(markov_chain<_Rationals, _Integers>& mc
 				next_state_copy |= _Integers(bit_to_map) << non_deterministic_positions[pos_it];
 			}
 			// Create edge:
-			const auto pEdge{ new mc_type::edge(unique_outgoing_edge_probability, mc.n_edge_decorations) };
+			const auto pEdge{ new typename mc_type::edge(unique_outgoing_edge_probability, mc.n_edge_decorations) };
 			mc.forward_transitions[state][next_state_copy] = pEdge;
 			mc.inverse_transitions[next_state_copy][state] = pEdge;
 			pEdge->decorations[0] = _Rationals(1);

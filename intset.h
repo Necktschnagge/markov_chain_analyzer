@@ -1,7 +1,14 @@
+/**
+ * @file intset.h
+ *
+ * Utility to read set of Integers from file.
+ *
+ */
 #pragma once
 
-#include <unordered_set>
 #include "regxc.h"
+
+#include <unordered_set>
 #include <istream>
 #include <functional>
 
