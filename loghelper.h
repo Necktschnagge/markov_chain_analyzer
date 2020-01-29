@@ -23,7 +23,7 @@ class surround_logger {
 	const _Doc* doc;
 
 	inline void print_entry_message() const { std::cout << *doc << "...\n"; }
-	inline void print_exit_message() const { std::cout << doc << "  DONE!\n"; }
+	inline void print_exit_message() const { std::cout << *doc << "  DONE!\n"; }
 public:
 	inline surround_logger(const _Doc& doc) : doc(&doc) { print_entry_message(); }
 	surround_logger(const surround_logger&) = delete;
