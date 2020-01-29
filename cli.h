@@ -1,56 +1,93 @@
+/**
+ * @file cli.h
+ *
+ * Commandline interface for MC Analyzer.
+ *
+ */
 #pragma once
 
 #include "global_data.h"
 
 #include <fstream>
 
+struct cli_commands {
+
+	using id = global::id;
+
+	/**
+		@brief Reinitialized a markov chain. The markov chain is replaced by a fresh one.
+		@details Syntax: reset_mc>{id}>{n_state_decorations}>{n_transition_decorations}
+		@param id                         id where to locate markov chain
+		@param n_state_decorations        number of state decorations (Needed for e.g. expect values, or variances)
+		@param n_transition_decorations   number of transition decorations (Needed for storing e.g. rewards)
+	*/
+	inline static const auto RESET_MC{ "reset_mc" };
+
+	/**
+		@brief reads transitions from prism's file format to build up a markov chain.
+		@param id id where the markov chain is stored. It must have been initialized before (with reset_mc) and be empty.
+		@param file fiel path of the *.tra file to read
+	*/
+	inline static const auto read_tra{ "read_tra" }; // id, file
+	inline static const auto read_gmc{ "read_gmc" }; // id, file
+	inline static const auto add_rew{ "add_rew" }; // id, file, reward_index
+	inline static const auto read_target{ "read_target" }; // id, file
+	inline static const auto read_label{ "read_label" }; // id, file, label_id
+	inline static const auto calc_expect{ "calc_expect" }; // mc_id, reward_index, target_id, destination_decoration
+	inline static const auto calc_variance{ "calc_variance" }; // mc_id, reward_index, target_id, destination_decoration, expect_decoration, free_reward
+	inline static const auto write_gmc{ "write_gmc" }; //##not impl
+	inline static const auto write_deco{ "write_deco" }; /// ##not impl
+	//inline static //cov calc
+	inline static const auto GENERATE_HERMAN{ "generate_herman" }; // id mc, n
+};
+
+/**
+	@brief Reads commands from stream, performs corresponding actions.
+	@param commands stream containing commands, separated by new line ('\n'). Parameters are separated with '>' within one line.
+	@param g global struct for storing data
+	@exception std::logic_error Maleformed instruction...
+	@exception std::invalid_argument Wrong number of parameters.
+	@exception std::invalid_argument Could not parse parameter.
+*/
 inline void cli(std::istream& commands, global& g) {
-	const auto reset{ "reset" }; // id, n_dec, n_rew
-	const auto read_tra{ "read_tra" }; // id, file
-	const auto read_gmc{ "read_gmc" }; // id, file
-	const auto add_rew{ "add_rew" }; // id, file, reward_index
-	const auto read_target{ "read_target" }; // id, file
-	const auto read_label{ "read_label" }; // id, file, label_id
-	const auto calc_expect{ "calc_expect" }; // mc_id, reward_index, target_id, destination_decoration
-	const auto calc_variance{ "calc_variance" }; // mc_id, reward_index, target_id, destination_decoration, expect_decoration, free_reward
-	const auto write_gmc{ "write_gmc" }; //##not impl
-	const auto write_deco{ "write_deco" }; /// ##not impl
-	//cov calc
-	const auto GENERATE_HERMAN{ "generate_herman" }; // id mc, n
 
+	using mc_type = markov_chain<double, unsigned long>; // ### what bit width is appropriate for measure purpose???, what for release
+	const std::string split_symbol{ ">" };
 
-	commands.unsetf(std::ios_base::skipws);
+	commands.unsetf(std::ios_base::skipws); // also read whitespaces
 	while (commands.good())
 	{
 		//fetch command
 		std::string command{};
 		std::getline(commands, command);
-		std::cout << "Fetched command: " << command << std::endl;
+		std::cout << "\n\nFetched command: " << command << std::endl;
 
 		//parse command
 		std::vector<std::string> items;
-		boost::split(items, command, boost::is_any_of(">"));
+		boost::split(items, command, boost::is_any_of(split_symbol));
 		if (items.size() == 0) throw std::logic_error(std::string("Maleformed instruction: ") + command);
+		std::string& instruction{ items[0] };
+		auto doc = make_surround_log("Executing command");
 
 		//execute command
-		std::string& instruction{ items[0] };
-		if (instruction == reset) { // create fresh markov chain
+		if (instruction == cli_commands::RESET_MC) {
 			if (items.size() != 4) throw std::invalid_argument("Wrong number of parameters.");
-			std::size_t n_dec{ 0 }, n_rew{ 0 }, id{ 0 };
+			std::size_t n_state_decoration{ 0 }, n_transition_decoration{ 0 };
+			cli_commands::id id{ 0 };
 			try {
 				id = std::stoul(items[1]);
-				n_dec = std::stoull(items[2]);
-				n_rew = std::stoull(items[3]);
+				n_state_decoration = std::stoull(items[2]);
+				n_transition_decoration = std::stoull(items[3]);
 			}
-			catch (...) { throw std::invalid_argument("Could not parse parameter"); }
-			g.markov_chains[id] = std::make_unique<markov_chain<double>>(n_rew, n_dec);
+			catch (...) { throw std::invalid_argument("Could not parse parameter."); }
+			g.markov_chains[id] = std::make_unique<markov_chain<double>>(n_transition_decoration, n_state_decoration);
 			continue;
 		}
 
-		if (instruction == read_tra) {
+		if (instruction == cli_commands::read_tra) {
 			if (items.size() != 3) throw std::invalid_argument("Wrong number of parameters.");
 			std::string& file_path = items[2];
-			std::size_t id{ 0 };
+			cli_commands::id id{ 0 };
 			std::ifstream file{};
 			try {
 				id = std::stoul(items[1]);
@@ -62,7 +99,7 @@ inline void cli(std::istream& commands, global& g) {
 			continue;
 		}
 
-		if (instruction == read_gmc) {
+		if (instruction == cli_commands::read_gmc) {
 			if (items.size() != 3) throw std::invalid_argument("Wrong number of parameters.");
 			std::string& file_path = items[2];
 			std::size_t id{ 0 };
@@ -77,7 +114,7 @@ inline void cli(std::istream& commands, global& g) {
 			continue;
 		}
 
-		if (instruction == add_rew) {
+		if (instruction == cli_commands::add_rew) {
 			if (items.size() != 4) throw std::invalid_argument("Wrong number of parameters.");
 			std::string& file_path = items[2];
 			std::size_t id{ 0 }, rew_index{ 0 };
@@ -93,7 +130,7 @@ inline void cli(std::istream& commands, global& g) {
 			continue;
 		}
 
-		if (instruction == read_target) {
+		if (instruction == cli_commands::read_target) {
 			if (items.size() != 3) throw std::invalid_argument("Wrong number of parameters.");
 			std::string& file_path = items[2];
 			std::size_t id{ 0 };
@@ -109,7 +146,7 @@ inline void cli(std::istream& commands, global& g) {
 			continue;
 		}
 
-		if (instruction == read_label) {
+		if (instruction == cli_commands::read_label) {
 			if (items.size() != 4) throw std::invalid_argument("Wrong number of parameters.");
 			std::string& file_path = items[2];
 			std::size_t id{ 0 }, label_id{ 0 };
@@ -125,7 +162,7 @@ inline void cli(std::istream& commands, global& g) {
 			continue;
 		}
 
-		if (instruction == calc_expect) { //  mc_id, reward_index, target_id, destination_decoration
+		if (instruction == cli_commands::calc_expect) { //  mc_id, reward_index, target_id, destination_decoration
 			if (items.size() != 5) throw std::invalid_argument("Wrong number of parameters.");
 			std::size_t destination_decoration{ 0 }, mc_id{ 0 };
 			unsigned long reward_index{ 0 }, target_id{ 0 };
@@ -142,7 +179,7 @@ inline void cli(std::istream& commands, global& g) {
 			continue;
 		}
 
-		if (instruction == calc_variance) {
+		if (instruction == cli_commands::calc_variance) {
 			// mc_id, reward_index, target_id, destination_decoration, expect_decoration, free_reward
 			if (items.size() != 7) throw std::invalid_argument("Wrong number of parameters.");
 			std::size_t expect_decoration{ 0 }, destination_decoration{ 0 }, mc_id{ 0 };
@@ -161,7 +198,7 @@ inline void cli(std::istream& commands, global& g) {
 			continue;
 		}
 
-		if (instruction == GENERATE_HERMAN) { // id mc, n, target_set_id
+		if (instruction == cli_commands::GENERATE_HERMAN) { // id mc, n, target_set_id
 			if (items.size() != 4) throw std::invalid_argument("Wrong number of parameters.");
 			std::size_t mc_id{ 0 }, target_set_id{ 0 };
 			unsigned long size{ 0 };
@@ -178,7 +215,7 @@ inline void cli(std::istream& commands, global& g) {
 			continue;
 		}
 
-		std::cout << "WARNING: Command not recognized:   " << command << "\n";
+		std::cout << "WARNING: Command not recognized:   " << command << "\nDid not match any known instruction key!\n";
 	}
 }
 
