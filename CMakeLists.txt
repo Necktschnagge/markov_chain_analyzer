@@ -18,6 +18,8 @@ include_directories(../amgcl)
 add_executable(MC_Analyzer
 	main.cpp
 	
+	cli.h
+	global_data.h
 	herman.h
 	intset.h
 	loghelper.h
