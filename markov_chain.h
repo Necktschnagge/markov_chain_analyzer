@@ -117,7 +117,7 @@ public:
 		@details some excpetions not yet documented. ###
 	*/
 	void read_transitions_from_prism_file(std::istream& transitions) {
-		auto d = make_surr_log("Building markov chain from prism transitions file");
+		auto d = make_surround_log("Building markov chain from prism transitions file");
 		if (!transitions.good()) throw std::invalid_argument("Bad stream.");
 		if (!empty()) throw std::logic_error("Forbidden to read transitions from file if markov chain is not empty.");
 
@@ -193,7 +193,7 @@ public:
 	void read_rewards_from_prism_file(std::istream& rewards, const std::size_t& index_of_reward = 0) {
 		if (!rewards.good()) throw std::invalid_argument("Bad stream.");
 		if (!(index_of_reward < n_edge_decorations)) throw std::logic_error("Markov chain has not enough space for rewards. You need to specify number of rewards at construction. Adding more rewards dynamically is not yet implemented.");
-		auto d = make_surr_log("Adding rewards to markov chain, reading from prism rewards file");
+		auto d = make_surround_log("Adding rewards to markov chain, reading from prism rewards file");
 		// read input to string
 		rewards.unsetf(std::ios_base::skipws);
 		const auto input_s{ std::string(std::istream_iterator<char>(rewards),std::istream_iterator<char>()) };
@@ -245,7 +245,7 @@ public:
 		auto& test_file_stream{ input };
 		if (!input.good()) throw std::invalid_argument("Bad stream.");
 		test_file_stream.unsetf(std::ios_base::skipws); // also recognize new lines and spaces
-		auto d = make_surr_log("Building markov chain from gmc file");
+		auto d = make_surround_log("Building markov chain from gmc file");
 
 		//rename::
 		const auto test_file_string{ std::string(std::istream_iterator<char>(static_cast<std::istream&>(test_file_stream)),std::istream_iterator<char>()) };
