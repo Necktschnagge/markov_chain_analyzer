@@ -65,8 +65,18 @@ struct cli_commands {
 		@param id id where the target set is stored. Previous target set located at given id will be overwritten.
 		@param file file path of the file to read
 	*/
-	inline static const auto READ_LABEL{ "read_label" }; // id, file, label_id
-	inline static const auto calc_expect{ "calc_expect" }; // mc_id, reward_index, target_id, destination_decoration
+	inline static const auto READ_LABEL{ "read_label" }; 
+
+	/**
+		@brief Calculates for each node of markov chain the expect of accumulated transition decoration (rewards) until reaching the first state in target set starting.
+		@details Syntax: calc_expect>{mc_id}>{transition_decoration_index}>{target_set_id}>{state_decoration_index}
+		@param mc_id id where the markov chain is stored.
+		@param transition_decoration_index Index of transition decorations (rewards) for that the expect should be calculated
+		@param target_set_id Id to find the set of goal states.
+		@param state_decoration_index Index of state decorations where the expect should be stored.
+	*/
+	inline static const auto CALC_EXPECT{ "calc_expect" };
+
 	inline static const auto calc_variance{ "calc_variance" }; // mc_id, reward_index, target_id, destination_decoration, expect_decoration, free_reward
 	inline static const auto write_gmc{ "write_gmc" }; //##not impl
 	inline static const auto write_deco{ "write_deco" }; /// ##not impl
@@ -207,14 +217,14 @@ inline void cli(std::istream& commands, global& g) {
 			continue;
 		}
 
-		if (instruction == cli_commands::calc_expect) { //  mc_id, reward_index, target_id, destination_decoration
+		if (instruction == cli_commands::CALC_EXPECT) {
 			if (items.size() != 5) throw std::invalid_argument("Wrong number of parameters.");
-			std::size_t destination_decoration{ 0 }, mc_id{ 0 };
-			unsigned long reward_index{ 0 }, target_id{ 0 };
+			std::size_t reward_index{ 0 }, destination_decoration{ 0 };
+			cli_commands::id mc_id{ 0 }, target_id{ 0 };
 			try {
-				mc_id = std::stoul(items[1]);
+				mc_id = std::stoull(items[1]);
 				reward_index = std::stoull(items[2]);
-				target_id = std::stoul(items[3]);
+				target_id = std::stoull(items[3]);
 				destination_decoration = std::stoull(items[4]);
 			}
 			catch (...) { throw std::invalid_argument("Could not parse parameter"); }
