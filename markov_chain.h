@@ -386,6 +386,19 @@ public:
 
 	}
 
+	/**
+		@brief Writes all node decorations of the markov chain into an \a std::ostream.
+		@param output stream to write decorations to.
+	*/
+	void write_edge_decorations(std::ostream& output) {
+		for (const auto& pair : states) {
+			output << pair.first << ":";
+			for (const auto& deco : pair.second.decorations) output << " " << deco;
+			output << '\n';
+		}
+	}
+
+
 	template<class, class>
 	friend class mc_analyzer;
 

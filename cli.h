@@ -65,10 +65,10 @@ struct cli_commands {
 		@param id id where the target set is stored. Previous target set located at given id will be overwritten.
 		@param file file path of the file to read
 	*/
-	inline static const auto READ_LABEL{ "read_label" }; 
+	inline static const auto READ_LABEL{ "read_label" };
 
 	/**
-		@brief Calculates for each node of markov chain the expect of accumulated transition decoration (rewards) until reaching the first state in target set starting.
+		@brief Calculates for each state of the markov chain the expect of accumulated transition decoration (rewards) until reaching the first state in target set.
 		@details Syntax: calc_expect>{mc_id}>{transition_decoration_index}>{target_set_id}>{state_decoration_index}
 		@param mc_id id where the markov chain is stored.
 		@param transition_decoration_index Index of transition decorations (rewards) for that the expect should be calculated
@@ -77,9 +77,28 @@ struct cli_commands {
 	*/
 	inline static const auto CALC_EXPECT{ "calc_expect" };
 
-	inline static const auto calc_variance{ "calc_variance" }; // mc_id, reward_index, target_id, destination_decoration, expect_decoration, free_reward
-	inline static const auto write_gmc{ "write_gmc" }; //##not impl
-	inline static const auto write_deco{ "write_deco" }; /// ##not impl
+	/**
+		@brief Calculates for each state of the markov chain the variance of accumulated transition decoration (rewards) until reaching the first state in target set.
+		@details Syntax: calc_variance>{mc_id}>{transition_decoration_index}>{target_set_id}>{state_decoration_index}>{state_decoration_expects_index}>{free_transition_decoration}
+		@param mc_id id where the markov chain is stored.
+		@param transition_decoration_index Index of transition decorations (rewards) for that the variance should be calculated
+		@param target_set_id Id to find the set of goal states.
+		@param state_decoration_index Index of state decorations where the variances should be stored.
+		@param state_decoration_expects_index Index of state decorations where the expects should be stored. (Note: the algorithm needs to calculate also expects in order to be able to claculate variances.)
+		@param state_decoration_index Index for storing interim results as transition decorations. Choose a free index that contains values which can be overwritten.
+	*/
+	inline static const auto CALC_VARIANCE{ "calc_variance" };
+
+	//inline static const auto write_gmc{ "write_gmc" }; //##not implemented
+
+	/**
+		@brief Writes state decorations of a markov chain into a file.
+		@details Syntax: write_state_decorations>{mc_id}>{file}
+		@param mc_id Id of the markov chian which should be written to file.
+		@param file File path where the result should be stored.
+	*/
+	inline static const auto WRITE_DECO{ "write_state_decorations" };
+
 	//inline static //cov calc
 	inline static const auto GENERATE_HERMAN{ "generate_herman" }; // id mc, n
 	// delte mc , delete target set 
@@ -204,7 +223,7 @@ inline void cli(std::istream& commands, global& g) {
 			cli_commands::id id{ 0 };
 			std::ifstream file{};
 			try {
-				id = std::stoull(items[1]); 
+				id = std::stoull(items[1]);
 				//###split
 				file.open(file_path);
 				label_id = std::stoull(items[3]);
@@ -234,15 +253,15 @@ inline void cli(std::istream& commands, global& g) {
 			continue;
 		}
 
-		if (instruction == cli_commands::calc_variance) {
+		if (instruction == cli_commands::CALC_VARIANCE) {
 			// mc_id, reward_index, target_id, destination_decoration, expect_decoration, free_reward
 			if (items.size() != 7) throw std::invalid_argument("Wrong number of parameters.");
-			std::size_t expect_decoration{ 0 }, destination_decoration{ 0 }, mc_id{ 0 };
-			unsigned long reward_index{ 0 }, target_id{ 0 }, free_reward{ 0 };
+			std::size_t expect_decoration{ 0 }, destination_decoration{ 0 }, reward_index{ 0 }, free_reward{ 0 };
+			cli_commands::id target_id{ 0 }, mc_id{ 0 };
 			try {
-				mc_id = std::stoul(items[1]);
+				mc_id = std::stoull(items[1]);
 				reward_index = std::stoull(items[2]);
-				target_id = std::stoul(items[3]);
+				target_id = std::stoull(items[3]);
 				destination_decoration = std::stoull(items[4]);
 				expect_decoration = std::stoull(items[5]);
 				free_reward = std::stoull(items[6]);
@@ -250,6 +269,25 @@ inline void cli(std::istream& commands, global& g) {
 			catch (...) { throw std::invalid_argument("Could not parse parameter"); }
 			if (g.markov_chains[mc_id] == nullptr) throw std::logic_error("No mc with given ID");
 			calc_variance_f(*(g.markov_chains[mc_id]), reward_index, *(g.target_sets[target_id]), destination_decoration, expect_decoration, free_reward);
+			continue;
+		}
+
+		if (instruction == cli_commands::WRITE_DECO) {
+			if (items.size() != 3) throw std::invalid_argument("Wrong number of parameters.");
+			std::string& file_path = items[2];
+			cli_commands::id id{ 0 };
+			std::ofstream file{};
+			try {
+				id = std::stoull(items[1]);
+			}
+			catch (...) { throw std::invalid_argument("Could not parse parameter."); }
+			try {
+				file.open(file_path);
+				if (!file.good()) throw 0;
+			}
+			catch (...) { throw std::invalid_argument("Bad file."); }
+			if (g.markov_chains[id] == nullptr) throw std::logic_error("No markov chain present with given ID.");
+			g.markov_chains[id]->write_edge_decorations(file);
 			continue;
 		}
 
