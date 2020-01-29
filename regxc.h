@@ -1,9 +1,18 @@
+/**
+ * @file regxc.h
+ *
+ * Constants for regexes.
+ *
+ */
 #pragma once
 
 
 #include <string>
 #include <boost/regex.hpp>
 
+/**
+	Contains strings to be compiled to regexes
+*/
 class regex_strings {
 public:
 	inline static const auto nonnegative_integer{ std::string(R"(([1-9][0-9]*|0))") };
@@ -20,14 +29,14 @@ public:
 	inline static const auto gmc_column_name{ std::string(R"(\$\w+)") };
 	inline static const auto native_ignored{ std::string(R"(\#.*)") };
 	inline static const auto gmc_semantics_definition{ std::string(R"(\$\w+(,\$\w+)*)") }; // use gmc column name here!
-	// use with ECMAScript mode -> not anymore, removed ^ and $
 
 	inline static const auto gmc_general{ std::string("^(") + native_ignored + new_line + ")*" +
 		gmc_semantics_definition + "(" + new_line + ".*)*$" };
-	
-
 };
 
+/**
+	Contains const boost::regex objects
+*/
 class regxc {
 public:
 	inline static const auto nonnegative_integer{ boost::regex(regex_strings::nonnegative_integer) };
