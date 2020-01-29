@@ -6,7 +6,8 @@
 template <class _MCType>
 void calc_expect_f(_MCType& mc, std::size_t reward_index, const std::unordered_set<unsigned long>& target_set, std::size_t decoration_destination_index) {
 
-	using analyzer = mc_analyzer<double>;
+	using analyzer = mc_analyzer<typename _MCType::rational_type,typename _MCType::integral_type>;
+
 	auto target_probability_matrix{ analyzer::target_adjusted_probability_matrix(mc, target_set) };
 	auto target_probability_matrix_minus_one{ target_probability_matrix };
 	analyzer::subtract_unity_matrix(target_probability_matrix_minus_one);
@@ -19,7 +20,7 @@ void calc_expect_f(_MCType& mc, std::size_t reward_index, const std::unordered_s
 template <class _MCType>
 void calc_variance_f(_MCType& mc, std::size_t reward_index, const std::unordered_set<unsigned long>& target_set, std::size_t decoration_destination_index, std::size_t expect_decoration_index, std::size_t free_reward_index) {
 
-	using analyzer = mc_analyzer<double>;
+	using analyzer = mc_analyzer<typename _MCType::rational_type, typename _MCType::integral_type>;
 
 	std::vector<decltype(std::chrono::steady_clock::now())> timestamps;
 	std::vector<std::string> names;

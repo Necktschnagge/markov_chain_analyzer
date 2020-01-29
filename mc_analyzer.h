@@ -2,11 +2,11 @@
 
 #include "sparse_amtrix.h"
 
-template<class _RationalT, class _RewardType = _RationalT>
+template<class _RationalT, class _IntegerT>
 struct mc_analyzer {
 
-	using mc_type = markov_chain<_RationalT>;
-	using set_type = std::unordered_set<unsigned long>;
+	using mc_type = markov_chain<_RationalT, _IntegerT>;
+	using set_type = std::unordered_set<_IntegerT>;
 
 	/** @
 	*/
@@ -26,12 +26,12 @@ struct mc_analyzer {
 		for (sparse_matrix::size_t it{ 0 }; it != m.size_m(); ++it) m(it, it) -= 1;
 	}
 
-	static std::vector<_RewardType> rewarded_image_vector(const sparse_matrix& target_adjusted_matrix, const mc_type& mc, const std::size_t& reward_selector) {
+	static std::vector<_RationalT> rewarded_image_vector(const sparse_matrix& target_adjusted_matrix, const mc_type& mc, const std::size_t& reward_selector) {
 		if (!(reward_selector < mc.n_edge_decorations)) throw std::invalid_argument("Given markov chain has to few rewards.");
-		auto result{ std::vector<_RewardType>(target_adjusted_matrix.size_m(), 0) };
+		auto result{ std::vector<_RationalT>(target_adjusted_matrix.size_m(), 0) };
 		for (sparse_matrix::size_t state_s{ 0 }; state_s != target_adjusted_matrix.size_m(); ++state_s) {
-			result[state_s] = -std::accumulate(target_adjusted_matrix[state_s].cbegin(), target_adjusted_matrix[state_s].cend(), double(0.0),
-				[&](const _RewardType& val, const auto& appendee /*pointing to state "t"*/) {
+			result[state_s] = -std::accumulate(target_adjusted_matrix[state_s].cbegin(), target_adjusted_matrix[state_s].cend(), _RationalT(0.0),
+				[&](const _RationalT& val, const auto& appendee /*pointing to state "t"*/) {
 					try {
 						return val + appendee.second /*P_{-> A} */ * mc.forward_transitions.at(state_s).at(appendee.first)->decorations[reward_selector];
 					}

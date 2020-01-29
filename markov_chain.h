@@ -16,7 +16,7 @@
 /**
 	@brief Represents a morkov chain by storing edges with probabilities, with the possibility to store edge and state decorations.
 */
-template <class _RationalT, class _IntegralT = unsigned long>// ##remove default!
+template <class _RationalT, class _IntegralT>
 class markov_chain
 {
 public:

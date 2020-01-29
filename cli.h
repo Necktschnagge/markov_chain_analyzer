@@ -80,7 +80,7 @@ inline void cli(std::istream& commands, global& g) {
 				n_transition_decoration = std::stoull(items[3]);
 			}
 			catch (...) { throw std::invalid_argument("Could not parse parameter."); }
-			g.markov_chains[id] = std::make_unique<markov_chain<double>>(n_transition_decoration, n_state_decoration);
+			g.markov_chains[id] = std::make_unique<mc_type>(n_transition_decoration, n_state_decoration);
 			continue;
 		}
 
