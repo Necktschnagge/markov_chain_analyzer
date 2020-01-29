@@ -10,6 +10,9 @@
 
 #include <fstream>
 
+ /**
+	 @brief Contains all instruction key to use MC Analyzer form command line. Additionally syntax information are given how to use the instructions.
+ */
 struct cli_commands {
 
 	using id = global::id;
@@ -24,21 +27,52 @@ struct cli_commands {
 	inline static const auto RESET_MC{ "reset_mc" };
 
 	/**
-		@brief reads transitions from prism's file format to build up a markov chain.
+		@brief Reads transitions from prism's file format to build up a markov chain.
+		@details Syntax: read_tra>{id}>{file}
 		@param id id where the markov chain is stored. It must have been initialized before (with reset_mc) and be empty.
-		@param file fiel path of the *.tra file to read
+		@param file file path of the *.tra file to read
 	*/
-	inline static const auto read_tra{ "read_tra" }; // id, file
-	inline static const auto read_gmc{ "read_gmc" }; // id, file
-	inline static const auto add_rew{ "add_rew" }; // id, file, reward_index
-	inline static const auto read_target{ "read_target" }; // id, file
-	inline static const auto read_label{ "read_label" }; // id, file, label_id
+	inline static const auto READ_TRA{ "read_tra" }; // id, file
+
+	/**
+		@brief Reads a markov chain from general markov chain (gmc) format, a file format introduced with this tool.
+		@details Syntax: read_gmc>{id}>{file}
+		@param id id where the markov chain is stored. It must have been initialized before (with reset_mc) and be empty.
+		@param file file path of the *.gmc file to read
+	*/
+	inline static const auto READ_GMC{ "read_gmc" };
+
+	/**
+		@brief Reads edge decorations (rewards) from prism's trew file format. Needs an initialized non-empty markov chain thatt already has a transition for each reward defined in file.
+		@details Syntax: add_rew>{id}>{file}>{decoration_index}
+		@param id id where the markov chain is stored. It must have been initialized before (with reset_mc) and be empty.
+		@param file file path of the *.trew file to read
+		@param decoration_index index where to store the reward values into each edge.
+	*/
+	inline static const auto ADD_REW{ "add_rew" };
+
+	/**
+		@brief Reads a set of integers from a file to store it as target set for expect / variance / cobvaraiance calculation
+		@details Syntax: read_target>{id}>{file}
+		@param id id where the target set is stored. Previous target set located at given id will be overwritten.
+		@param file file path of the file to read
+	*/
+	inline static const auto READ_TARGET{ "read_target" };
+
+	/**
+		@brief Reads a prism state label file in order to recognize a set of target states
+		@details Syntax: read_label>{id}>{file}>{label_id}
+		@param id id where the target set is stored. Previous target set located at given id will be overwritten.
+		@param file file path of the file to read
+	*/
+	inline static const auto READ_LABEL{ "read_label" }; // id, file, label_id
 	inline static const auto calc_expect{ "calc_expect" }; // mc_id, reward_index, target_id, destination_decoration
 	inline static const auto calc_variance{ "calc_variance" }; // mc_id, reward_index, target_id, destination_decoration, expect_decoration, free_reward
 	inline static const auto write_gmc{ "write_gmc" }; //##not impl
 	inline static const auto write_deco{ "write_deco" }; /// ##not impl
 	//inline static //cov calc
 	inline static const auto GENERATE_HERMAN{ "generate_herman" }; // id mc, n
+	// delte mc , delete target set 
 };
 
 /**
@@ -48,10 +82,12 @@ struct cli_commands {
 	@exception std::logic_error Maleformed instruction...
 	@exception std::invalid_argument Wrong number of parameters.
 	@exception std::invalid_argument Could not parse parameter.
+	@exception std::invalid_argument Bad file.
+	@exception std::logic_error No markov chain present with given ID.
 */
 inline void cli(std::istream& commands, global& g) {
 
-	using mc_type = markov_chain<double, unsigned long>; // ### what bit width is appropriate for measure purpose???, what for release
+	using mc_type = global::mc_type;
 	const std::string split_symbol{ ">" };
 
 	commands.unsetf(std::ios_base::skipws); // also read whitespaces
@@ -75,7 +111,7 @@ inline void cli(std::istream& commands, global& g) {
 			std::size_t n_state_decoration{ 0 }, n_transition_decoration{ 0 };
 			cli_commands::id id{ 0 };
 			try {
-				id = std::stoul(items[1]);
+				id = std::stoull(items[1]);
 				n_state_decoration = std::stoull(items[2]);
 				n_transition_decoration = std::stoull(items[3]);
 			}
@@ -84,22 +120,26 @@ inline void cli(std::istream& commands, global& g) {
 			continue;
 		}
 
-		if (instruction == cli_commands::read_tra) {
+		if (instruction == cli_commands::READ_TRA) {
 			if (items.size() != 3) throw std::invalid_argument("Wrong number of parameters.");
 			std::string& file_path = items[2];
 			cli_commands::id id{ 0 };
 			std::ifstream file{};
 			try {
-				id = std::stoul(items[1]);
-				file.open(file_path);
+				id = std::stoull(items[1]);
 			}
-			catch (...) { throw std::invalid_argument("Could not parse parameter or open file"); }
-			if (g.markov_chains[id] == nullptr) throw std::logic_error("No mc with given ID");
+			catch (...) { throw std::invalid_argument("Could not parse parameter."); }
+			try {
+				file.open(file_path);
+				if (!file.good()) throw 0;
+			}
+			catch (...) { throw std::invalid_argument("Bad file."); }
+			if (g.markov_chains[id] == nullptr) throw std::logic_error("No markov chain present with given ID.");
 			g.markov_chains[id]->read_transitions_from_prism_file(file);
 			continue;
 		}
 
-		if (instruction == cli_commands::read_gmc) {
+		if (instruction == cli_commands::READ_GMC) {
 			if (items.size() != 3) throw std::invalid_argument("Wrong number of parameters.");
 			std::string& file_path = items[2];
 			std::size_t id{ 0 };
@@ -114,13 +154,14 @@ inline void cli(std::istream& commands, global& g) {
 			continue;
 		}
 
-		if (instruction == cli_commands::add_rew) {
+		if (instruction == cli_commands::ADD_REW) {
 			if (items.size() != 4) throw std::invalid_argument("Wrong number of parameters.");
 			std::string& file_path = items[2];
-			std::size_t id{ 0 }, rew_index{ 0 };
+			std::size_t rew_index{ 0 };
+			cli_commands::id id{ 0 };
 			std::ifstream file{};
 			try {
-				id = std::stoul(items[1]);
+				id = std::stoull(items[1]); //### split try block, like some lines in code before
 				file.open(file_path);
 				rew_index = std::stoull(items[3]);
 			}
@@ -130,35 +171,39 @@ inline void cli(std::istream& commands, global& g) {
 			continue;
 		}
 
-		if (instruction == cli_commands::read_target) {
+		if (instruction == cli_commands::READ_TARGET) {
 			if (items.size() != 3) throw std::invalid_argument("Wrong number of parameters.");
 			std::string& file_path = items[2];
-			std::size_t id{ 0 };
+			cli_commands::id id{ 0 };
 			std::ifstream file{};
 			try {
-				id = std::stoul(items[1]);
+				id = std::stoul(items[1]); // ###split
 				file.open(file_path);
 			}
 			catch (...) { throw std::invalid_argument("Could not parse parameter or open file"); }
-			g.target_sets[id] = std::make_unique<std::unordered_set<unsigned long>>(
-				std::move(int_set<unsigned long>::stointset(file, [](auto s) { return std::stoul(s); }))
+			g.target_sets[id] = std::make_unique<global::set_type>(
+				std::move(int_set<global::int_type>::stointset(file, [](auto s) { return std::stoull(s); }))
 				);
 			continue;
 		}
 
-		if (instruction == cli_commands::read_label) {
+		if (instruction == cli_commands::READ_LABEL) {
 			if (items.size() != 4) throw std::invalid_argument("Wrong number of parameters.");
 			std::string& file_path = items[2];
-			std::size_t id{ 0 }, label_id{ 0 };
+			std::size_t label_id{ 0 };
+			cli_commands::id id{ 0 };
 			std::ifstream file{};
 			try {
-				id = std::stoul(items[1]);
+				id = std::stoull(items[1]); 
+				//###split
 				file.open(file_path);
 				label_id = std::stoull(items[3]);
 			}
 			catch (...) { throw std::invalid_argument("Could not parse parameter or open file"); }
 
-			throw std::logic_error("not implemented: read prism label file to build up a target set.");
+			g.target_sets[id] = std::make_unique<global::set_type>(
+				std::move(int_set<global::int_type>::prismlabeltointset(file, [](auto s) { return std::stoull(s); }, label_id))
+				);
 			continue;
 		}
 
