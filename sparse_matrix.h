@@ -1,8 +1,10 @@
+/**
+ * @file sparse_matrix.h
+ *
+ * sparse matrix and adaptive stuff for AMGCL
+ *
+ */
 #pragma once
-
-#include <vector>
-#include <unordered_map>
-
 
 #include <amgcl/backend/builtin.hpp>
 #include <amgcl/make_solver.hpp>
@@ -13,9 +15,16 @@
 #include <amgcl/solver/cg.hpp>
 #include <amgcl/profiler.hpp>
 
+#include <vector>
+#include <unordered_map>
+
+
+/**
+	Simple sparse matrix implementation to be used with AMGCL sparse linear system solver.
+*/
 class sparse_matrix {
 public:
-	typedef std::unordered_map<int, double> sparse_row; // original it was explicit map.
+	typedef std::unordered_map<int, double> sparse_row;
 
 private:
 	int m, n;
@@ -111,5 +120,4 @@ namespace amgcl {
 
 	} // namespace backend
 
-	//##locate elsewhere
 } // namespace amgcl

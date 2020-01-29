@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sparse_amtrix.h"
+#include "sparse_matrix.h"
 
 template<class _RationalT, class _IntegerT>
 struct mc_analyzer {
