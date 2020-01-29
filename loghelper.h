@@ -9,6 +9,7 @@
 #include <iostream>
 #include <chrono>
 #include <string>
+#include <iomanip>
 
  /// @brief Turns a bool into an "okay" or "failed" followed by line break "\n"
 inline std::string interprete_bool_n(const bool& success) { return success ? "okay\n" : "failed\n"; };
