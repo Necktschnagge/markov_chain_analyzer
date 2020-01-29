@@ -10,7 +10,7 @@
 #include <chrono>
 #include <string>
 
-/// @brief Turns a bool into an "okay" or "failed" followed by line break "\n"
+ /// @brief Turns a bool into an "okay" or "failed" followed by line break "\n"
 inline std::string interprete_bool_n(const bool& success) { return success ? "okay\n" : "failed\n"; };
 
 /**
@@ -40,10 +40,16 @@ surround_logger<_Doc> make_surround_log(const _Doc& doc) { return surround_logge
 template<class _Duration>
 inline void printDuration(const _Duration& duration) {
 	using namespace std::chrono;
+
+	auto width = 1; {
+		auto x = duration_cast<nanoseconds>(duration).count();
+		auto n = 50; // just to completely rule out infinite loop
+		while (x > 0 && n > 0) { ++width; x >>= 1; --n; }
+	}
 	std::cout << "TIME:\n"
-		<< "nanoseconds:   " << duration_cast<nanoseconds>(duration).count()
-		<< "\nmicroseconds:   " << duration_cast<microseconds>(duration).count()
-		<< "\nmilliseconds:   " << duration_cast<milliseconds>(duration).count()
-		<< "\nseconds:   " << duration_cast<seconds>(duration).count()
+		<< "nanoseconds:      " << std::setw(width) << duration_cast<nanoseconds>(duration).count()
+		<< "\nmicroseconds:   " << std::setw(width) << duration_cast<microseconds>(duration).count()
+		<< "\nmilliseconds:   " << std::setw(width) << duration_cast<milliseconds>(duration).count()
+		<< "\nseconds:        " << std::setw(width) << duration_cast<seconds>(duration).count()
 		<< "\n\n";
 }
