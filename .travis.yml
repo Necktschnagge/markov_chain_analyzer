@@ -40,7 +40,7 @@ deploy:
     skip_cleanup: true
     token: $GH_REPO_TOKEN
     keep_history: true
-    local_dir: docs/html
+    local_dir: html
     target_branch: github-pages
     on :
         branch: fix-travis-deploy
