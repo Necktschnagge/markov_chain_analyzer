@@ -1,0 +1,43 @@
+os: linux 
+dist: bionic
+
+language: cpp
+compiler:
+  - clang
+  - gcc
+
+addons:
+  apt:
+    packages:
+      - gcc-8
+      - g++-8
+      - cmake
+      - libboost-all-dev
+      - doxygen
+      
+
+script:
+    - sudo ln -s /usr/bin/gcc-8 /usr/local/bin/gcc
+    - sudo ln -s /usr/bin/g++-8 /usr/local/bin/g++
+    - gcc -v
+    - g++ -v
+    - /usr/local/bin/g++ -v
+    - cmake --version
+    - git clone 'https://github.com/ddemidov/amgcl.git' '../amgcl/'
+    - ls ..
+    - mkdir cmake-build
+    - cd cmake-build
+    - echo Create Project...
+    - cmake -DCMAKE_RULE_MESSAGES:BOOL=OFF -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ..
+    - echo Build Project...
+    - cmake --build .
+    - cd ..
+    - doxygen Doxyfile
+
+   
+deploy:
+    provider: pages:git
+    skip_cleanup: true
+    local_dir: docs/html
+    token: $GH_REPO_TOKEN
+    target_branch: github-pages
