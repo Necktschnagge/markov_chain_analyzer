@@ -1,12 +1,20 @@
+/**
+ * @file mc_calc.h
+ *
+ * Contains facades for calculate expects / variances / ..  on markov chains.
+ *
+ */
 #pragma once
 
 #include "markov_chain.h"
 
+/**
+	Calculates expects of accumulated edge rewards along paths until reaching target_set in markov chain.
+*/
+template <class _MarkovChain, class _IntegralSet>
+void calc_expect(_MarkovChain& mc, std::size_t reward_index, const _IntegralSet& target_set, std::size_t decoration_destination_index) {
 
-template <class _MCType>
-void calc_expect_f(_MCType& mc, std::size_t reward_index, const std::unordered_set<unsigned long>& target_set, std::size_t decoration_destination_index) {
-
-	using analyzer = mc_analyzer<typename _MCType::rational_type,typename _MCType::integral_type>;
+	using analyzer = mc_analyzer<typename _MarkovChain::rational_type,typename _MarkovChain::integral_type>;
 
 	auto target_probability_matrix{ target_adjusted_probability_matrix(mc, target_set) };
 	auto target_probability_matrix_minus_one{ target_probability_matrix };
@@ -17,10 +25,13 @@ void calc_expect_f(_MCType& mc, std::size_t reward_index, const std::unordered_s
 	mc.set_decoration(result, decoration_destination_index);
 }
 
-template <class _MCType>
-void calc_variance_f(_MCType& mc, std::size_t reward_index, const std::unordered_set<unsigned long>& target_set, std::size_t decoration_destination_index, std::size_t expect_decoration_index, std::size_t free_reward_index) {
+/**
+	Calculates variances of accumulated edge rewards along paths until reaching target_set in markov chain.
+*/
+template <class _MarkovChain, class _IntegralSet>
+void calc_variance(_MarkovChain& mc, std::size_t reward_index, const _IntegralSet& target_set, std::size_t decoration_destination_index, std::size_t expect_decoration_index, std::size_t free_reward_index) {
 
-	using analyzer = mc_analyzer<typename _MCType::rational_type, typename _MCType::integral_type>;
+	using analyzer = mc_analyzer<typename _MarkovChain::rational_type, typename _MarkovChain::integral_type>;
 
 	std::vector<decltype(std::chrono::steady_clock::now())> timestamps;
 	std::vector<std::string> names;

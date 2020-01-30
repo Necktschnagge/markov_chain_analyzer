@@ -257,7 +257,7 @@ inline void cli(std::istream& commands, global& g) {
 			catch (...) { throw std::invalid_argument("Could not parse parameter"); }
 			if (g.markov_chains[mc_id] == nullptr) throw std::logic_error("No mc with given ID");
 
-			calc_expect_f(*(g.markov_chains[mc_id]), reward_index, *(g.target_sets[target_id]), destination_decoration);
+			calc_expect(*(g.markov_chains[mc_id]), reward_index, *(g.target_sets[target_id]), destination_decoration);
 			continue;
 		}
 
@@ -276,7 +276,7 @@ inline void cli(std::istream& commands, global& g) {
 			}
 			catch (...) { throw std::invalid_argument("Could not parse parameter"); }
 			if (g.markov_chains[mc_id] == nullptr) throw std::logic_error("No mc with given ID");
-			calc_variance_f(*(g.markov_chains[mc_id]), reward_index, *(g.target_sets[target_id]), destination_decoration, expect_decoration, free_reward);
+			calc_variance(*(g.markov_chains[mc_id]), reward_index, *(g.target_sets[target_id]), destination_decoration, expect_decoration, free_reward);
 			continue;
 		}
 
