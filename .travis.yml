@@ -41,6 +41,6 @@ deploy:
     token: $GH_REPO_TOKEN
     keep_history: true
     local_dir: html
-    target_branch: github-pages
+    target_branch: gh-pages
     on :
-        branch: fix-travis-deploy
+        branch: master
