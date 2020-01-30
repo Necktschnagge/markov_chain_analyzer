@@ -1,3 +1,9 @@
+/**
+ * @file markov_chain.h
+ *
+ * Contains class template markov_chain.
+ *
+ */
 #pragma once
 
 #include "regxc.h"
@@ -238,8 +244,10 @@ public:
 		}
 	}
 
-	//### sanity check for probabilitiy functions
-
+	/**
+		@brief Reads a general markov chain file and builds up the corresponding markov chain as object.
+		@details provide more details here ##
+	*/
 	void read_from_gmc_file(std::istream& input) {
 		/// rename all identifiers here!
 		auto& test_file_stream{ input };
@@ -363,11 +371,11 @@ public:
 			catch (...) {
 				throw std::invalid_argument("Could not read some parameter");
 			}
-
 		}
 	}
 
 	markov_chain& operator=(const markov_chain&) = delete;
+
 	markov_chain(const markov_chain&) = delete;
 
 	~markov_chain() {
@@ -378,6 +386,10 @@ public:
 		}
 	}
 
+	/**
+		@brief Assignes the values of given array structure as state decorations to the states.
+		@details source needs an operator[] takeing an \tparam _Integer for state id.
+	*/
 	template<class _Array>
 	void set_decoration(const _Array& source, std::size_t index) {
 		if (!(index < n_node_decorations)) throw std::out_of_range("Not enough decorations defined.");
