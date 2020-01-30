@@ -42,3 +42,5 @@ deploy:
     keep_history: true
     local_dir: docs/html
     target_branch: github-pages
+    on :
+        branch: fix-travis-deploy
