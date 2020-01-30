@@ -34,15 +34,6 @@ struct mc_analyzer {
 	using mc_type = markov_chain<_RationalT, _IntegerT>;
 	using set_type = std::unordered_set<_IntegerT>;
 
-
-	/**
-
-	*/
-	static void subtract_unity_matrix(sparse_matrix& m) {
-		if (m.size_m() != m.size_n()) throw std::invalid_argument("Matrix is not quadratic.");
-		for (sparse_matrix::size_t it{ 0 }; it != m.size_m(); ++it) m(it, it) -= 1;
-	}
-
 	static std::vector<_RationalT> rewarded_image_vector(const sparse_matrix& target_adjusted_matrix, const mc_type& mc, const std::size_t& reward_selector) {
 		if (!(reward_selector < mc.n_edge_decorations)) throw std::invalid_argument("Given markov chain has to few rewards.");
 		auto result{ std::vector<_RationalT>(target_adjusted_matrix.size_m(), 0) };

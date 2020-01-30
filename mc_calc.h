@@ -10,8 +10,8 @@ void calc_expect_f(_MCType& mc, std::size_t reward_index, const std::unordered_s
 
 	auto target_probability_matrix{ target_adjusted_probability_matrix(mc, target_set) };
 	auto target_probability_matrix_minus_one{ target_probability_matrix };
-	analyzer::subtract_unity_matrix(target_probability_matrix_minus_one);
-
+	target_probability_matrix_minus_one.subtract_unity_matrix();
+	
 	auto image_vector{ analyzer::rewarded_image_vector(target_probability_matrix,mc,reward_index) };
 	auto result{ solve_linear_system(target_probability_matrix_minus_one, image_vector) };
 	mc.set_decoration(result, decoration_destination_index);
@@ -40,7 +40,7 @@ void calc_variance_f(_MCType& mc, std::size_t reward_index, const std::unordered
 	*inserter++ = std::chrono::steady_clock::now();
 	*add_name++ = "Copy P -> target";
 
-	analyzer::subtract_unity_matrix(target_probability_matrix_minus_one);
+	target_probability_matrix_minus_one.subtract_unity_matrix();
 	*inserter++ = std::chrono::steady_clock::now();
 	*add_name++ = "Subtract I";
 

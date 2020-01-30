@@ -51,6 +51,14 @@ public:
 	// Access the whole row
 	const sparse_row& operator[](int i) const { return rows[i]; }
 
+	/**
+		@brief Subtracts the unity martix.
+	*/
+	inline void subtract_unity_matrix() {
+		if (size_m() != size_n()) throw std::invalid_argument("Matrix is not quadratic.");
+		for (sparse_matrix::size_t it{ 0 }; it != size_m(); ++it) rows[it][it] -= 1;
+	}
+
 };
 
 
