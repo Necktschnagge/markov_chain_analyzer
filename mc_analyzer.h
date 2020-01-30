@@ -1,26 +1,43 @@
+/**
+ * @file mc_analyzer.h
+ *
+ * Contains utilities for calculations on markov chains.
+ *
+ */
 #pragma once
 
 #include "sparse_matrix.h"
 
+
+/**
+	@brief Returns a sparse matrix that contains transition probabilities such that matrix[from][to] is the probability of the transition \a from --> \a to, except for states \a from in \target_states, there the value is set to zero (i.e. no entry in sparse matrix).
+*/
+template <class mc_type, class set_type>
+inline sparse_matrix target_adjusted_probability_matrix(const mc_type& mc, const set_type& target_states) {
+	static_assert(std::is_same<typename mc_type::integral_type, typename set_type::value_type>::value, "Value type of set must equal integral type of markov chain.");
+	auto m{ sparse_matrix(mc.size_states(), mc.size_states()) };
+
+	for (auto it = mc.forward_transitions.cbegin(); it != mc.forward_transitions.cend(); ++it) {
+		if (target_states.find(it->first) != target_states.cend()) continue;
+		for (auto jt = it->second.cbegin(); jt != it->second.cend(); ++jt)
+			m(it->first, jt->first) = jt->second->probability;
+	}
+	return m;
+}
+
+/**
+	@brief Contains static functions for analyzing and calculating values from markov chains.
+*/
 template<class _RationalT, class _IntegerT>
 struct mc_analyzer {
 
 	using mc_type = markov_chain<_RationalT, _IntegerT>;
 	using set_type = std::unordered_set<_IntegerT>;
 
-	/** @
+
+	/**
+
 	*/
-	static sparse_matrix target_adjusted_probability_matrix(const mc_type& mc, const set_type& target_states) {
-		auto m{ sparse_matrix(mc.size_states(), mc.size_states()) };
-
-		for (auto it = mc.forward_transitions.cbegin(); it != mc.forward_transitions.cend(); ++it) {
-			if (target_states.find(it->first) != target_states.cend()) continue;
-			for (auto jt = it->second.cbegin(); jt != it->second.cend(); ++jt)
-				m(it->first, jt->first) = jt->second->probability;
-		}
-		return m;
-	}
-
 	static void subtract_unity_matrix(sparse_matrix& m) {
 		if (m.size_m() != m.size_n()) throw std::invalid_argument("Matrix is not quadratic.");
 		for (sparse_matrix::size_t it{ 0 }; it != m.size_m(); ++it) m(it, it) -= 1;

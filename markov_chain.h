@@ -8,6 +8,7 @@
 
 #include "regxc.h"
 #include "loghelper.h"
+#include "sparse_matrix.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
@@ -416,5 +417,8 @@ public:
 
 	template<class _Rationals, class _Integers, class _Set, bool>
 	friend std::chrono::nanoseconds generate_herman(markov_chain<_Rationals, _Integers>& mc, const _Integers& size, std::unique_ptr<_Set>& target_set);
+
+	template <class mc_type, class set_type>
+	friend sparse_matrix target_adjusted_probability_matrix(const mc_type& mc, const set_type& target_states);
 };
 

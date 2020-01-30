@@ -8,7 +8,7 @@ void calc_expect_f(_MCType& mc, std::size_t reward_index, const std::unordered_s
 
 	using analyzer = mc_analyzer<typename _MCType::rational_type,typename _MCType::integral_type>;
 
-	auto target_probability_matrix{ analyzer::target_adjusted_probability_matrix(mc, target_set) };
+	auto target_probability_matrix{ target_adjusted_probability_matrix(mc, target_set) };
 	auto target_probability_matrix_minus_one{ target_probability_matrix };
 	analyzer::subtract_unity_matrix(target_probability_matrix_minus_one);
 
@@ -32,7 +32,7 @@ void calc_variance_f(_MCType& mc, std::size_t reward_index, const std::unordered
 	
 	*inserter++ = std::chrono::steady_clock::now();
 
-	auto target_probability_matrix{ analyzer::target_adjusted_probability_matrix(mc, target_set) };
+	auto target_probability_matrix{ target_adjusted_probability_matrix(mc, target_set) };
 	*inserter++ = std::chrono::steady_clock::now();
 	*add_name++ = "Create P -> target";
 

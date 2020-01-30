@@ -20,8 +20,8 @@
 
 
 /**
-	Simple sparse matrix implementation to be used with AMGCL sparse linear system solver.
-*/
+	@brief Simple sparse matrix implementation to be used with AMGCL sparse linear system solver.
+*/ //## make this class template, recheck all usages! -> rational type and int type
 class sparse_matrix {
 public:
 	typedef std::unordered_map<int, double> sparse_row;
