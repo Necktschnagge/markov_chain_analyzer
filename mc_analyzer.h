@@ -23,7 +23,8 @@ inline sparse_matrix target_adjusted_probability_matrix(const mc_type& mc, const
 			m(it->first, jt->first) = jt->second->probability;
 	}
 	return m;
-}
+} //### could also be matrix class member function.
+
 
 /**
 	@brief Contains static functions for analyzing and calculating values from markov chains.
@@ -34,6 +35,9 @@ struct mc_analyzer {
 	using mc_type = markov_chain<_RationalT, _IntegerT>;
 	using set_type = std::unordered_set<_IntegerT>;
 
+	/**
+		@brief Calculates image vector in linear system of equations for calculation of expects.
+	*/
 	static std::vector<_RationalT> rewarded_image_vector(const sparse_matrix& target_adjusted_matrix, const mc_type& mc, const std::size_t& reward_selector) {
 		if (!(reward_selector < mc.n_edge_decorations)) throw std::invalid_argument("Given markov chain has to few rewards.");
 		auto result{ std::vector<_RationalT>(target_adjusted_matrix.size_m(), 0) };
@@ -51,7 +55,8 @@ struct mc_analyzer {
 		return result;
 	}
 
-	/** Stores a new reward function for variance
+	/** 
+		Stores a new composed reward function for variance as edge decorations in the markoch chain mc.
 	*/
 	static void calculate_variance_reward(mc_type& mc, std::size_t index_basic_reward, std::size_t index_basic_decoration, std::size_t index_destination_reward){
 		if (!(index_basic_reward < mc.n_edge_decorations)) throw std::out_of_range("Basic reward out of range.");
@@ -68,6 +73,9 @@ struct mc_analyzer {
 		}
 	}
 
+	/**
+		Stores a new composed reward function for covariance as edge decorations in the markoch chain mc.
+	*/
 	static void calculate_covariance_reward(mc_type& mc, std::size_t index_basic_reward_1, std::size_t index_basic_reward_2, std::size_t index_basic_decoration_1, std::size_t index_basic_decoration_2, std::size_t index_destination_reward) {
 		if (!(index_basic_reward_1 < mc.n_edge_decorations)) throw std::out_of_range("Basic reward out of range.");
 		if (!(index_basic_reward_2 < mc.n_edge_decorations)) throw std::out_of_range("Basic reward out of range.");
@@ -94,12 +102,14 @@ struct mc_analyzer {
 
 
 /**
-  Solves linear system M * x = b
+	@brief Solves linear system M * x = b
 */
-std::vector<double> solve_linear_system(const sparse_matrix& M, const std::vector<double>& b, amgcl::profiler<>* optional_profiler = nullptr) {
+std::vector<double> solve_linear_system(const sparse_matrix& M, const std::vector<double>& b /*, amgcl::profiler<>* optional_profiler = nullptr*/ ) {
 
-	amgcl::profiler<> profiler;
-	auto t_total = profiler.scoped_tic("total");
+	//## read the docs of AMGCL to get to know what a profiler actualy does.
+
+	//amgcl::profiler<> profiler;
+	//auto t_total = profiler.scoped_tic("total");
 
 	// Create an AMGCL solver for the problem.
 	typedef amgcl::backend::builtin<double> Backend;
@@ -115,11 +125,11 @@ std::vector<double> solve_linear_system(const sparse_matrix& M, const std::vecto
 
 	std::cout << solve.precond() << std::endl;
 
-	auto t_solve = profiler.scoped_tic("solve");
+	//auto t_solve = profiler.scoped_tic("solve");
 	std::vector<double>  x(M.size_n(), 0.0);
 	solve(b, x);
 
-	if (optional_profiler) *optional_profiler = profiler;
+	//if (optional_profiler) *optional_profiler = profiler;
 	return x;
 }
 
