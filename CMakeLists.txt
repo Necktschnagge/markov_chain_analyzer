@@ -19,6 +19,7 @@ add_executable(MC_Analyzer
 	main.cpp
 	
 	cli.h
+	commands.h
 	global_data.h
 	herman.h
 	intset.h
