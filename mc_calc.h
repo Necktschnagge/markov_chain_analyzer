@@ -7,6 +7,7 @@
 #pragma once
 
 #include "markov_chain.h"
+#include "commands.h"
 
 /**
 	Calculates expects of accumulated edge rewards along paths until reaching target_set in markov chain.
@@ -29,72 +30,63 @@ void calc_expect(_MarkovChain& mc, std::size_t reward_index, const _IntegralSet&
 	Calculates variances of accumulated edge rewards along paths until reaching target_set in markov chain.
 */
 template <class _MarkovChain, class _IntegralSet>
-void calc_variance(_MarkovChain& mc, std::size_t reward_index, const _IntegralSet& target_set, std::size_t decoration_destination_index, std::size_t expect_decoration_index, std::size_t free_reward_index) {
+nlohmann::json calc_variance(_MarkovChain& mc, std::size_t reward_index, const _IntegralSet& target_set, std::size_t decoration_destination_index, std::size_t expect_decoration_index, std::size_t free_reward_index) {
 
 	using analyzer = mc_analyzer<typename _MarkovChain::rational_type, typename _MarkovChain::integral_type>;
 
-	std::vector<decltype(std::chrono::steady_clock::now())> timestamps;
-	std::vector<std::string> names;
+	std::array<decltype(std::chrono::steady_clock::now()),11> timestamps;
 
-	timestamps.reserve(20);
-	names.reserve(20);
-	auto inserter = std::back_inserter(timestamps);
-	auto add_name = std::back_inserter(names);
-	
-	*inserter++ = std::chrono::steady_clock::now();
-
+	timestamps[0] = std::chrono::steady_clock::now();
 	auto target_probability_matrix{ target_adjusted_probability_matrix(mc, target_set) };
-	*inserter++ = std::chrono::steady_clock::now();
-	*add_name++ = "Create P -> target";
-
+	timestamps[1] = std::chrono::steady_clock::now();
 	auto target_probability_matrix_minus_one{ target_probability_matrix };
-	*inserter++ = std::chrono::steady_clock::now();
-	*add_name++ = "Copy P -> target";
-
+	timestamps[2] = std::chrono::steady_clock::now();
 	target_probability_matrix_minus_one.subtract_unity_matrix();
-	*inserter++ = std::chrono::steady_clock::now();
-	*add_name++ = "Subtract I";
-
+	timestamps[3] = std::chrono::steady_clock::now();
 	auto image_vector{ analyzer::rewarded_image_vector(target_probability_matrix,mc,reward_index) };
-	*inserter++ = std::chrono::steady_clock::now();
-	*add_name++ = "Calculate image vector (expect)";
-
+	timestamps[4] = std::chrono::steady_clock::now();
 	auto result{ solve_linear_system(target_probability_matrix_minus_one, image_vector) };
-	*inserter++ = std::chrono::steady_clock::now();
-	*add_name++ = "Solve expect values";
-
+	timestamps[5] = std::chrono::steady_clock::now();
 	mc.set_decoration(result, expect_decoration_index);
-	*inserter++ = std::chrono::steady_clock::now();
-	*add_name++ = "Write decorations (expect)";
-
+	timestamps[6] = std::chrono::steady_clock::now();
 	analyzer::calculate_variance_reward(mc, reward_index, expect_decoration_index, free_reward_index);
-	*inserter++ = std::chrono::steady_clock::now();
-	*add_name++ = "Calculate modified reward";
-
+	timestamps[7] = std::chrono::steady_clock::now();
 	auto image_vector2{ analyzer::rewarded_image_vector(target_probability_matrix, mc, free_reward_index) };
-	*inserter++ = std::chrono::steady_clock::now();
-	*add_name++ = "Calculate image vector (variance)";
-
+	timestamps[8] = std::chrono::steady_clock::now();
 	auto result2{ solve_linear_system(target_probability_matrix_minus_one, image_vector2) };
-	*inserter++ = std::chrono::steady_clock::now();
-	*add_name++ = "Solve variances";
-
+	timestamps[9] = std::chrono::steady_clock::now();
 	mc.set_decoration(result2, decoration_destination_index);
-	*inserter++ = std::chrono::steady_clock::now();
-	*add_name++ = "Write decorations (variance)";
-	
-	std::vector<std::chrono::nanoseconds> differences;
+	timestamps[10] = std::chrono::steady_clock::now();
+
+	nlohmann::json performance_log;
+	static_assert(std::is_same<decltype(timestamps[1] - timestamps[0])::period, std::nano>::value, "Unit is supposed to be nanoseconds.");
+	std::array<decltype((timestamps[1] - timestamps[0]).count()), timestamps.size()-1> diffs;
 	std::transform(timestamps.cbegin(),
 		timestamps.cbegin() + (timestamps.size() - 1),
 		timestamps.cbegin() + 1,
-		std::back_inserter(differences),
-		[](auto before, auto after) -> std::chrono::nanoseconds {
-			return after - before;
-		});
+		diffs.begin(),
+		[](auto before, auto after) { return (after - before).count(); }
+	);
 
-	std::cout << "variance time measures:\n\n";
-	for (int i = 0; i < differences.size(); ++i) {
-		std::cout << std::setw(15) << differences[i].count() << "   :IN STEP:   " << names[i] << "\n";
-	}
-	
+	performance_log[cli_commands::CALC_VARIANCE] = {
+		{"reward_index", reward_index },
+		{"interim_result_edge_decoration_index", free_reward_index },
+		{"expect_state_decoration_index", expect_decoration_index },
+		{"variance_state_decoration_index", decoration_destination_index },
+		{"source_edge_decoration_index", reward_index },
+		{"create_P_target", diffs[0]},
+		{"copy_P_target", diffs[1]},
+		{"subtract_unity_matrix", diffs[2]},
+		{"calc_image_vector_for_expect", diffs[3]},
+		{"solve_linear_system_expect", diffs[4]},
+		{"write_decorations_expect", diffs[5]},
+		{"calc_interim_reward", diffs[6]},
+		{"calc_image_vector_for_variance", diffs[7]},
+		{"solve_linear_system_variance", diffs[8]},
+		{"write_decorations_variance", diffs[9]},
+		{"total_time", (timestamps[10] - timestamps[0]).count()},
+		{"linear_system_solve_time", diffs[4] + diffs[8] },
+		{"unit", "nanoseconds"}
+	};
+	return performance_log;
 }
