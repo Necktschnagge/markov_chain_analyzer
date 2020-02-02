@@ -8,6 +8,8 @@
 
 #include "global_data.h"
 
+#include "json.hpp"
+
 #include <fstream>
 
  /**
@@ -122,14 +124,18 @@ struct cli_commands {
 	@exception std::invalid_argument Bad file.
 	@exception std::logic_error No markov chain present with given ID.
 */
-inline void cli(std::istream& commands, global& g) {
+inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 
 	using mc_type = global::mc_type;
 	const std::string split_symbol{ ">" };
+	auto performance_log{ nlohmann::json() };
 
 	commands.unsetf(std::ios_base::skipws); // also read whitespaces
 	while (commands.good())
 	{
+		// Print performance log
+		std::cout << "performance_log.json so far...\n\n" << performance_log;
+
 		//fetch command
 		std::string command{};
 		std::getline(commands, command);
@@ -311,8 +317,10 @@ inline void cli(std::istream& commands, global& g) {
 			catch (...) { throw std::invalid_argument("Could not parse parameter"); }
 			if (g.markov_chains[mc_id] == nullptr) throw std::logic_error("No mc with given ID");
 
-			auto time = generate_herman(*g.markov_chains[mc_id], size, g.target_sets[target_set_id]);
-			printDuration(time);
+			auto&& log = generate_herman(*g.markov_chains[mc_id], size, g.target_sets[target_set_id]);
+			log["generate_herman"].push_back({"markov_chain_id", mc_id});
+			log["generate_herman"].push_back({ "target_set_id", target_set_id });
+			performance_log.push_back(std::move(log));
 			continue;
 		}
 
