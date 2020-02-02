@@ -34,7 +34,8 @@ nlohmann::json calc_variance(_MarkovChain& mc, std::size_t reward_index, const _
 
 	using analyzer = mc_analyzer<typename _MarkovChain::rational_type, typename _MarkovChain::integral_type>;
 
-	std::array<decltype(std::chrono::steady_clock::now()),11> timestamps;
+	constexpr unsigned COUNT_TIMESTAMPS{ 11 };
+	std::array<decltype(std::chrono::steady_clock::now()),COUNT_TIMESTAMPS> timestamps;
 
 	timestamps[0] = std::chrono::steady_clock::now();
 	auto target_probability_matrix{ target_adjusted_probability_matrix(mc, target_set) };
@@ -60,7 +61,7 @@ nlohmann::json calc_variance(_MarkovChain& mc, std::size_t reward_index, const _
 
 	nlohmann::json performance_log;
 	static_assert(std::is_same<decltype(timestamps[1] - timestamps[0])::period, std::nano>::value, "Unit is supposed to be nanoseconds.");
-	std::array<decltype((timestamps[1] - timestamps[0]).count()), timestamps.size()-1> diffs;
+	std::array<decltype((timestamps[1] - timestamps[0]).count()), COUNT_TIMESTAMPS - 1> diffs;
 	std::transform(timestamps.cbegin(),
 		timestamps.cbegin() + (timestamps.size() - 1),
 		timestamps.cbegin() + 1,
