@@ -357,9 +357,7 @@ public:
 				inverse_transitions[to][from] = e;
 				init_state(from);
 				init_state(to);
-				//if (states.find(from) == states.cend()) states.emplace(from, n_node_decorations);
-				//if (states.find(to) == states.cend()) states.emplace(to, n_node_decorations);
-
+					
 				//set rewards
 				for (std::size_t i = 0; i < cnv.size(); ++i) {
 					if (ppositions.find(i) != ppositions.cend()) continue;
