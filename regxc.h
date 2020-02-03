@@ -28,7 +28,7 @@ public:
 
 	inline static const auto gmc_column_name{ std::string(R"(\$\w+)") };
 	inline static const auto native_ignored{ std::string(R"(\#.*)") };
-	inline static const auto gmc_semantics_definition{ std::string(R"(\$\w+(,\$\w+)*)") }; // use gmc column name here!
+	inline static const auto gmc_semantics_definition{ std::string(R"(\s*\$\w+\s*(,\s*\$\w+\s*)*)") }; // use gmc column name here!
 
 	inline static const auto gmc_general{ std::string("^(") + native_ignored + new_line + ")*" +
 		gmc_semantics_definition + "(" + new_line + ".*)*$" };
