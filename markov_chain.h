@@ -310,9 +310,6 @@ public:
 		const std::size_t pprob = cprob - cnv.cbegin();
 		std::set<std::size_t> ppositions{ pfrom, pto, pprob };
 
-		throw std::logic_error("Not yet fully implemented.");
-		// from here on recheck the code!
-
 		//check all other lines for being in right format (wellformed body)
 		const auto gmc_s_value_format{ std::string(R"([+-]?([0-9]*[.])?[0-9]+)") };
 		const auto gmc_s_separator{ std::string(R"(\s*,\s*)") };
@@ -360,13 +357,13 @@ public:
 				// check if edge alr4eady exists!!!
 				forward_transitions[from][to] = e;
 				inverse_transitions[to][from] = e;
-				if (states.find(from) == states.cend()) states.emplace(from, n_node_decorations);
-				if (states.find(to) == states.cend()) states.emplace(to, n_node_decorations);
-
+				init_state(from);
+				init_state(to);
+					
 				//set rewards
 				for (std::size_t i = 0; i < cnv.size(); ++i) {
 					if (ppositions.find(i) != ppositions.cend()) continue;
-					std::size_t reward_index{ std::stoull(cnv[i]) };
+					std::size_t reward_index{ std::stoull(cnv[i].substr(1)) };
 					double reward{ std::stod(row_items[i]) };
 					e->decorations.at(reward_index) = reward;
 				}

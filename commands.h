@@ -85,7 +85,7 @@ struct cli_commands {
 		@param target_set_id Id to find the set of goal states.
 		@param state_decoration_index Index of state decorations where the variances should be stored.
 		@param state_decoration_expects_index Index of state decorations where the expects should be stored. (Note: the algorithm needs to calculate also expects in order to be able to claculate variances.)
-		@param state_decoration_index Index for storing interim results as transition decorations. Choose a free index that contains values which can be overwritten.
+		@param free_transition_decoration Index for storing interim results as transition decorations. Choose a free index that contains values which can be overwritten.
 	*/
 	inline static const auto CALC_VARIANCE{ "calc_variance" };
 
