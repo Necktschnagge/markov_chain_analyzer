@@ -61,12 +61,12 @@ nlohmann::json calc_variance(_MarkovChain& mc, std::size_t reward_index, const _
 
 	nlohmann::json performance_log;
 	static_assert(std::is_same<decltype(timestamps[1] - timestamps[0])::period, std::nano>::value, "Unit is supposed to be nanoseconds.");
-	std::array<decltype((timestamps[1] - timestamps[0]).count()), COUNT_TIMESTAMPS - 1> diffs;
+	std::array<double, COUNT_TIMESTAMPS - 1> diffs;
 	std::transform(timestamps.cbegin(),
 		timestamps.cbegin() + (timestamps.size() - 1),
 		timestamps.cbegin() + 1,
 		diffs.begin(),
-		[](auto before, auto after) { return (after - before).count(); }
+		[](auto before, auto after) { return (after - before).count() / 1'000'000.0; }
 	);
 
 	performance_log[cli_commands::CALC_VARIANCE] = {
@@ -85,9 +85,9 @@ nlohmann::json calc_variance(_MarkovChain& mc, std::size_t reward_index, const _
 		{"calc_image_vector_for_variance", diffs[7]},
 		{"solve_linear_system_variance", diffs[8]},
 		{"write_decorations_variance", diffs[9]},
-		{"total_time", (timestamps[10] - timestamps[0]).count()},
+		{"total_time", (timestamps[10] - timestamps[0]).count() / 1'000'000.0},
 		{"linear_system_solve_time", diffs[4] + diffs[8] },
-		{"unit", "nanoseconds"}
+		{"unit", "milliseconds"}
 	};
 	return performance_log;
 }

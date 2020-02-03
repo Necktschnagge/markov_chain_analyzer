@@ -230,5 +230,6 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 
 		std::cout << "WARNING: Command not recognized:   " << command << "\nDid not match any known instruction key!\n";
 	}
+	json = std::move(performance_log);
 }
 

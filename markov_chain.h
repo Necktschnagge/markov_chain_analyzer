@@ -21,6 +21,7 @@
 #include <exception>
 #include <chrono>
 #include <sstream>
+#include <numeric>
 
 /**
 	@brief Represents a morkov chain by storing edges with probabilities, with the possibility to store edge and state decorations.
@@ -112,6 +113,16 @@ public:
 	/// @brief Returns the number of states in the markov chain.
 	auto size_states() const noexcept -> decltype(states.size()) {
 		return states.size();
+	}
+
+	/// @brief Returns the number of edges in the markov chain.
+	auto size_edges() const noexcept -> decltype(forward_transitions.size()){
+		return std::accumulate(
+			forward_transitions.cbegin(),
+			forward_transitions.cend(),
+			decltype(forward_transitions.size())(0),
+			[](const auto& partial_sum, const auto& elem) { return partial_sum + elem.second.size(); }
+			);
 	}
 
 	/**
