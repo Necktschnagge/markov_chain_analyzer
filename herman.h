@@ -152,9 +152,11 @@ nlohmann::json generate_herman(markov_chain<_Rationals, _Integers>& mc, const _I
 	static_assert(std::is_same<decltype(timestamps[1] - timestamps[0])::period, std::nano>::value, "Unit is supposed to be nanoseconds.");
 	performance_log["generate_herman"] = {
 		{"size", size },
-		{"checks", (timestamps[1] - timestamps[0]).count() },
-		{"generator", (timestamps[2] - timestamps[1]).count() },
-		{"unit", "nanoseconds"}
+		{"#nodes", mc.size_states() },
+		{"#edges", mc.size_edges()},
+		{"checks", 1.0 * (timestamps[1] - timestamps[0]).count()/1'000'000.0 },
+		{"generator", 1.0 * (timestamps[2] - timestamps[1]).count()/1'000'000.0 },
+		{"unit", "milliseconds"}
 	};
 
 	return performance_log;
