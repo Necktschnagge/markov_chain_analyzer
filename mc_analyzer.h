@@ -20,7 +20,7 @@ inline sparse_matrix target_adjusted_probability_matrix(const mc_type& mc, const
 	for (auto it = mc.forward_transitions.cbegin(); it != mc.forward_transitions.cend(); ++it) {
 		if (target_states.find(it->first) != target_states.cend()) continue;
 		for (auto jt = it->second.cbegin(); jt != it->second.cend(); ++jt)
-			m(it->first, jt->first) = jt->second->probability;
+			m(it->first, jt->first) = jt->second->probability; //###assumes that states are enumerated from 0 ... to n-1
 	}
 	return m;
 } //### could also be matrix class member function.
