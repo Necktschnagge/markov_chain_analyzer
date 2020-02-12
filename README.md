@@ -26,3 +26,45 @@ After these steps just move into the directory where the `CMakeLists.txt` is loc
 * [C++ boost](https://www.boost.org/) (It is necessary to compiler boost, since features like [boost::regex](https://www.boost.org/doc/libs/1_72_0/libs/regex/doc/html/index.html) are used.)
 * [AMGCL](https://amgcl.readthedocs.io/en/latest/)
 * [CMake](https://cmake.org/) (needed in case you want to build the command line tool)
+
+
+### Usage
+
+To use single classes and functions in your custom tool build upon MC_Analyzer, see [the Doxymentation of the code](https://necktschnagge.github.io/markov_chain_analyzer/annotated.html). For using the **command line tool MC_Analyzer** read the following lines.
+
+
+**MC_Analyzer CLI** stores markov chains as well as target sets associated to some integer id. For state enumeration integers `0,1, ... n-1` are used. **MC_Analyzer CLI** offers you various commands in order to obtain expects, variances and covariances and to create or destroy a markov chain. You may find the single [instructions and their detailed descriptions here](https://necktschnagge.github.io/markov_chain_analyzer/structcli__commands.html). We provide some example workflow here:
+
+1. First you need to create a markov chain:
+
+On construction of a markov chain object a number of state decorations (i.e. number of `double` values that can be assigned to each state later) and a number of edge decorations (respectively) is assigned to the markov chain. You will need edge decorations in order to store edge-based rewards and state decorations in order to store e.g. expects and variances. These numbers are fixed during the lifetime of a markov chain object. So in order to do so, start your executable like:
+```
+>mc_analyzer.exe
+```
+ Then **MC_Analyzer CLI** will wait for input. So type an instruction like:
+```
+reset_mc>1>2>2 
+```
+A markov chain is created and associated to id `1`. It provides two cells for `double` values per edge and node.
+
+2. To fill the fresh created, still empty markov chain with some sensible content, you may load a markov chain from file.
+
+**MC_Analyzer CLI** supports reading from a file format coming with this tool, called _General Markov Chain Format (gmc)_ as well as reading from [PRISM's explicit model files](https://www.prismmodelchecker.org/manual/Appendices/ExplicitModelFiles) In this Quickguide we are going to use the former option. So suppose you have an input file `script-example.gmc` with the following content
+```
+$from, $to, $prob,$1
+1,2,0.5,4
+1,3,0.5,5
+2,0,1,2
+3,2,0.25,5
+3,4,0.5,2
+3,5,0.25,3
+4,4,0.8,2
+4,5,0.2,3
+5,0,1,3
+0,5,1,7
+```
+The first line defines the semantics of the following content, saying the first value of the line is the state where the edge represented by the line is coming from, the second where it is going to. The third states the probability assigned to the edge. The third defines some edge-wise reward that will be assigned to the edge decoration at index 1. **! Note: Indexes of edge as well as state rewards start at zero and end with n-1 where n is the number given on construction.** So here the reward function will be placed into the _last_ cells of the edge decoration arrays. **! Note: Probabilities are stored separately. There is no need to provid a cell edge decoration to store probabilities. There is also no option to convert edge decorations into probabilities.**
+
+In order to read the file just type `read_gmc>0>C:/script-example.gmc`
+
+
