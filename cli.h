@@ -7,6 +7,7 @@
 #pragma once
 
 #include "commands.h"
+#include "string_constants.h"
 
 #include "json.hpp"
 
@@ -34,7 +35,7 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 	while (commands.good())
 	{
 		// Print performance log
-		std::cout << "performance_log.json so far...\n\n" << performance_log;
+		std::cout << "\nPerformance Log JSON so far...\n\n" << performance_log;
 
 		//fetch command
 		std::string command{};
@@ -60,6 +61,13 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 			}
 			catch (...) { throw std::invalid_argument("Could not parse parameter."); }
 			g.markov_chains[id] = std::make_unique<mc_type>(n_transition_decoration, n_state_decoration);
+			auto&& log{ nlohmann::json() };
+			log[cli_commands::RESET_MC] = {
+				{ sc::markov_chain_id, id},
+				{ sc::number_node_decorations, n_state_decoration},
+				{ sc::number_edge_decorations, n_transition_decoration}
+			};
+			performance_log.push_back(std::move(log));
 			continue;
 		}
 
@@ -204,7 +212,6 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 			}
 			catch (...) { throw std::invalid_argument("Bad file."); }
 			if (g.markov_chains[id] == nullptr) throw std::logic_error("No markov chain present with given ID.");
-
 			g.markov_chains[id]->write_edge_decorations(file);
 			continue;
 		}

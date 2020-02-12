@@ -1,0 +1,11 @@
+#pragma once
+
+#include <string>
+
+struct sc {
+
+	inline static const auto markov_chain_id{ std::string("mc_id") };
+	inline static const auto number_node_decorations{ std::string("n_node_deco") };
+	inline static const auto number_edge_decorations{ std::string("n_edge_deco") };
+
+};

@@ -29,6 +29,7 @@ add_executable(MC_Analyzer
 	mc_calc.h
 	regxc.h
 	sparse_matrix.h
+	string_constants.h
 	)
 	
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MC_Analyzer)

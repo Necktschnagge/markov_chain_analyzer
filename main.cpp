@@ -7,7 +7,7 @@
 
 #include "json.hpp"
 
-static constexpr bool DEBUG_MODE = true;
+static constexpr bool DEBUG_MODE = false;
 static constexpr bool COMPRESSED_JSON_MODE = true;
 
 int main(int argc, char** argv)
