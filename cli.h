@@ -284,18 +284,10 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 			if (g.markov_chains[mc_id] == nullptr) throw std::logic_error("No mc with given ID");
 
 			auto&& log = generate_herman(*g.markov_chains[mc_id], size, g.target_sets[target_set_id]);
-			log[cli_commands::GENERATE_HERMAN].push_back({ "markov_chain_id", mc_id });
-			log[cli_commands::GENERATE_HERMAN].push_back({ "target_set_id", target_set_id });
+			log[cli_commands::GENERATE_HERMAN].push_back({ sc::markov_chain_id, mc_id });
+			log[cli_commands::GENERATE_HERMAN].push_back({ sc::target_set_id, target_set_id });
+			log[cli_commands::GENERATE_HERMAN].push_back({ sc::size, size });
 			performance_log.push_back(std::move(log));
-			performance_log.push_back({
-					{instruction,
-						{
-							{ sc::markov_chain_id, mc_id },
-							{ sc::target_set_id, target_set_id },
-							{ sc::size, size }
-						}
-					}
-				});
 			continue;
 		}
 
