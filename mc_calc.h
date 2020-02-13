@@ -9,21 +9,57 @@
 #include "markov_chain.h"
 #include "commands.h"
 
-/**
-	Calculates expects of accumulated edge rewards along paths until reaching target_set in markov chain.
-*/
+ /**
+	 Calculates expects of accumulated edge rewards along paths until reaching target_set in markov chain.
+ */
 template <class _MarkovChain, class _IntegralSet>
-void calc_expect(_MarkovChain& mc, std::size_t reward_index, const _IntegralSet& target_set, std::size_t decoration_destination_index) {
+nlohmann::json calc_expect(_MarkovChain& mc, std::size_t reward_index, const _IntegralSet& target_set, std::size_t decoration_destination_index) {
 
-	using analyzer = mc_analyzer<typename _MarkovChain::rational_type,typename _MarkovChain::integral_type>;
+	using analyzer = mc_analyzer<typename _MarkovChain::rational_type, typename _MarkovChain::integral_type>;
 
+	constexpr unsigned COUNT_TIMESTAMPS{ 7 };
+	std::array<decltype(std::chrono::steady_clock::now()), COUNT_TIMESTAMPS> timestamps;
+
+	timestamps[0] = std::chrono::steady_clock::now();
 	auto target_probability_matrix{ target_adjusted_probability_matrix(mc, target_set) };
+	timestamps[1] = std::chrono::steady_clock::now();
 	auto target_probability_matrix_minus_one{ target_probability_matrix };
+	timestamps[2] = std::chrono::steady_clock::now();
 	target_probability_matrix_minus_one.subtract_unity_matrix();
-	
-	auto image_vector{ analyzer::rewarded_image_vector(target_probability_matrix,mc,reward_index) };
+	timestamps[3] = std::chrono::steady_clock::now();
+	auto image_vector{ analyzer::rewarded_image_vector(target_probability_matrix, mc, reward_index) };
+	timestamps[4] = std::chrono::steady_clock::now();
 	auto result{ solve_linear_system(target_probability_matrix_minus_one, image_vector) };
+	timestamps[5] = std::chrono::steady_clock::now();
 	mc.set_decoration(result, decoration_destination_index);
+	timestamps[6] = std::chrono::steady_clock::now();
+
+	nlohmann::json performance_log;
+	static_assert(std::is_same<decltype(timestamps[1] - timestamps[0])::period, std::nano>::value, "Unit is supposed to be nanoseconds.");
+	std::array<double, COUNT_TIMESTAMPS - 1> diffs;
+	std::transform(timestamps.cbegin(),
+		timestamps.cbegin() + (timestamps.size() - 1),
+		timestamps.cbegin() + 1,
+		diffs.begin(),
+		[](auto before, auto after) { return (after - before).count() / 1'000'000.0; }
+	);
+
+	performance_log[cli_commands::CALC_EXPECT] = {
+		{"reward_index", reward_index },
+		{"variance_state_decoration_index", decoration_destination_index },
+		{"source_edge_decoration_index", reward_index },
+		{"create_P_target", diffs[0]},
+		{"copy_P_target", diffs[1]},
+		{"subtract_unity_matrix", diffs[2]},
+		{"calc_image_vector_for_expect", diffs[3]},
+		{"solve_linear_system_expect", diffs[4]},
+		{"write_decorations_expect", diffs[5]},
+		{"total_time", (timestamps[COUNT_TIMESTAMPS-1] - timestamps[0]).count() / 1'000'000.0},
+		{"linear_system_solve_time", diffs[4] },
+		{"unit", "milliseconds"}
+	};
+	return performance_log;
+	//### reuse this code where variances are calculated?
 }
 
 /**
@@ -35,7 +71,7 @@ nlohmann::json calc_variance(_MarkovChain& mc, std::size_t reward_index, const _
 	using analyzer = mc_analyzer<typename _MarkovChain::rational_type, typename _MarkovChain::integral_type>;
 
 	constexpr unsigned COUNT_TIMESTAMPS{ 11 };
-	std::array<decltype(std::chrono::steady_clock::now()),COUNT_TIMESTAMPS> timestamps;
+	std::array<decltype(std::chrono::steady_clock::now()), COUNT_TIMESTAMPS> timestamps;
 
 	timestamps[0] = std::chrono::steady_clock::now();
 	auto target_probability_matrix{ target_adjusted_probability_matrix(mc, target_set) };
@@ -85,7 +121,7 @@ nlohmann::json calc_variance(_MarkovChain& mc, std::size_t reward_index, const _
 		{"calc_image_vector_for_variance", diffs[7]},
 		{"solve_linear_system_variance", diffs[8]},
 		{"write_decorations_variance", diffs[9]},
-		{"total_time", (timestamps[10] - timestamps[0]).count() / 1'000'000.0},
+		{"total_time", (timestamps[COUNT_TIMESTAMPS - 1] - timestamps[0]).count() / 1'000'000.0},
 		{"linear_system_solve_time", diffs[4] + diffs[8] },
 		{"unit", "milliseconds"}
 	};

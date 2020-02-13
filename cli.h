@@ -62,7 +62,7 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 			catch (...) { throw std::invalid_argument("Could not parse parameter."); }
 			g.markov_chains[id] = std::make_unique<mc_type>(n_transition_decoration, n_state_decoration);
 			performance_log.push_back({
-					{cli_commands::RESET_MC,
+					{instruction,
 						{
 							{ sc::markov_chain_id, id},
 							{ sc::number_node_decorations, n_state_decoration},
@@ -90,7 +90,7 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 			if (g.markov_chains[id] == nullptr) throw std::logic_error("No markov chain present with given ID.");
 			g.markov_chains[id]->read_transitions_from_prism_file(file);
 			performance_log.push_back({
-					{cli_commands::READ_TRA,
+					{instruction,
 						{
 							{ sc::markov_chain_id, id},
 							{ sc::file_path, file_path}
@@ -113,7 +113,7 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 			if (g.markov_chains[id] == nullptr) throw std::logic_error("No mc with given ID");
 			g.markov_chains[id]->read_from_gmc_file(file);
 			performance_log.push_back({
-					{cli_commands::READ_GMC,
+					{instruction,
 						{
 							{ sc::markov_chain_id, id},
 							{ sc::file_path, file_path}
@@ -138,7 +138,7 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 			if (g.markov_chains[id] == nullptr) throw std::logic_error("No mc with given ID");
 			g.markov_chains[id]->read_rewards_from_prism_file(file, rew_index);
 			performance_log.push_back({
-					{cli_commands::ADD_REW,
+					{instruction,
 						{
 							{ sc::markov_chain_id, id},
 							{ sc::decoration_index, rew_index },
@@ -162,6 +162,14 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 			g.target_sets[id] = std::make_unique<global::set_type>(
 				std::move(int_set<global::int_type>::stointset(file, [](auto s) { return std::stoull(s); }))
 				);
+			performance_log.push_back({
+					{instruction,
+						{
+							{ sc::target_set_id, id},
+							{ sc::file_path, file_path}
+						}
+					}
+				});
 			continue;
 		}
 
@@ -182,6 +190,15 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 			g.target_sets[id] = std::make_unique<global::set_type>(
 				std::move(int_set<global::int_type>::prismlabeltointset(file, [](auto s) { return std::stoull(s); }, label_id))
 				);
+			performance_log.push_back({
+					{instruction,
+						{
+							{ sc::target_set_id, id },
+							{ sc::file_path, file_path },
+							{ sc::prism_label_id, label_id }
+						}
+					}
+				});
 			continue;
 		}
 
@@ -198,7 +215,10 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 			catch (...) { throw std::invalid_argument("Could not parse parameter"); }
 			if (g.markov_chains[mc_id] == nullptr) throw std::logic_error("No mc with given ID");
 
-			calc_expect(*(g.markov_chains[mc_id]), reward_index, *(g.target_sets[target_id]), destination_decoration);
+			auto&& log = calc_expect(*(g.markov_chains[mc_id]), reward_index, *(g.target_sets[target_id]), destination_decoration);
+			log[cli_commands::CALC_VARIANCE].push_back({ sc::markov_chain_id, mc_id });
+			log[cli_commands::CALC_VARIANCE].push_back({ sc::target_set_id, target_id });
+			performance_log.push_back(std::move(log));
 			continue;
 		}
 
@@ -240,6 +260,14 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 			catch (...) { throw std::invalid_argument("Bad file."); }
 			if (g.markov_chains[id] == nullptr) throw std::logic_error("No markov chain present with given ID.");
 			g.markov_chains[id]->write_edge_decorations(file);
+			performance_log.push_back({
+					{instruction,
+						{
+							{ sc::markov_chain_id, id },
+							{ sc::file_path, file_path }
+						}
+					}
+				});
 			continue;
 		}
 
@@ -259,6 +287,15 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 			log[cli_commands::GENERATE_HERMAN].push_back({ "markov_chain_id", mc_id });
 			log[cli_commands::GENERATE_HERMAN].push_back({ "target_set_id", target_set_id });
 			performance_log.push_back(std::move(log));
+			performance_log.push_back({
+					{instruction,
+						{
+							{ sc::markov_chain_id, mc_id },
+							{ sc::target_set_id, target_set_id },
+							{ sc::size, size }
+						}
+					}
+				});
 			continue;
 		}
 
