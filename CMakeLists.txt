@@ -9,15 +9,10 @@ set(CMAKE_CXX_EXTENSIONS False)
 
 set(Boost_USE_STATIC_LIBS ON)
 
-#FIND_PACKAGE(amgcl)
-FIND_PACKAGE( Boost 1.54.0 COMPONENTS regex REQUIRED )
-#INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIR} )
-include_directories(../amgcl)
-TARGET_LINK_LIBRARIES(MC_Analyzer LINK_PUBLIC ${Boost_LIBRARIES} )
-
 add_executable(MC_Analyzer
 	main.cpp
 	
+	#headers -> so that IDEs like Visual Studio will find them
 	cli.h
 	commands.h
 	global_data.h
@@ -31,8 +26,14 @@ add_executable(MC_Analyzer
 	sparse_matrix.h
 	string_constants.h
 	)
-	
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MC_Analyzer)
+
+#FIND_PACKAGE(amgcl)
+FIND_PACKAGE( Boost 1.54.0 COMPONENTS regex REQUIRED )
+INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIR} )
+include_directories(../amgcl)
+TARGET_LINK_LIBRARIES(MC_Analyzer LINK_PUBLIC ${Boost_LIBRARIES} )
+
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MC_Analyzer)#Set Visualo Studio start-up project, so that one can directly run the debugger.
 
 #add_executable(MC_Analyzer )
 
