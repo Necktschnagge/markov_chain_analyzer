@@ -89,6 +89,20 @@ struct cli_commands {
 	*/
 	inline static const auto CALC_VARIANCE{ "calc_variance" };
 
+	/**
+		@brief Calculates for each state of the markov chain the covariance of accumulated transition decoration (rewards) until reaching the first state in target set.
+		@details Syntax: calc_covariance>{mc_id}>{edge_decoration_1}>{edge_decoration_2}>{target_set_id}>{state_decoration_index}>{state_decoration_expects_index1}>{state_decoration_expects_index2}>{free_transition_decoration}
+		@param mc_id id where the markov chain is stored.
+		@param edge_decoration_1 Index of transition decorations (1. reward function) for that the variance should be calculated
+		@param edge_decoration_2 Index of transition decorations (2. reward function) for that the variance should be calculated
+		@param target_set_id Id to find the set of goal states.
+		@param state_decoration_index Index of state decorations where the variances should be stored.
+		@param state_decoration_expects_index1 Index of state decorations where the expects for the 1. reward function should be stored. (Note: the algorithm needs to calculate also expects in order to be able to claculate variances.)
+		@param state_decoration_expects_index2 Index of state decorations where the expects for the 2. reward function should be stored. (Note: the algorithm needs to calculate also expects in order to be able to claculate variances.)
+		@param free_transition_decoration Index for storing interim results as transition decorations. Choose a free index that contains values which can be overwritten.
+	*/
+	inline static const auto CALC_COVARIANCE{ "calc_covariance" };
+
 	//inline static const auto write_gmc{ "write_gmc" }; //##not implemented
 
 	/**
@@ -121,4 +135,5 @@ struct cli_commands {
 		@param id Id of the target set to delete.
 	*/
 	inline static const auto DELETE_TS{ "del_ts" }; // id mc, n, targetset id
+
 };

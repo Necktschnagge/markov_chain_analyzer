@@ -218,8 +218,8 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 			if (g.markov_chains[mc_id] == nullptr) throw std::logic_error("No mc with given ID");
 
 			auto&& log = calc_expect(*(g.markov_chains[mc_id]), reward_index, *(g.target_sets[target_id]), destination_decoration);
-			log[cli_commands::CALC_VARIANCE].push_back({ sc::markov_chain_id, mc_id });
-			log[cli_commands::CALC_VARIANCE].push_back({ sc::target_set_id, target_id });
+			log[instruction].push_back({ sc::markov_chain_id, mc_id });
+			log[instruction].push_back({ sc::target_set_id, target_id });
 			performance_log.push_back(std::move(log));
 			continue;
 		}
@@ -240,8 +240,55 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 			catch (...) { throw std::invalid_argument("Could not parse parameter"); }
 			if (g.markov_chains[mc_id] == nullptr) throw std::logic_error("No mc with given ID");
 			auto&& log = calc_variance(*(g.markov_chains[mc_id]), reward_index, *(g.target_sets[target_id]), destination_decoration, expect_decoration, free_reward);
-			log[cli_commands::CALC_VARIANCE].push_back({ sc::markov_chain_id, mc_id });
-			log[cli_commands::CALC_VARIANCE].push_back({ sc::target_set_id, target_id });
+			log[instruction].push_back({ sc::markov_chain_id, mc_id });
+			log[instruction].push_back({ sc::target_set_id, target_id });
+			performance_log.push_back(std::move(log));
+			continue;
+		}
+		
+		if (instruction == cli_commands::CALC_COVARIANCE) {
+			/* Syntax: calc_covariance
+				>{mc_id}
+				>{edge_decoration_1}
+				>{edge_decoration_2}
+				>{target_set_id}
+				>{state_decoration_index}
+				>{state_decoration_expects_index1}
+				>{state_decoration_expects_index2}
+				>{free_transition_decoration}
+			*/
+			if (items.size() != 9) throw std::invalid_argument("Wrong number of parameters.");
+			std::size_t state_decoration_expects_index1{ 0 },
+				state_decoration_expects_index2{ 0 },
+				destination_decoration{ 0 },
+				edge_decoration_1{ 0 },
+				edge_decoration_2{ 0 },
+				free_reward{ 0 };
+			cli_commands::id target_set_id{ 0 },
+				mc_id{ 0 };
+			try {
+				mc_id = std::stoull(items[1]);
+				edge_decoration_1 = std::stoull(items[2]);
+				edge_decoration_2 = std::stoull(items[3]);
+				target_set_id = std::stoull(items[4]);
+				destination_decoration = std::stoull(items[5]);
+				state_decoration_expects_index1 = std::stoull(items[6]);
+				state_decoration_expects_index2 = std::stoull(items[7]);
+				free_reward = std::stoull(items[8]);
+			}
+			catch (...) { throw std::invalid_argument("Could not parse parameter"); }
+			if (g.markov_chains[mc_id] == nullptr) throw std::logic_error("No mc with given ID");
+			auto&& log = calc_covariance(
+				*(g.markov_chains[mc_id]),
+				edge_decoration_1,
+				edge_decoration_2,
+				*(g.target_sets[target_set_id]),
+				destination_decoration,
+				state_decoration_expects_index1,
+				state_decoration_expects_index2,
+				free_reward);
+			log[instruction].push_back({ sc::markov_chain_id, mc_id });
+			log[instruction].push_back({ sc::target_set_id, target_set_id });
 			performance_log.push_back(std::move(log));
 			continue;
 		}
@@ -286,9 +333,9 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 			if (g.markov_chains[mc_id] == nullptr) throw std::logic_error("No mc with given ID");
 
 			auto&& log = generate_herman(*g.markov_chains[mc_id], size, g.target_sets[target_set_id]);
-			log[cli_commands::GENERATE_HERMAN].push_back({ sc::markov_chain_id, mc_id });
-			log[cli_commands::GENERATE_HERMAN].push_back({ sc::target_set_id, target_set_id });
-			log[cli_commands::GENERATE_HERMAN].push_back({ sc::size, size });
+			log[instruction].push_back({ sc::markov_chain_id, mc_id });
+			log[instruction].push_back({ sc::target_set_id, target_set_id });
+			log[instruction].push_back({ sc::size, size });
 			performance_log.push_back(std::move(log));
 			continue;
 		}
