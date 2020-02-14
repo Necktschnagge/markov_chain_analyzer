@@ -31,6 +31,6 @@ struct sc {
 	inline static const auto time_calc_interim_reward{ std::string("time_calc_interim_reward") };
 	inline static const auto _expect{ std::string("_expect") };
 	inline static const auto _variance{ std::string("_variance") };
-
+	inline static const auto _covariance{ std::string("_covariance") };
 
 };
