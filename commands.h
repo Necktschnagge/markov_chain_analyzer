@@ -108,6 +108,5 @@ struct cli_commands {
 	*/
 	inline static const auto GENERATE_HERMAN{ "generate_herman" }; // id mc, n, targetset id
 
-	//inline static //cov calc
-	// delte mc , delete target set #####
+
 };

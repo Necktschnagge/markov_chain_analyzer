@@ -12,5 +12,12 @@ struct sc {
 	inline static const auto decoration_index{ std::string("deco_index") };
 	inline static const auto prism_label_id{ std::string("prism_label_id") };
 	inline static const auto size{ std::string("size") };
+	inline static const auto size_nodes{ std::string("size_nodes") };
+	inline static const auto size_edges{ std::string("size_edges") };
+	inline static const auto time_run_checks{ std::string("time_run_checks") };
+	inline static const auto time_run_generator{ std::string("time_run_generator") };
+	inline static const auto time_total{ std::string("time_total") };
+	inline static const auto unit{ std::string("unit") };
+	inline static const auto milliseconds{ std::string("milliseconds") };
 
 };
