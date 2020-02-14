@@ -5,7 +5,7 @@
 #include "mc_calc.h"
 #include "cli.h"
 
-#include "json.hpp"
+#include "nlohmann/json.hpp"
 
 static constexpr bool DEBUG_MODE = false;
 static constexpr bool COMPRESSED_JSON_MODE = true;

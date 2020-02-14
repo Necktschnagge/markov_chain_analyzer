@@ -9,7 +9,7 @@
 #include "commands.h"
 #include "string_constants.h"
 
-#include "json.hpp"
+#include "nlohmann/json.hpp"
 
 #include <fstream>
 

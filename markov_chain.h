@@ -13,7 +13,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 
-#include "json.hpp"
+#include "nlohmann/json.hpp"
 
 #include <unordered_map>
 #include <unordered_set>
