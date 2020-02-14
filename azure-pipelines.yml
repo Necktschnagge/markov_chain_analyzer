@@ -17,4 +17,6 @@ jobs:
   pool:
     vmImage: 'vs2017-win2016'
   steps:
-  - script: echo "bla bla"
+  - script:
+    - echo "bla bla"
+    - gci
