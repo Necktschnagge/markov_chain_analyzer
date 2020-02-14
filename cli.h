@@ -293,6 +293,44 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 			continue;
 		}
 
+		if (instruction == cli_commands::DELETE_MC) {
+			if (items.size() != 2) throw std::invalid_argument("Wrong number of parameters.");
+			cli_commands::id id{ 0 };
+			try {
+				id = std::stoull(items[1]);
+			}
+			catch (...) { throw std::invalid_argument("Could not parse parameter"); }
+			if (g.markov_chains[id] == nullptr) throw std::logic_error("No mc with given ID");
+			g.markov_chains.erase(id);
+			performance_log.push_back({
+					{instruction,
+						{
+							{ sc::markov_chain_id, id }
+						}
+					}
+				});
+			continue;
+		}
+
+		if (instruction == cli_commands::DELETE_TS) {
+			if (items.size() != 2) throw std::invalid_argument("Wrong number of parameters.");
+			cli_commands::id id{ 0 };
+			try {
+				id = std::stoull(items[1]);
+			}
+			catch (...) { throw std::invalid_argument("Could not parse parameter"); }
+			if (g.target_sets[id] == nullptr) throw std::logic_error("No mc with given ID");
+			g.target_sets.erase(id);
+			performance_log.push_back({
+					{instruction,
+						{
+							{ sc::target_set_id, id }
+						}
+					}
+				});
+			continue;
+		}
+
 		std::cout << "WARNING: Command not recognized:   " << command << "\nDid not match any known instruction key!\n";
 	}
 	return performance_log;

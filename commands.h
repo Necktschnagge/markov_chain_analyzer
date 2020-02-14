@@ -101,12 +101,24 @@ struct cli_commands {
 
 	/**
 		@brief Generates transitions for Herman's self-stabilizing algorithm and sets all edge decorations at index 0 to 1.
-		@details Syntax: generate_herman>{id}>{herman_size}>{target_set_id} It also prints the time that has been spent.
+		@details Syntax: generate_herman>{id}>{herman_size}>{target_set_id}
 		@param id id where the markov chain is stored. It must have been initialized before (with reset_mc) and be empty.
 		@param herman_size Number of the processes in ring architecture for herman instance. Must be odd.
 		@param target_set_id Id of the target set that will be created by the algorithm to store the goal states corresponding to the created markov chain.
 	*/
 	inline static const auto GENERATE_HERMAN{ "generate_herman" }; // id mc, n, targetset id
 
+	/**
+		@brief Deletes a markov chain.
+		@details Syntax: del_mc>{id}
+		@param id Id of the markov chain to delete.
+	*/
+	inline static const auto DELETE_MC{ "del_mc" }; // id mc, n, targetset id
 
+	/**
+		@brief Deletes a target set.
+		@details Syntax: del_ts>{id}
+		@param id Id of the target set to delete.
+	*/
+	inline static const auto DELETE_TS{ "del_ts" }; // id mc, n, targetset id
 };
