@@ -8,7 +8,7 @@
 #include "nlohmann/json.hpp"
 
 static constexpr bool DEBUG_MODE = false;
-static constexpr bool COMPRESSED_JSON_MODE = true;
+static constexpr bool COMPRESSED_JSON_MODE = false;
 
 int main(int argc, char** argv)
 {
