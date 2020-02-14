@@ -31,7 +31,7 @@ add_executable(MC_Analyzer
 FIND_PACKAGE( Boost 1.54.0 COMPONENTS regex REQUIRED )
 include_directories(SYSTEM extern/json/include)
 INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIR} )
-include_directories(../amgcl)
+include_directories(extern/amgcl)
 TARGET_LINK_LIBRARIES(MC_Analyzer LINK_PUBLIC ${Boost_LIBRARIES} )
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT MC_Analyzer)#Set Visualo Studio start-up project, so that one can directly run the debugger.
