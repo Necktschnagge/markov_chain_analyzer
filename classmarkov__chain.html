@@ -98,6 +98,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmarkov__chain.html#a23509bf2c38427e0005cb3a06666ce41">size_states</a> () const noexcept -&gt; decltype(states.size())</td></tr>
 <tr class="memdesc:a23509bf2c38427e0005cb3a06666ce41"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of states in the markov chain. <br /></td></tr>
 <tr class="separator:a23509bf2c38427e0005cb3a06666ce41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7ddd57acb1f462472d07277a53c0913"><td class="memItemLeft" align="right" valign="top"><a id="ad7ddd57acb1f462472d07277a53c0913"></a>
+auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmarkov__chain.html#ad7ddd57acb1f462472d07277a53c0913">size_edges</a> () const noexcept -&gt; decltype(forward_transitions.size())</td></tr>
+<tr class="memdesc:ad7ddd57acb1f462472d07277a53c0913"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of edges in the markov chain. <br /></td></tr>
+<tr class="separator:ad7ddd57acb1f462472d07277a53c0913"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf4c9878d1deb95357d180053aff3cee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmarkov__chain.html#adf4c9878d1deb95357d180053aff3cee">read_transitions_from_prism_file</a> (std::istream &amp;transitions)</td></tr>
 <tr class="memdesc:adf4c9878d1deb95357d180053aff3cee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads a prism transitions file to build up a markov chain.  <a href="#adf4c9878d1deb95357d180053aff3cee">More...</a><br /></td></tr>
 <tr class="separator:adf4c9878d1deb95357d180053aff3cee"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -127,10 +131,10 @@ Friends</h2></td></tr>
 template&lt;class , class &gt; </td></tr>
 <tr class="memitem:aec7dec921b13c80e70e1c482d5cabd16"><td class="memTemplItemLeft" align="right" valign="top">class&#160;</td><td class="memTemplItemRight" valign="bottom"><b>mc_analyzer</b></td></tr>
 <tr class="separator:aec7dec921b13c80e70e1c482d5cabd16"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a872a0870a972b267c9056091668fa6"><td class="memTemplParams" colspan="2">template&lt;class _Rationals , class _Integers , class _Set , bool &gt; </td></tr>
-<tr class="memitem:a3a872a0870a972b267c9056091668fa6"><td class="memTemplItemLeft" align="right" valign="top">std::chrono::nanoseconds&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmarkov__chain.html#a3a872a0870a972b267c9056091668fa6">generate_herman</a> (<a class="el" href="classmarkov__chain.html">markov_chain</a>&lt; _Rationals, _Integers &gt; &amp;mc, const _Integers &amp;size, std::unique_ptr&lt; _Set &gt; &amp;target_set)</td></tr>
-<tr class="memdesc:a3a872a0870a972b267c9056091668fa6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Takes markov chain object and creates transitions for herman's self-stabilizing algorithm.  <a href="#a3a872a0870a972b267c9056091668fa6">More...</a><br /></td></tr>
-<tr class="separator:a3a872a0870a972b267c9056091668fa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac52fe66f7e82b3225f83347b4b52235"><td class="memTemplParams" colspan="2">template&lt;class _Rationals , class _Integers , class _Set , bool &gt; </td></tr>
+<tr class="memitem:aac52fe66f7e82b3225f83347b4b52235"><td class="memTemplItemLeft" align="right" valign="top">nlohmann::json&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmarkov__chain.html#aac52fe66f7e82b3225f83347b4b52235">generate_herman</a> (<a class="el" href="classmarkov__chain.html">markov_chain</a>&lt; _Rationals, _Integers &gt; &amp;mc, const _Integers &amp;size, std::unique_ptr&lt; _Set &gt; &amp;target_set)</td></tr>
+<tr class="memdesc:aac52fe66f7e82b3225f83347b4b52235"><td class="mdescLeft">&#160;</td><td class="mdescRight">Takes markov chain object and creates transitions for herman's self-stabilizing algorithm.  <a href="#aac52fe66f7e82b3225f83347b4b52235">More...</a><br /></td></tr>
+<tr class="separator:aac52fe66f7e82b3225f83347b4b52235"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79d21fb9e3a070f050c778c4193b6af4"><td class="memTemplParams" colspan="2"><a id="a79d21fb9e3a070f050c778c4193b6af4"></a>
 template&lt;class mc_type , class set_type &gt; </td></tr>
 <tr class="memitem:a79d21fb9e3a070f050c778c4193b6af4"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classsparse__matrix.html">sparse_matrix</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classmarkov__chain.html#a79d21fb9e3a070f050c778c4193b6af4">target_adjusted_probability_matrix</a> (const mc_type &amp;mc, const set_type &amp;target_states)</td></tr>
@@ -385,8 +389,8 @@ template&lt;class _RationalT, class _IntegralT&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Friends And Related Function Documentation</h2>
-<a id="a3a872a0870a972b267c9056091668fa6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3a872a0870a972b267c9056091668fa6">&#9670;&nbsp;</a></span>generate_herman</h2>
+<a id="aac52fe66f7e82b3225f83347b4b52235"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aac52fe66f7e82b3225f83347b4b52235">&#9670;&nbsp;</a></span>generate_herman</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -399,7 +403,7 @@ template&lt;class _Rationals , class _Integers , class _Set , bool &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::chrono::nanoseconds generate_herman </td>
+          <td class="memname">nlohmann::json generate_herman </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classmarkov__chain.html">markov_chain</a>&lt; _Rationals, _Integers &gt; &amp;&#160;</td>
           <td class="paramname"><em>mc</em>, </td>

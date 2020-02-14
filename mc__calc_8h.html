@@ -65,23 +65,24 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="markov__chain_8h_source.html">markov_chain.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="commands_8h_source.html">commands.h</a>&quot;</code><br />
 </div>
 <p><a href="mc__calc_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ac06b024677e92458ea206bc9498ebde3"><td class="memTemplParams" colspan="2">template&lt;class _MarkovChain , class _IntegralSet &gt; </td></tr>
-<tr class="memitem:ac06b024677e92458ea206bc9498ebde3"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="mc__calc_8h.html#ac06b024677e92458ea206bc9498ebde3">calc_expect</a> (_MarkovChain &amp;mc, std::size_t reward_index, const _IntegralSet &amp;target_set, std::size_t decoration_destination_index)</td></tr>
-<tr class="separator:ac06b024677e92458ea206bc9498ebde3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acfc52177149a721555d5b16613514b41"><td class="memTemplParams" colspan="2">template&lt;class _MarkovChain , class _IntegralSet &gt; </td></tr>
-<tr class="memitem:acfc52177149a721555d5b16613514b41"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="mc__calc_8h.html#acfc52177149a721555d5b16613514b41">calc_variance</a> (_MarkovChain &amp;mc, std::size_t reward_index, const _IntegralSet &amp;target_set, std::size_t decoration_destination_index, std::size_t expect_decoration_index, std::size_t free_reward_index)</td></tr>
-<tr class="separator:acfc52177149a721555d5b16613514b41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16e7aebd37daf0744894918fc2b755f3"><td class="memTemplParams" colspan="2">template&lt;class _MarkovChain , class _IntegralSet &gt; </td></tr>
+<tr class="memitem:a16e7aebd37daf0744894918fc2b755f3"><td class="memTemplItemLeft" align="right" valign="top">nlohmann::json&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="mc__calc_8h.html#a16e7aebd37daf0744894918fc2b755f3">calc_expect</a> (_MarkovChain &amp;mc, std::size_t reward_index, const _IntegralSet &amp;target_set, std::size_t decoration_destination_index)</td></tr>
+<tr class="separator:a16e7aebd37daf0744894918fc2b755f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c969b1a418fa36c144ecdcc10dc7b22"><td class="memTemplParams" colspan="2">template&lt;class _MarkovChain , class _IntegralSet &gt; </td></tr>
+<tr class="memitem:a0c969b1a418fa36c144ecdcc10dc7b22"><td class="memTemplItemLeft" align="right" valign="top">nlohmann::json&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="mc__calc_8h.html#a0c969b1a418fa36c144ecdcc10dc7b22">calc_variance</a> (_MarkovChain &amp;mc, std::size_t reward_index, const _IntegralSet &amp;target_set, std::size_t decoration_destination_index, std::size_t expect_decoration_index, std::size_t free_reward_index)</td></tr>
+<tr class="separator:a0c969b1a418fa36c144ecdcc10dc7b22"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains facades for calculate expects / variances / .. on markov chains. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="ac06b024677e92458ea206bc9498ebde3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac06b024677e92458ea206bc9498ebde3">&#9670;&nbsp;</a></span>calc_expect()</h2>
+<a id="a16e7aebd37daf0744894918fc2b755f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a16e7aebd37daf0744894918fc2b755f3">&#9670;&nbsp;</a></span>calc_expect()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -89,7 +90,7 @@ Functions</h2></td></tr>
 template&lt;class _MarkovChain , class _IntegralSet &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void calc_expect </td>
+          <td class="memname">nlohmann::json calc_expect </td>
           <td>(</td>
           <td class="paramtype">_MarkovChain &amp;&#160;</td>
           <td class="paramname"><em>mc</em>, </td>
@@ -123,8 +124,8 @@ template&lt;class _MarkovChain , class _IntegralSet &gt; </div>
 
 </div>
 </div>
-<a id="acfc52177149a721555d5b16613514b41"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acfc52177149a721555d5b16613514b41">&#9670;&nbsp;</a></span>calc_variance()</h2>
+<a id="a0c969b1a418fa36c144ecdcc10dc7b22"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c969b1a418fa36c144ecdcc10dc7b22">&#9670;&nbsp;</a></span>calc_variance()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -132,7 +133,7 @@ template&lt;class _MarkovChain , class _IntegralSet &gt; </div>
 template&lt;class _MarkovChain , class _IntegralSet &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">void calc_variance </td>
+          <td class="memname">nlohmann::json calc_variance </td>
           <td>(</td>
           <td class="paramtype">_MarkovChain &amp;&#160;</td>
           <td class="paramname"><em>mc</em>, </td>

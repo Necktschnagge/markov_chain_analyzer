@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.13"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MC Analyzer: markov_chain.h File Reference</title>
+<title>MC Analyzer: commands.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -61,33 +61,21 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a>  </div>
   <div class="headertitle">
-<div class="title">markov_chain.h File Reference</div>  </div>
+<div class="title">commands.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="regxc_8h_source.html">regxc.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="loghelper_8h_source.html">loghelper.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="sparse__matrix_8h_source.html">sparse_matrix.h</a>&quot;</code><br />
-<code>#include &lt;boost/algorithm/string.hpp&gt;</code><br />
-<code>#include &lt;boost/regex.hpp&gt;</code><br />
-<code>#include &quot;nlohmann/json.hpp&quot;</code><br />
-<code>#include &lt;unordered_map&gt;</code><br />
-<code>#include &lt;unordered_set&gt;</code><br />
-<code>#include &lt;istream&gt;</code><br />
-<code>#include &lt;exception&gt;</code><br />
-<code>#include &lt;chrono&gt;</code><br />
-<code>#include &lt;sstream&gt;</code><br />
-<code>#include &lt;numeric&gt;</code><br />
+<div class="textblock"><code>#include &quot;global_data.h&quot;</code><br />
 </div>
-<p><a href="markov__chain_8h_source.html">Go to the source code of this file.</a></p>
+<p><a href="commands_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmarkov__chain.html">markov_chain&lt; _RationalT, _IntegralT &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Represents a morkov chain by storing edges with probabilities, with the possibility to store edge and state decorations.  <a href="classmarkov__chain.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcli__commands.html">cli_commands</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Contains all instruction key to use MC Analyzer form command line. Additionally syntax information are given how to use the instructions.  <a href="structcli__commands.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Contains class template <a class="el" href="classmarkov__chain.html" title="Represents a morkov chain by storing edges with probabilities, with the possibility to store edge and...">markov_chain</a>. </p>
+<div class="textblock"><p>Lists the instruction keywords that may be used from the commandline interface. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

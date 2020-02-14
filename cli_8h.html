@@ -59,34 +59,29 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
-<a href="#nested-classes">Classes</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">cli.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;global_data.h&quot;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="commands_8h_source.html">commands.h</a>&quot;</code><br />
+<code>#include &quot;string_constants.h&quot;</code><br />
+<code>#include &quot;nlohmann/json.hpp&quot;</code><br />
 <code>#include &lt;fstream&gt;</code><br />
 </div>
 <p><a href="cli_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
-Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcli__commands.html">cli_commands</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Contains all instruction key to use MC Analyzer form command line. Additionally syntax information are given how to use the instructions.  <a href="structcli__commands.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ac2e7887cffd003367a226cb0e1a5633b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cli_8h.html#ac2e7887cffd003367a226cb0e1a5633b">cli</a> (std::istream &amp;commands, <a class="el" href="structglobal.html">global</a> &amp;g)</td></tr>
-<tr class="memdesc:ac2e7887cffd003367a226cb0e1a5633b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads commands from stream, performs corresponding actions.  <a href="#ac2e7887cffd003367a226cb0e1a5633b">More...</a><br /></td></tr>
-<tr class="separator:ac2e7887cffd003367a226cb0e1a5633b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba3f0a3d205f9518c500c7bc9247157a"><td class="memItemLeft" align="right" valign="top">nlohmann::json&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cli_8h.html#aba3f0a3d205f9518c500c7bc9247157a">cli</a> (std::istream &amp;commands, <a class="el" href="structglobal.html">global</a> &amp;g)</td></tr>
+<tr class="memdesc:aba3f0a3d205f9518c500c7bc9247157a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads commands from stream, performs corresponding actions.  <a href="#aba3f0a3d205f9518c500c7bc9247157a">More...</a><br /></td></tr>
+<tr class="separator:aba3f0a3d205f9518c500c7bc9247157a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Commandline interface for MC Analyzer. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="ac2e7887cffd003367a226cb0e1a5633b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac2e7887cffd003367a226cb0e1a5633b">&#9670;&nbsp;</a></span>cli()</h2>
+<a id="aba3f0a3d205f9518c500c7bc9247157a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba3f0a3d205f9518c500c7bc9247157a">&#9670;&nbsp;</a></span>cli()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -95,7 +90,7 @@ Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void cli </td>
+          <td class="memname">nlohmann::json cli </td>
           <td>(</td>
           <td class="paramtype">std::istream &amp;&#160;</td>
           <td class="paramname"><em>commands</em>, </td>
@@ -134,10 +129,11 @@ Functions</h2></td></tr>
     <tr><td class="paramname">std::invalid_argument</td><td>Wrong number of parameters. </td></tr>
     <tr><td class="paramname">std::invalid_argument</td><td>Could not parse parameter. </td></tr>
     <tr><td class="paramname">std::invalid_argument</td><td>Bad file. </td></tr>
-    <tr><td class="paramname">std::logic_error</td><td>No markov chain present with given ID. </td></tr>
+    <tr><td class="paramname">std::logic_error</td><td>No markov chain present with given ID.</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>Logs as <em>nlohmann::json</em> containing qualitative description of what happenned as well as quantitative performance measures. </dd></dl>
 
 </div>
 </div>
