@@ -10,7 +10,7 @@
 #include "commands.h"
 
  /**
-	 Calculates expects of accumulated edge rewards along paths until reaching target_set in markov chain.
+	  Calculates expects of accumulated edge rewards along paths until reaching target_set in markov chain.
  */
 template <class _MarkovChain, class _IntegralSet>
 nlohmann::json calc_expect(_MarkovChain& mc, std::size_t reward_index, const _IntegralSet& target_set, std::size_t decoration_destination_index) {
@@ -45,18 +45,16 @@ nlohmann::json calc_expect(_MarkovChain& mc, std::size_t reward_index, const _In
 	);
 
 	performance_log[cli_commands::CALC_EXPECT] = {
-		{"reward_index", reward_index },
-		{"variance_state_decoration_index", decoration_destination_index },
-		{"source_edge_decoration_index", reward_index },
-		{"create_P_target", diffs[0]},
-		{"copy_P_target", diffs[1]},
-		{"subtract_unity_matrix", diffs[2]},
-		{"calc_image_vector_for_expect", diffs[3]},
-		{"solve_linear_system_expect", diffs[4]},
-		{"write_decorations_expect", diffs[5]},
-		{"total_time", (timestamps[COUNT_TIMESTAMPS-1] - timestamps[0]).count() / 1'000'000.0},
-		{"linear_system_solve_time", diffs[4] },
-		{"unit", "milliseconds"}
+		{sc::decoration_index_egde_source, reward_index },
+		{sc::decoration_index_node_target, decoration_destination_index },
+		{sc::time_total_create_pto_matrix, diffs[0]},
+		{sc::time_total_copy_pto_matrix, diffs[1]},
+		{sc::time_subtract_unity_matrix, diffs[2]},
+		{sc::time_calc_image_vector, diffs[3]},
+		{sc::time_solve_linear_system, diffs[4]},
+		{sc::time_write_decoration_node, diffs[5]},
+		{sc::time_total, (timestamps[COUNT_TIMESTAMPS - 1] - timestamps[0]).count() / 1'000'000.0},
+		{sc::unit, sc::milliseconds}
 	};
 	return performance_log;
 	//### reuse this code where variances are calculated?
