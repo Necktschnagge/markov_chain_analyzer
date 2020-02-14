@@ -3,21 +3,27 @@
 # Add steps that build, test, save build artifacts, deploy, and more:
 # https://aka.ms/yaml
 
-trigger:
-- master
-
-pool:
-  vmImage: 'ubuntu-latest'
-
-steps:
-- task: Docker@0
-  displayName: 'Run Jekyll'
+#trigger:
+#- master
+#
+#pool:
+#  vmImage: 'ubuntu-latest'
+#
+#steps:
+#- task: Docker@0
+#  displayName: 'Run Jekyll'
+#  inputs:
+#    containerRegistryType: 'Container Registry'
+#    action: 'Run an image'
+#    imageName: 'jekyll/builder:latest'
+#    volumes: |
+#      $(build.sourcesDirectory):/srv/jekyll
+#      $(build.binariesDirectory):/srv/jekyll/_site
+#    containerCommand: 'jekyll build --future'
+#    detached: false
+# CMake
+# Build with the CMake cross-platform build system
+- task: CMake@1
   inputs:
-    containerRegistryType: 'Container Registry'
-    action: 'Run an image'
-    imageName: 'jekyll/builder:latest'
-    volumes: |
-      $(build.sourcesDirectory):/srv/jekyll
-      $(build.binariesDirectory):/srv/jekyll/_site
-    containerCommand: 'jekyll build --future'
-    detached: false
+    #workingDirectory: 'build' # Optional
+    #cmakeArgs: # Optional
