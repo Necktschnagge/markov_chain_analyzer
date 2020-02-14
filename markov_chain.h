@@ -13,12 +13,15 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/regex.hpp>
 
+#include "nlohmann/json.hpp"
+
 #include <unordered_map>
 #include <unordered_set>
 #include <istream>
 #include <exception>
 #include <chrono>
 #include <sstream>
+#include <numeric>
 
 /**
 	@brief Represents a morkov chain by storing edges with probabilities, with the possibility to store edge and state decorations.
@@ -110,6 +113,16 @@ public:
 	/// @brief Returns the number of states in the markov chain.
 	auto size_states() const noexcept -> decltype(states.size()) {
 		return states.size();
+	}
+
+	/// @brief Returns the number of edges in the markov chain.
+	auto size_edges() const noexcept -> decltype(forward_transitions.size()){
+		return std::accumulate(
+			forward_transitions.cbegin(),
+			forward_transitions.cend(),
+			decltype(forward_transitions.size())(0),
+			[](const auto& partial_sum, const auto& elem) { return partial_sum + elem.second.size(); }
+			);
 	}
 
 	/**
@@ -413,7 +426,7 @@ public:
 	friend class mc_analyzer;
 
 	template<class _Rationals, class _Integers, class _Set, bool>
-	friend std::chrono::nanoseconds generate_herman(markov_chain<_Rationals, _Integers>& mc, const _Integers& size, std::unique_ptr<_Set>& target_set);
+	friend nlohmann::json generate_herman(markov_chain<_Rationals, _Integers>& mc, const _Integers& size, std::unique_ptr<_Set>& target_set);
 
 	template <class mc_type, class set_type>
 	friend sparse_matrix target_adjusted_probability_matrix(const mc_type& mc, const set_type& target_states);

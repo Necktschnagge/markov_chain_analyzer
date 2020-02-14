@@ -36,21 +36,3 @@ public:
 template<class _Doc>
 surround_logger<_Doc> make_surround_log(const _Doc& doc) { return surround_logger<_Doc>(doc); }
 
-
-/// @brief prints a duration (see \a std::chrono::duration)
-template<class _Duration>
-inline void printDuration(const _Duration& duration) {
-	using namespace std::chrono;
-
-	auto width = 1; {
-		auto x = duration_cast<nanoseconds>(duration).count();
-		auto n = 50; // just to completely rule out infinite loop
-		while (x > 0 && n > 0) { ++width; x >>= 1; --n; }
-	}
-	std::cout << "TIME:\n"
-		<< "nanoseconds:      " << std::setw(width) << duration_cast<nanoseconds>(duration).count()
-		<< "\nmicroseconds:   " << std::setw(width) << duration_cast<microseconds>(duration).count()
-		<< "\nmilliseconds:   " << std::setw(width) << duration_cast<milliseconds>(duration).count()
-		<< "\nseconds:        " << std::setw(width) << duration_cast<seconds>(duration).count()
-		<< "\n\n";
-}

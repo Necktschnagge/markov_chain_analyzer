@@ -7,6 +7,11 @@
 #pragma once
 
 #include "markov_chain.h"
+#include "commands.h"
+#include "string_constants.h"
+
+#include "nlohmann/json.hpp"
+
 
 #include <chrono>
 
@@ -22,8 +27,10 @@
 	 @exception std::invalid_argument Reward 0 needed for costs.
  */
 template<class _Rationals, class _Integers, class _Set, bool disable_checks = false>
-std::chrono::nanoseconds generate_herman(markov_chain<_Rationals, _Integers>& mc, const _Integers& size, std::unique_ptr<_Set>& target_set) {
+nlohmann::json generate_herman(markov_chain<_Rationals, _Integers>& mc, const _Integers& size, std::unique_ptr<_Set>& target_set) {
 	//### get rid of unique ptr ? // -> then make unique must be replace set must be cleared. (just drop it or use inserter iterator???)
+	auto  performance_log{ nlohmann::json() };
+	std::array<std::chrono::steady_clock::time_point, 3> timestamps;
 
 	using mc_type = markov_chain<_Rationals, _Integers>;
 	const _Integers INT1{ 1 };
@@ -31,6 +38,8 @@ std::chrono::nanoseconds generate_herman(markov_chain<_Rationals, _Integers>& mc
 	// Compile-time checks:
 	static_assert(std::is_same<typename _Set::value_type, _Integers>::value,
 		"typename _Set does not agree with typename _Integers. Values in _Set must be of type _Integers");
+
+	timestamps[0] = std::chrono::steady_clock::now();
 
 	// Runtime checks:
 	if constexpr (!disable_checks) {
@@ -56,8 +65,7 @@ std::chrono::nanoseconds generate_herman(markov_chain<_Rationals, _Integers>& mc
 		if (mc.n_edge_decorations == 0) throw std::invalid_argument("Reward 0 needed for costs.");
 	}
 
-	// Store timepoint:
-	std::chrono::steady_clock::time_point time_stamp_before{ std::chrono::steady_clock::now() };
+	timestamps[1] = std::chrono::steady_clock::now();
 
 	// Do the actual calculation:
 
@@ -142,8 +150,18 @@ std::chrono::nanoseconds generate_herman(markov_chain<_Rationals, _Integers>& mc
 		}
 	}
 	
-	// Record time consumption:
-	auto time_stamp_after{ std::chrono::steady_clock::now() };
-	auto difference = time_stamp_after - time_stamp_before;
-	return difference;
+	timestamps[2] = std::chrono::steady_clock::now();
+
+	static_assert(std::is_same<decltype(timestamps[1] - timestamps[0])::period, std::nano>::value, "Unit is supposed to be nanoseconds.");
+	performance_log[cli_commands::GENERATE_HERMAN] = {
+		{sc::size, size },
+		{sc::size_nodes, mc.size_states() },
+		{sc::size_edges, mc.size_edges()},
+		{sc::time_run_checks, 1.0 * (timestamps[1] - timestamps[0]).count()/1'000'000.0 },
+		{sc::time_run_generator, 1.0 * (timestamps[2] - timestamps[1]).count()/1'000'000.0 },
+		{sc::time_total,  1.0 * (timestamps[2] - timestamps[0]).count() / 1'000'000.0},
+		{sc::unit, sc::milliseconds}
+	};
+
+	return performance_log;
 }
