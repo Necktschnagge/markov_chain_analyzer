@@ -77,10 +77,80 @@ Functions</h2></td></tr>
 <tr class="memitem:a0c969b1a418fa36c144ecdcc10dc7b22"><td class="memTemplParams" colspan="2">template&lt;class _MarkovChain , class _IntegralSet &gt; </td></tr>
 <tr class="memitem:a0c969b1a418fa36c144ecdcc10dc7b22"><td class="memTemplItemLeft" align="right" valign="top">nlohmann::json&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="mc__calc_8h.html#a0c969b1a418fa36c144ecdcc10dc7b22">calc_variance</a> (_MarkovChain &amp;mc, std::size_t reward_index, const _IntegralSet &amp;target_set, std::size_t decoration_destination_index, std::size_t expect_decoration_index, std::size_t free_reward_index)</td></tr>
 <tr class="separator:a0c969b1a418fa36c144ecdcc10dc7b22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a140e6896b5b9f40fc187e58aa834970e"><td class="memTemplParams" colspan="2">template&lt;class _MarkovChain , class _IntegralSet &gt; </td></tr>
+<tr class="memitem:a140e6896b5b9f40fc187e58aa834970e"><td class="memTemplItemLeft" align="right" valign="top">nlohmann::json&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="mc__calc_8h.html#a140e6896b5b9f40fc187e58aa834970e">calc_covariance</a> (_MarkovChain &amp;mc, std::size_t reward_index1, std::size_t reward_index2, const _IntegralSet &amp;target_set, std::size_t decoration_destination_index, std::size_t expect_decoration_index1, std::size_t expect_decoration_index2, std::size_t free_reward_index)</td></tr>
+<tr class="separator:a140e6896b5b9f40fc187e58aa834970e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains facades for calculate expects / variances / .. on markov chains. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a id="a140e6896b5b9f40fc187e58aa834970e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a140e6896b5b9f40fc187e58aa834970e">&#9670;&nbsp;</a></span>calc_covariance()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;class _MarkovChain , class _IntegralSet &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">nlohmann::json calc_covariance </td>
+          <td>(</td>
+          <td class="paramtype">_MarkovChain &amp;&#160;</td>
+          <td class="paramname"><em>mc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>reward_index1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>reward_index2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const _IntegralSet &amp;&#160;</td>
+          <td class="paramname"><em>target_set</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>decoration_destination_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>expect_decoration_index1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>expect_decoration_index2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>free_reward_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Calculates covariances of accumulated edge rewards along paths until reaching target_set in markov chain. </p>
+
+</div>
+</div>
 <a id="a16e7aebd37daf0744894918fc2b755f3"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a16e7aebd37daf0744894918fc2b755f3">&#9670;&nbsp;</a></span>calc_expect()</h2>
 

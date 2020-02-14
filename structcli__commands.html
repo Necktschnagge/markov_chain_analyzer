@@ -104,12 +104,21 @@ Static Public Attributes</h2></td></tr>
 <tr class="memitem:aae4cb1882c87f3525d0c5f2c8264d217"><td class="memItemLeft" align="right" valign="top">static const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcli__commands.html#aae4cb1882c87f3525d0c5f2c8264d217">CALC_VARIANCE</a> { &quot;calc_variance&quot; }</td></tr>
 <tr class="memdesc:aae4cb1882c87f3525d0c5f2c8264d217"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates for each state of the markov chain the variance of accumulated transition decoration (rewards) until reaching the first state in target set.  <a href="#aae4cb1882c87f3525d0c5f2c8264d217">More...</a><br /></td></tr>
 <tr class="separator:aae4cb1882c87f3525d0c5f2c8264d217"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afe9e5edac5e5de897378971828384834"><td class="memItemLeft" align="right" valign="top">static const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcli__commands.html#afe9e5edac5e5de897378971828384834">CALC_COVARIANCE</a> { &quot;calc_covariance&quot; }</td></tr>
+<tr class="memdesc:afe9e5edac5e5de897378971828384834"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates for each state of the markov chain the covariance of accumulated transition decoration (rewards) until reaching the first state in target set.  <a href="#afe9e5edac5e5de897378971828384834">More...</a><br /></td></tr>
+<tr class="separator:afe9e5edac5e5de897378971828384834"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1391c7094e56c936a1c3ea8adae0c32f"><td class="memItemLeft" align="right" valign="top">static const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcli__commands.html#a1391c7094e56c936a1c3ea8adae0c32f">WRITE_DECO</a> { &quot;write_state_decorations&quot; }</td></tr>
 <tr class="memdesc:a1391c7094e56c936a1c3ea8adae0c32f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes state decorations of a markov chain into a file.  <a href="#a1391c7094e56c936a1c3ea8adae0c32f">More...</a><br /></td></tr>
 <tr class="separator:a1391c7094e56c936a1c3ea8adae0c32f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a135cd4c0a3fdcf2ba70030f409ab8a61"><td class="memItemLeft" align="right" valign="top">static const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcli__commands.html#a135cd4c0a3fdcf2ba70030f409ab8a61">GENERATE_HERMAN</a> { &quot;generate_herman&quot; }</td></tr>
 <tr class="memdesc:a135cd4c0a3fdcf2ba70030f409ab8a61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates transitions for Herman's self-stabilizing algorithm and sets all edge decorations at index 0 to 1.  <a href="#a135cd4c0a3fdcf2ba70030f409ab8a61">More...</a><br /></td></tr>
 <tr class="separator:a135cd4c0a3fdcf2ba70030f409ab8a61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31e880450c5fcd781a1602c2e9357d66"><td class="memItemLeft" align="right" valign="top">static const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcli__commands.html#a31e880450c5fcd781a1602c2e9357d66">DELETE_MC</a> { &quot;del_mc&quot; }</td></tr>
+<tr class="memdesc:a31e880450c5fcd781a1602c2e9357d66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes a markov chain.  <a href="#a31e880450c5fcd781a1602c2e9357d66">More...</a><br /></td></tr>
+<tr class="separator:a31e880450c5fcd781a1602c2e9357d66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a76ed172620dadf1616db6dc80730e2d0"><td class="memItemLeft" align="right" valign="top">static const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcli__commands.html#a76ed172620dadf1616db6dc80730e2d0">DELETE_TS</a> { &quot;del_ts&quot; }</td></tr>
+<tr class="memdesc:a76ed172620dadf1616db6dc80730e2d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes a target set.  <a href="#a76ed172620dadf1616db6dc80730e2d0">More...</a><br /></td></tr>
+<tr class="separator:a76ed172620dadf1616db6dc80730e2d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains all instruction key to use MC Analyzer form command line. Additionally syntax information are given how to use the instructions. </p>
@@ -140,6 +149,43 @@ Static Public Attributes</h2></td></tr>
     <tr><td class="paramname">id</td><td>id where the markov chain is stored. It must have been initialized before (with reset_mc) and be empty. </td></tr>
     <tr><td class="paramname">file</td><td>file path of the *.trew file to read </td></tr>
     <tr><td class="paramname">decoration_index</td><td>index where to store the reward values into each edge. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="afe9e5edac5e5de897378971828384834"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afe9e5edac5e5de897378971828384834">&#9670;&nbsp;</a></span>CALC_COVARIANCE</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const auto cli_commands::CALC_COVARIANCE { &quot;calc_covariance&quot; }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates for each state of the markov chain the covariance of accumulated transition decoration (rewards) until reaching the first state in target set. </p>
+<p>Syntax: calc_covariance&gt;{mc_id}&gt;{edge_decoration_1}&gt;{edge_decoration_2}&gt;{target_set_id}&gt;{state_decoration_index}&gt;{state_decoration_expects_index1}&gt;{state_decoration_expects_index2}&gt;{free_transition_decoration} </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mc_id</td><td>id where the markov chain is stored. </td></tr>
+    <tr><td class="paramname">edge_decoration_1</td><td>Index of transition decorations (1. reward function) for that the variance should be calculated </td></tr>
+    <tr><td class="paramname">edge_decoration_2</td><td>Index of transition decorations (2. reward function) for that the variance should be calculated </td></tr>
+    <tr><td class="paramname">target_set_id</td><td>Id to find the set of goal states. </td></tr>
+    <tr><td class="paramname">state_decoration_index</td><td>Index of state decorations where the variances should be stored. </td></tr>
+    <tr><td class="paramname">state_decoration_expects_index1</td><td>Index of state decorations where the expects for the 1. reward function should be stored. (Note: the algorithm needs to calculate also expects in order to be able to claculate variances.) </td></tr>
+    <tr><td class="paramname">state_decoration_expects_index2</td><td>Index of state decorations where the expects for the 2. reward function should be stored. (Note: the algorithm needs to calculate also expects in order to be able to claculate variances.) </td></tr>
+    <tr><td class="paramname">free_transition_decoration</td><td>Index for storing interim results as transition decorations. Choose a free index that contains values which can be overwritten. </td></tr>
   </table>
   </dd>
 </dl>
@@ -214,6 +260,66 @@ Static Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a31e880450c5fcd781a1602c2e9357d66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31e880450c5fcd781a1602c2e9357d66">&#9670;&nbsp;</a></span>DELETE_MC</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const auto cli_commands::DELETE_MC { &quot;del_mc&quot; }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Deletes a markov chain. </p>
+<p>Syntax: del_mc&gt;{id} </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>Id of the markov chain to delete. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a76ed172620dadf1616db6dc80730e2d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a76ed172620dadf1616db6dc80730e2d0">&#9670;&nbsp;</a></span>DELETE_TS</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const auto cli_commands::DELETE_TS { &quot;del_ts&quot; }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Deletes a target set. </p>
+<p>Syntax: del_ts&gt;{id} </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>Id of the target set to delete. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a135cd4c0a3fdcf2ba70030f409ab8a61"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a135cd4c0a3fdcf2ba70030f409ab8a61">&#9670;&nbsp;</a></span>GENERATE_HERMAN</h2>
 
@@ -235,7 +341,7 @@ Static Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Generates transitions for Herman's self-stabilizing algorithm and sets all edge decorations at index 0 to 1. </p>
-<p>Syntax: generate_herman&gt;{id}&gt;{herman_size}&gt;{target_set_id} It also prints the time that has been spent. </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Syntax: generate_herman&gt;{id}&gt;{herman_size}&gt;{target_set_id} </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">id</td><td>id where the markov chain is stored. It must have been initialized before (with reset_mc) and be empty. </td></tr>
     <tr><td class="paramname">herman_size</td><td>Number of the processes in ring architecture for herman instance. Must be odd. </td></tr>

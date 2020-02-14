@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['welcome_20to_20github_20pages',['Welcome to GitHub Pages',['../autotoc_md0.html',1,'']]],
-  ['write_5fdeco',['WRITE_DECO',['../structcli__commands.html#a1391c7094e56c936a1c3ea8adae0c32f',1,'cli_commands']]],
-  ['write_5fedge_5fdecorations',['write_edge_decorations',['../classmarkov__chain.html#ab04c5ca7fb83ce76ceb372bec5be7233',1,'markov_chain']]]
+  ['value_5ftype_3c_20sparse_5fmatrix_20_3e',['value_type&lt; sparse_matrix &gt;',['../structamgcl_1_1backend_1_1value__type_3_01sparse__matrix_01_4.html',1,'amgcl::backend']]]
 ];
