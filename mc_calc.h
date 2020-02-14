@@ -47,8 +47,8 @@ nlohmann::json calc_expect(_MarkovChain& mc, std::size_t reward_index, const _In
 	performance_log[cli_commands::CALC_EXPECT] = {
 		{sc::decoration_index_egde_source, reward_index },
 		{sc::decoration_index_node_target, decoration_destination_index },
-		{sc::time_total_create_pto_matrix, diffs[0]},
-		{sc::time_total_copy_pto_matrix, diffs[1]},
+		{sc::time_create_pto_matrix, diffs[0]},
+		{sc::time_copy_pto_matrix, diffs[1]},
 		{sc::time_subtract_unity_matrix, diffs[2]},
 		{sc::time_calc_image_vector, diffs[3]},
 		{sc::time_solve_linear_system, diffs[4]},
@@ -104,24 +104,23 @@ nlohmann::json calc_variance(_MarkovChain& mc, std::size_t reward_index, const _
 	);
 
 	performance_log[cli_commands::CALC_VARIANCE] = {
-		{"reward_index", reward_index },
-		{"interim_result_edge_decoration_index", free_reward_index },
-		{"expect_state_decoration_index", expect_decoration_index },
-		{"variance_state_decoration_index", decoration_destination_index },
-		{"source_edge_decoration_index", reward_index },
-		{"create_P_target", diffs[0]},
-		{"copy_P_target", diffs[1]},
-		{"subtract_unity_matrix", diffs[2]},
-		{"calc_image_vector_for_expect", diffs[3]},
-		{"solve_linear_system_expect", diffs[4]},
-		{"write_decorations_expect", diffs[5]},
-		{"calc_interim_reward", diffs[6]},
-		{"calc_image_vector_for_variance", diffs[7]},
-		{"solve_linear_system_variance", diffs[8]},
-		{"write_decorations_variance", diffs[9]},
-		{"total_time", (timestamps[COUNT_TIMESTAMPS - 1] - timestamps[0]).count() / 1'000'000.0},
-		{"linear_system_solve_time", diffs[4] + diffs[8] },
-		{"unit", "milliseconds"}
+		{sc::decoration_index_egde_source, reward_index },
+		{sc::decoration_index_egde_free, free_reward_index },
+		{sc::decoration_index_node_target + sc::_expect, expect_decoration_index },
+		{sc::decoration_index_node_target + sc::_variance, decoration_destination_index },
+		{sc::time_create_pto_matrix, diffs[0]},
+		{sc::time_copy_pto_matrix, diffs[1]},
+		{sc::time_subtract_unity_matrix, diffs[2]},
+		{sc::time_calc_image_vector + sc::_expect, diffs[3]},
+		{sc::time_solve_linear_system + sc::_expect, diffs[4]},
+		{sc::time_write_decoration_node + sc::_expect, diffs[5]},
+		{sc::time_calc_interim_reward, diffs[6]},
+		{sc::time_calc_image_vector + sc::_variance, diffs[7]},
+		{sc::time_solve_linear_system + sc::_variance, diffs[8]},
+		{sc::time_write_decoration_node + sc::_variance, diffs[9]},
+		{sc::time_total, (timestamps[COUNT_TIMESTAMPS - 1] - timestamps[0]).count() / 1'000'000.0},
+		{sc::time_solve_linear_system, diffs[4] + diffs[8] },
+		{sc::unit, sc::milliseconds}
 	};
 	return performance_log;
 }
