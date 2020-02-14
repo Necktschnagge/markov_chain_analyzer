@@ -7,8 +7,10 @@
 #pragma once
 
 #include "markov_chain.h"
+#include "commands.h"
 
 #include "json.hpp"
+
 
 #include <chrono>
 
