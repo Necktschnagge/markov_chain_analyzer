@@ -24,8 +24,10 @@
 	 @exception std::invalid_argument Could not parse parameter.
 	 @exception std::invalid_argument Bad file.
 	 @exception std::logic_error No markov chain present with given ID.
+
+	 @return Logs as \a nlohmann::json containing qualitative description of what happenned as well as quantitative performance measures.
  */
-inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
+inline nlohmann::json cli(std::istream& commands, global& g) {
 
 	using mc_type = global::mc_type;
 	const std::string split_symbol{ ">" };
@@ -238,8 +240,8 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 			catch (...) { throw std::invalid_argument("Could not parse parameter"); }
 			if (g.markov_chains[mc_id] == nullptr) throw std::logic_error("No mc with given ID");
 			auto&& log = calc_variance(*(g.markov_chains[mc_id]), reward_index, *(g.target_sets[target_id]), destination_decoration, expect_decoration, free_reward);
-			log[cli_commands::CALC_VARIANCE].push_back({ "markov_chain_id", mc_id });
-			log[cli_commands::CALC_VARIANCE].push_back({ "target_set_id", target_id });
+			log[cli_commands::CALC_VARIANCE].push_back({ sc::markov_chain_id, mc_id });
+			log[cli_commands::CALC_VARIANCE].push_back({ sc::target_set_id, target_id });
 			performance_log.push_back(std::move(log));
 			continue;
 		}
@@ -293,6 +295,6 @@ inline void cli(std::istream& commands, global& g, nlohmann::json& json) {
 
 		std::cout << "WARNING: Command not recognized:   " << command << "\nDid not match any known instruction key!\n";
 	}
-	json = std::move(performance_log);
+	return performance_log;
 }
 

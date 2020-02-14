@@ -1,7 +1,7 @@
 /**
  * @file commands.h
  *
- * lists the instructions that may be used from the commandline interface.
+ * Lists the instruction keywords that may be used from the commandline interface.
  *
  */
 

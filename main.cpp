@@ -18,16 +18,16 @@ int main(int argc, char** argv)
 
 	if constexpr (DEBUG_MODE) {
 		auto commands{ std::ifstream("R:\\c.txt") };
-		cli(commands, g, performance_log);
+		performance_log = std::move(cli(commands, g));
 	}
 	else {
 
 		if (argc == 2) {
 			auto commands{ std::ifstream(argv[1]) };
-			cli(commands, g, performance_log);
+			performance_log = std::move(cli(commands, g));
 		}
 		else {
-			cli(std::cin, g, performance_log);
+			performance_log = std::move(cli(std::cin, g));
 		}
 	}
 
