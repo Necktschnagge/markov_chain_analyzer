@@ -11,7 +11,7 @@ set(Boost_USE_STATIC_LIBS ON)
 
 #FIND_PACKAGE(amgcl)
 FIND_PACKAGE( Boost 1.54.0 COMPONENTS regex REQUIRED )
-INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIR} )
+#INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIR} )
 include_directories(../amgcl)
 TARGET_LINK_LIBRARIES(MC_Analyzer LINK_PUBLIC ${Boost_LIBRARIES} )
 
@@ -38,7 +38,4 @@ set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT M
 
 #target_include_directories(MC_Analyzer PUBLIC "${PROJECT_BINARY_DIR}")
 #configure_file(ProjectConfig.h.in ProjectConfig.h)
-
-
-
 #target_link_libraries(MC_Analyzer Boost::regex)
