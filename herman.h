@@ -7,7 +7,7 @@
 #pragma once
 
 #include "markov_chain.h"
-#include "commands.h"
+#include "string_constants.h"
 
 #include "json.hpp"
 
