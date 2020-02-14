@@ -33,5 +33,4 @@ struct sc {
 	inline static const auto _variance{ std::string("_variance") };
 	inline static const auto _covariance{ std::string("_covariance") };
 
-
 };
