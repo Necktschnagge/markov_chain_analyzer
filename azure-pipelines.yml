@@ -1,21 +1,20 @@
 # File: azure-pipelines.yml
 
 jobs:
-- job: macOS
-  pool:
-    vmImage: 'macOS-10.14'
-  steps:
-  - template: steps/build.yml # Template reference
-
-- job: Linux
-  pool:
-    vmImage: 'ubuntu-16.04'
-  steps:
-  - template: steps/build.yml # Template reference
+#- job: macOS
+#  pool:
+#    vmImage: 'macOS-10.14'
+#  steps:
+#  - template: steps/build.yml # Template reference
+#
+#- job: Linux
+#  pool:
+#    vmImage: 'ubuntu-16.04'
+#  steps:
+#  - template: steps/build.yml # Template reference
 
 - job: Windows
   pool:
     vmImage: 'vs2017-win2016'
   steps:
-  - template: steps/build.yml # Template reference
-  - script: sign              # Extra step on Windows only
+  - script: echo "bla bla"
