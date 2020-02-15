@@ -1,0 +1,5 @@
+reset_mc>0>2>2
+read_gmc>0>./markov_chain.gmc
+read_target>0>./target_set.intset
+calc_variance>0>1>0>1>0>0
+write_state_decorations>0>./output.decos
