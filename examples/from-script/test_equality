@@ -1,6 +1,11 @@
 #!/bin/bash
 if
-	cmp -s "./expected_output.decos" "./output.decos";
+	grep "0: 0 0" "./output.decos" &&
+	grep "1: 10 45" "./output.decos" &&
+	grep "2: 2 0" "./output.decos" &&
+	grep "3: 9 58" "./output.decos" &&
+	grep "4: 11 80" "./output.decos" &&
+	grep "5: 0 0" "./output.decos"
 then 
 	exit 0;
 else 
