@@ -37,7 +37,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 	while (commands.good())
 	{
 		// Print performance log
-		std::cout << "\nPerformance Log JSON so far...\n\n" << performance_log;
+		std::cout << "\nPerformance Log JSON so far...\n\n" << performance_log << "\n\n";
 
 		//fetch command
 		std::string command{};
