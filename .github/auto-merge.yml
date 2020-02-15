@@ -1,0 +1,9 @@
+requiredLabels:
+- merge_and_delete
+updateBranch: true
+deleteBranchAfterMerge: true
+mergeMethod: merge
+reportStatus: true
+mergeCommitMessage: |
+  {title} (#{number})
+  {body}
