@@ -25,8 +25,6 @@ script:
     - g++ -v
     - /usr/local/bin/g++ -v
     - cmake --version
-    - git clone 'https://github.com/ddemidov/amgcl.git' '../amgcl/'
-    - ls ..
     - mkdir cmake-build
     - cd cmake-build
     - echo Create Project...
