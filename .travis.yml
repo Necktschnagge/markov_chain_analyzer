@@ -35,9 +35,7 @@ script:
     # test example:
     - cd ./examples/from-script/
     - cat ./instructions.mca | ../../cmake-build/MC_Analyzer
-    - cat ./expected_output.decos
     - cat ./output.decos
-    - cmp -s "./expected_output.decos" "./output.decos";
     - /bin/bash ./test_equality
 
 
