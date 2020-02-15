@@ -35,7 +35,7 @@ script:
     # test example:
     - cd ./examples/from-script/
     - cat ./instructions.mca | ../../cmake-build/MC_Analyzer
-    - ./test_equality
+    - /bin/bash ./test_equality
 
 
    
