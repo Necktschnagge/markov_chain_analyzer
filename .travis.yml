@@ -32,6 +32,10 @@ script:
     - ls -la
     - cd ..
     - doxygen Doxyfile
+    # test example:
+    - cd ./examples/from-script/
+    - cat ./instructions.mca | ../../cmake-build/MC_Analyzer
+    - ./test_equality
 
 
    
