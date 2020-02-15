@@ -1,0 +1,8 @@
+[submodule "extern/json"]
+	path = extern/json
+	url = https://github.com/nlohmann/json
+	branch = master
+[submodule "extern/amgcl"]
+	path = extern/amgcl
+	url = https://github.com/ddemidov/amgcl
+	branch = master
