@@ -1,6 +1,6 @@
 #!/bin/bash
 if
-	cmp -s "expected_output.decos" "output.decos";
+	cmp -s "./expected_output.decos" "./output.decos";
 then 
 	exit 0;
 else 
