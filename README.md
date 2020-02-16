@@ -88,5 +88,10 @@ Type `read_target>0>./target_set.intset` to read a set of integers representing 
 ```
 5 0
 ```
+Like markov chains, target sets are stored by id, independently from markov chain ids. With the instruction above the set `{0, 5}` is stored with id `0`.
 
+4. Calculate the desired characteristics, e.g. variances:
 
+To do so, simply type `calc_variance>0>1>0>1>0>0`. Here, as arguments you have to pass the _id of the markov chain (0)_, the  _index of the reward for which you want to calculate variance (1)_, the _id of the target set (0)_, the _index of state decorations where the resulting variances should be stored (1)_, the _index of state decorations where the expect values should be stored (0)_, an _index of edge decorations that can be used for intrim results (0)_. **! Note: Expect values have to be calculated before calculating variances. This command already does this job. But you need to provide some free state decoration index for this.** **! Note: You also need an index of edge decorations to store interim results.**
+
+5. To export the results just type `write_state_decorations>0>./output.decos`. This will write all state decoration arrays to file. [See this examplke output](https://github.com/Necktschnagge/markov_chain_analyzer/blob/master/examples/from-script/expected_output.decos)
