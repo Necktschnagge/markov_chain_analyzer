@@ -12,7 +12,7 @@ static constexpr bool COMPRESSED_JSON_MODE = false;
 
 struct cli_params {
 
-	inline static const auto __instructions{ std::string("--in") };
+	inline static const auto __instructions{ std::string("--instructions") };
 	inline static const auto __json_log{ std::string("--json-log") };
 
 	std::istream* instructions{ nullptr };
@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 			}
 			recognized_params[i] = true;
 			recognized_params[i + 1] = true;
-			params.instructions_param = argv[i];
+			params.instructions_param = argv[i + 1];
 		}
 		if (get_param(i) == cli_params::__json_log) {
 			if (recognized_params[i] || !(i + 1 < argc)) {
@@ -52,12 +52,12 @@ int main(int argc, char** argv)
 			}
 			recognized_params[i] = true;
 			recognized_params[i + 1] = true;
-			params.json_log_param = argv[i];
+			params.json_log_param = argv[i + 1];
 		}
 	}
 
-	// check for unrecogniszed tokens:
-	if (std::accumulate(recognized_params.cbegin(), recognized_params.cend(), false, [](auto l, auto r) { return l || r; })) {
+	// check for unrecognized tokens:
+	if (!std::accumulate(recognized_params.cbegin(), recognized_params.cend(), true, [](auto l, auto r) { return l && r; })) {
 		std::cout << "\nWARNING:   There were unrecognized parameters:\n";
 		for (std::size_t i{ 0 }; i < recognized_params.size(); ++i) {
 			if (!recognized_params[i])
@@ -67,7 +67,10 @@ int main(int argc, char** argv)
 	};
 
 	// apply configuration of parameters
-	if (params.instructions_param) _Commands_from_file.open(params.instructions_param);
+	if (params.instructions_param) {
+		_Commands_from_file.open(params.instructions_param);
+		params.instructions = &_Commands_from_file;
+	}
 	if (params.json_log_param) {
 		_Json_log_file.open(params.json_log_param);
 		params.json_log = &_Json_log_file;
