@@ -14,17 +14,27 @@ To use the C++ class and function definitions directly when writing your own cod
 ### How to build
 To build the command line tool (executable) you may have a look at how it is build on [Travis CI](https://travis-ci.com/Necktschnagge/markov_chain_analyzer). The configuration for Travis can be found in [.travis.yml](https://github.com/Necktschnagge/markov_chain_analyzer/blob/master/.travis.yml). There you can see what packages are needed to build on Linux. You may also use the following explanation to get started.
 #### Set-Up
-Download (compile and install where necessary) the following tools:
-* A C++ Compiler (such as clang, g++ or MSVC++) with full [C++17](https://en.cppreference.com/w/cpp/17) support
-* [CMake](https://cmake.org/), make sure that CMake is able to find your compiler
-* [Boost](https://www.boost.org/), make sure you compiled boost and that CMake is able to find your boost installation
-* [AMGCL](https://github.com/ddemidov/amgcl) Use the link to Github.com in order to clone the repository. first create some diretcory `repos`. Create a subdirectory `amgcl` where you clone AMGCL into. AMGCL is header-only and therefore does not need to be build. Create another subdirectory to `repos`, called `mc_analyzer` where you clone [this repository](https://github.com/Necktschnagge/markov_chain_analyzer) to.
+1. Download (compile and install where necessary) the following tools:
+   * A C++ Compiler (such as clang, g++ or MSVC++) with full [C++17](https://en.cppreference.com/w/cpp/17) support
+   * [CMake](https://cmake.org/), make sure that CMake is able to find your compiler
+   * [Boost](https://www.boost.org/), make sure you compiled boost and that CMake is able to find your boost installation
 
-After these steps just move into the directory where the `CMakeLists.txt` is located (`cd /repos/mc_analyer/`). Run `cmake .` to setup a platform-dependent project followed by `cmake --build .` to build the command line tool.
+2. Clone [this repository](https://github.com/Necktschnagge/markov_chain_analyzer) and make sure you pulled submodules, e.g. type:
+   ```
+   git clone 'https://github.com/Necktschnagge/markov_chain_analyzer' './markov_chain_analyzer'
+   cd './markov_chain_analyzer'
+   git submodule init
+   git submodule update
+   ```
+
+3. Move into the directory where the `CMakeLists.txt` is located (`cd './markov_chain_analyzer'`). Run `cmake .` to setup a platform-dependent project.
+
+4. Run `cmake --build .` to build the command line tool or open the created project with your custom tool of choice.
 
 #### Dependencies
 * [C++ boost](https://www.boost.org/) (It is necessary to compiler boost, since features like [boost::regex](https://www.boost.org/doc/libs/1_72_0/libs/regex/doc/html/index.html) are used.)
-* [AMGCL](https://amgcl.readthedocs.io/en/latest/)
+* [AMGCL](https://amgcl.readthedocs.io/en/latest/) (automatically included via git submodule)
+* [nlohmann/json](https://github.com/nlohmann/json) (automatically included via git submodule)
 * [CMake](https://cmake.org/) (needed in case you want to build the command line tool)
 
 
@@ -49,7 +59,7 @@ A markov chain is created and associated to id `1`. It provides two cells for `d
 
 2. To fill the fresh created, still empty markov chain with some sensible content, you may load a markov chain from file.
 
-**MC_Analyzer CLI** supports reading from a file format coming with this tool, called _General Markov Chain Format (gmc)_ as well as reading from [PRISM's explicit model files](https://www.prismmodelchecker.org/manual/Appendices/ExplicitModelFiles) In this Quickguide we are going to use the former option. So suppose you have an input file `script-example.gmc` with the following content
+**MC_Analyzer CLI** supports reading from a file format coming with this tool, called _General Markov Chain Format (gmc)_ as well as reading from [PRISM's explicit model files](https://www.prismmodelchecker.org/manual/Appendices/ExplicitModelFiles). In this guide we use the former option. So suppose you have an input file `markov_chain.gmc` with the following content
 ```
 $from, $to, $prob,$1
 1,2,0.5,4
@@ -63,8 +73,20 @@ $from, $to, $prob,$1
 5,0,1,3
 0,5,1,7
 ```
-The first line defines the semantics of the following content, saying the first value of the line is the state where the edge represented by the line is coming from, the second where it is going to. The third states the probability assigned to the edge. The third defines some edge-wise reward that will be assigned to the edge decoration at index 1. **! Note: Indexes of edge as well as state rewards start at zero and end with n-1 where n is the number given on construction.** So here the reward function will be placed into the _last_ cells of the edge decoration arrays. **! Note: Probabilities are stored separately. There is no need to provid a cell edge decoration to store probabilities. There is also no option to convert edge decorations into probabilities.**
+You may also [find this file here](https://github.com/Necktschnagge/markov_chain_analyzer/blob/master/examples/from-script/markov_chain.gmc).
 
-In order to read the file just type `read_gmc>0>C:/script-example.gmc`
+The first line defines the semantics of the following content, saying the first value of the line is the state where the edge represented by the line is coming from, the second where it is going to. The third states the probability assigned to the edge. The third defines some edge-wise reward that will be assigned to the edge decoration at index 1. **! Note: Indexes of edge as well as state rewards start at zero and end with n-1 where n is the number given on construction.** So here the reward function will be placed into the _last_ cells of the edge decoration arrays. **! Note: Probabilities are stored separately. There is no need to provid a cell edge decoration to store probabilities. There is also no option to convert edge decorations into probabilities.** **! Note: You need to use numbers `0, 1, ... ,n-1` as state ids. Otherwise bevaviour will be undefined.**
+
+In order to read the file just type `read_gmc>0>./markov_chain.gmc`. This way the file is loaded to the markov chain with id `0`.
+Again, see [instructions and their detailed descriptions here](https://necktschnagge.github.io/markov_chain_analyzer/structcli__commands.html)
+
+_You may also [see the next instructions here](https://github.com/Necktschnagge/markov_chain_analyzer/blob/master/examples/from-script/instructions.mca)_
+
+3. Before calculating variances (or expect values, or covariances) you need to tell, what are the final states.
+
+Type `read_target>0>./target_set.intset` to read a set of integers representing the goal states from file, where `./target_set.intset` [(see also here)](https://github.com/Necktschnagge/markov_chain_analyzer/blob/master/examples/from-script/target_set.intset) just contains state ids separated by spaces:
+```
+5 0
+```
 
 
