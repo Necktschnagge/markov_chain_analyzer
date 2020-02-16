@@ -8,6 +8,7 @@ var searchData=
   ['cli',['cli',['../cli_8h.html#aba3f0a3d205f9518c500c7bc9247157a',1,'cli.h']]],
   ['cli_2eh',['cli.h',['../cli_8h.html',1,'']]],
   ['cli_5fcommands',['cli_commands',['../structcli__commands.html',1,'']]],
+  ['cli_5fparams',['cli_params',['../structcli__params.html',1,'']]],
   ['cols_5fimpl_3c_20sparse_5fmatrix_20_3e',['cols_impl&lt; sparse_matrix &gt;',['../structamgcl_1_1backend_1_1cols__impl_3_01sparse__matrix_01_4.html',1,'amgcl::backend']]],
   ['commands_2eh',['commands.h',['../commands_8h.html',1,'']]]
 ];
