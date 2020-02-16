@@ -29,8 +29,15 @@ script:
     - cmake -DCMAKE_RULE_MESSAGES:BOOL=OFF -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON ..
     - echo Build Project...
     - cmake --build .
+    - ls -la
     - cd ..
     - doxygen Doxyfile
+    # test example:
+    - cd ./examples/from-script/
+    - cat ./instructions.mca | ../../cmake-build/MC_Analyzer
+    - cat ./output.decos
+    - /bin/bash ./test_equality
+
 
    
 deploy:
