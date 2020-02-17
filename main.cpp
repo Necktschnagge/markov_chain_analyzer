@@ -76,8 +76,10 @@ int main(int argc, char** argv)
 		params.json_log = &_Json_log_file;
 	}
 	if constexpr (DEBUG_MODE) {
-		_Commands_from_file.open("R:\\c.txt");
+		const auto FILE_PATH{ "R:\\c.txt" };
+		_Commands_from_file.open(FILE_PATH);
 		params.instructions = &_Commands_from_file;
+		std::cout << "DEBUG MODE ENABLED: Loading instructions from " << FILE_PATH << "\n";
 	}
 
 	if (!params.instructions) params.instructions = &std::cin;
