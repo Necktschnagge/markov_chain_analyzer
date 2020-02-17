@@ -146,7 +146,7 @@ public:
 		const auto input_s{ std::string(std::istream_iterator<char>(transitions),std::istream_iterator<char>()) };
 
 		// check overall file format
-		const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) };
+		const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) }; //### may produce runtime error
 		std::cout << "Check for well-formed file format: " << interprete_bool_n(valid_file_format);
 		if (!valid_file_format) throw std::invalid_argument("The input is maleformed.");
 

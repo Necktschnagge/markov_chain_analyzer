@@ -34,6 +34,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 	auto performance_log{ nlohmann::json() };
 
 	commands.unsetf(std::ios_base::skipws); // also read whitespaces
+
 	while (commands.good())
 	{
 		// Print performance log
@@ -44,36 +45,41 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 		std::getline(commands, command);
 		std::cout << "\n\nFetched command: " << command << std::endl;
 
-		//parse command
-		std::vector<std::string> items;
-		boost::split(items, command, boost::is_any_of(split_symbol));
-		if (items.size() == 0) throw std::logic_error(std::string("Maleformed instruction: ") + command);
-		std::string& instruction{ items[0] };
-		auto doc = make_surround_log("Executing command");
-
-		//execute command
-		if (instruction == cli_commands::RESET_MC) {
-			if (items.size() != 4) throw std::invalid_argument("Wrong number of parameters.");
-			std::size_t n_state_decoration{ 0 }, n_transition_decoration{ 0 };
-			cli_commands::id id{ 0 };
-			try {
-				id = std::stoull(items[1]);
-				n_state_decoration = std::stoull(items[2]);
-				n_transition_decoration = std::stoull(items[3]);
-			}
-			catch (...) { throw std::invalid_argument("Could not parse parameter."); }
-			g.markov_chains[id] = std::make_unique<mc_type>(n_transition_decoration, n_state_decoration);
-			performance_log.push_back({
-					{instruction,
-						{
-							{ sc::markov_chain_id, id},
-							{ sc::number_node_decorations, n_state_decoration},
-							{ sc::number_edge_decorations, n_transition_decoration}
-						}
-					}
-				});
+		if (boost::regex_match(command, boost::regex(R"(\s*)"))) {
+			std::cout << "Recognized empty line. Skipping ..." << std::endl;
 			continue;
 		}
+
+		//parse command
+		std::vector<std::string> items;
+			boost::split(items, command, boost::is_any_of(split_symbol));
+			if (items.size() == 0) throw std::logic_error(std::string("Maleformed instruction: ") + command);
+			std::string& instruction{ items[0] };
+			auto doc = make_surround_log("Executing command");
+
+			//execute command
+				if (instruction == cli_commands::RESET_MC) {
+					if (items.size() != 4) throw std::invalid_argument("Wrong number of parameters.");
+					std::size_t n_state_decoration{ 0 }, n_transition_decoration{ 0 };
+					cli_commands::id id{ 0 };
+					try {
+						id = std::stoull(items[1]);
+						n_state_decoration = std::stoull(items[2]);
+						n_transition_decoration = std::stoull(items[3]);
+					}
+					catch (...) { throw std::invalid_argument("Could not parse parameter."); }
+					g.markov_chains[id] = std::make_unique<mc_type>(n_transition_decoration, n_state_decoration);
+					performance_log.push_back({
+							{instruction,
+								{
+									{ sc::markov_chain_id, id},
+									{ sc::number_node_decorations, n_state_decoration},
+									{ sc::number_edge_decorations, n_transition_decoration}
+								}
+							}
+						});
+					continue;
+				}
 
 		if (instruction == cli_commands::READ_TRA) {
 			if (items.size() != 3) throw std::invalid_argument("Wrong number of parameters.");
@@ -245,7 +251,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 			performance_log.push_back(std::move(log));
 			continue;
 		}
-		
+
 		if (instruction == cli_commands::CALC_COVARIANCE) {
 			/* Syntax: calc_covariance
 				>{mc_id}
