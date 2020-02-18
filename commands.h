@@ -135,5 +135,12 @@ struct cli_commands {
 		@param id Id of the target set to delete.
 	*/
 	inline static const auto DELETE_TS{ "del_ts" }; // id mc, n, targetset id
+	
+	/**
+		@brief Writes characteristic values about the markov chain into json log, e.g. number of states, number of transitions
+		@details Syntax: print_mc>{id}
+		@param id Id of the markov chain.
+	*/
+	inline static const auto PRINT_MC{ "print_mc" }; // id mc, n, targetset id
 
 };
