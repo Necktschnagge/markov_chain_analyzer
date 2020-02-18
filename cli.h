@@ -384,6 +384,26 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 			continue;
 		}
 
+		if (instruction == cli_commands::PRINT_MC) {
+			if (items.size() != 2) throw std::invalid_argument("Wrong number of parameters.");
+			cli_commands::id id{ 0 };
+			try {
+				id = std::stoull(items[1]);
+			}
+			catch (...) { throw std::invalid_argument("Could not parse parameter"); }
+			if (g.markov_chains[id] == nullptr) throw std::logic_error("No mc with given ID");
+			performance_log.push_back({
+					{instruction,
+						{
+							{ sc::markov_chain_id, id },
+							{ sc::size_nodes, g.markov_chains[id]->size_states() },
+							{ sc::size_edges, g.markov_chains[id]->size_edges() }
+						}
+					}
+				});
+			continue;
+		}
+
 		std::cout << "WARNING: Command not recognized:   " << command << "\nDid not match any known instruction key!\n";
 	}
 	return performance_log;
