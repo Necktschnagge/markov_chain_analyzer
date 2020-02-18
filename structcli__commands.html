@@ -119,6 +119,9 @@ Static Public Attributes</h2></td></tr>
 <tr class="memitem:a76ed172620dadf1616db6dc80730e2d0"><td class="memItemLeft" align="right" valign="top">static const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcli__commands.html#a76ed172620dadf1616db6dc80730e2d0">DELETE_TS</a> { &quot;del_ts&quot; }</td></tr>
 <tr class="memdesc:a76ed172620dadf1616db6dc80730e2d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes a target set.  <a href="#a76ed172620dadf1616db6dc80730e2d0">More...</a><br /></td></tr>
 <tr class="separator:a76ed172620dadf1616db6dc80730e2d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55630b7256f12797fa749cca452fe98e"><td class="memItemLeft" align="right" valign="top">static const auto&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcli__commands.html#a55630b7256f12797fa749cca452fe98e">PRINT_MC</a> { &quot;print_mc&quot; }</td></tr>
+<tr class="memdesc:a55630b7256f12797fa749cca452fe98e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Writes characteristic values about the markov chain into json log, e.g. number of states, number of transitions.  <a href="#a55630b7256f12797fa749cca452fe98e">More...</a><br /></td></tr>
+<tr class="separator:a55630b7256f12797fa749cca452fe98e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Contains all instruction key to use MC Analyzer form command line. Additionally syntax information are given how to use the instructions. </p>
@@ -346,6 +349,36 @@ Static Public Attributes</h2></td></tr>
     <tr><td class="paramname">id</td><td>id where the markov chain is stored. It must have been initialized before (with reset_mc) and be empty. </td></tr>
     <tr><td class="paramname">herman_size</td><td>Number of the processes in ring architecture for herman instance. Must be odd. </td></tr>
     <tr><td class="paramname">target_set_id</td><td>Id of the target set that will be created by the algorithm to store the goal states corresponding to the created markov chain. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a55630b7256f12797fa749cca452fe98e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55630b7256f12797fa749cca452fe98e">&#9670;&nbsp;</a></span>PRINT_MC</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const auto cli_commands::PRINT_MC { &quot;print_mc&quot; }</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Writes characteristic values about the markov chain into json log, e.g. number of states, number of transitions. </p>
+<p>Syntax: print_mc&gt;{id} </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>Id of the markov chain. </td></tr>
   </table>
   </dd>
 </dl>
