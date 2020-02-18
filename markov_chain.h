@@ -146,15 +146,21 @@ public:
 		const auto input_s{ std::string(std::istream_iterator<char>(transitions),std::istream_iterator<char>()) };
 
 		// check overall file format
-		const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) }; //### may produce runtime error
+		/*
+		const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) }; //### may produce runtime error -> in case the fi9le does not match -> check if chosen regexes have some kind of structure where runtime state-set of emulating NFA may explode.
 		std::cout << "Check for well-formed file format: " << interprete_bool_n(valid_file_format);
 		if (!valid_file_format) throw std::invalid_argument("The input is maleformed.");
-
+		*/
 		// find end of header line
+		std::cout << "\n" << 1;
 		const auto regx_it_prism_header_transitions{ regex_iterator(input_s.cbegin(),input_s.cend(),regxc::prism_header) };
+		std::cout << 2;
 		const auto exists_header_line{ regx_it_prism_header_transitions != regex_iterator() };
+		std::cout << 3;
 		if (!exists_header_line) throw std::logic_error("Could not find end of the header line.");
+		std::cout << 4;
 		const std::string::const_iterator transitions_header_begin{ regx_it_prism_header_transitions->operator[](0).first };
+		std::cout << 5;
 		const std::string::const_iterator transitions_header_end{ regx_it_prism_header_transitions->operator[](0).second };
 
 		// store number of states and number of transitions
@@ -190,6 +196,8 @@ public:
 			if (forward_transitions[from].find(to) != forward_transitions[from].end())
 				throw std::invalid_argument("Trying to add a transition that already exists.");
 
+			//std::cout << "read transition from " << from << " to " << to << " with p= " << probability << "\n";
+
 			//## cast prob here!! We need custom striung to int/double in case someone chooses custom types.
 			auto ptr{ new edge(probability, n_edge_decorations) };
 			inverse_transitions[to][from] = forward_transitions[from][to] = ptr;
@@ -219,9 +227,11 @@ public:
 		const auto input_s{ std::string(std::istream_iterator<char>(rewards),std::istream_iterator<char>()) };
 
 		// check overall file format
+		/*
 		const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) };
 		std::cout << "Check for well-formed file format: " << interprete_bool_n(valid_file_format);
 		if (!valid_file_format) throw std::invalid_argument("The file is not well-formed.");
+		*/
 
 		// find end of header line
 		const auto regx_it_prism_header_rewards{ regex_iterator(input_s.cbegin(),input_s.cend(),regxc::prism_header) };

@@ -1,0 +1,6 @@
+reset_mc>13>2>2
+read_tra>13>./model.tra
+add_rew>13>./model.trew>0
+read_label>20>./model.lab>2 
+calc_variance>13>0>20>1>0>1
+write_state_decorations>13>./output.decos
