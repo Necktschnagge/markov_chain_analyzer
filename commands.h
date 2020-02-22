@@ -7,15 +7,13 @@
 
 #pragma once
 
-#include "global_data.h"
-
 
 /**
 	@brief Contains all instruction key to use MC Analyzer form command line. Additionally syntax information are given how to use the instructions.
 */
 struct cli_commands {
 
-	using id = global::id;
+
 
 	/**
 		@brief Reinitialized a markov chain. The markov chain is replaced by a fresh one.

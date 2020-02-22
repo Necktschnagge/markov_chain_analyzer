@@ -1,3 +1,4 @@
+add_subdirectory(process_json)
 cmake_minimum_required(VERSION 3.10)
 project(MC_Analyzer VERSION 1.0)
 
