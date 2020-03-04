@@ -15,9 +15,9 @@
 
 
 
-class failed_instruction : public std::exception {
+class failed_instruction : public std::runtime_error {
 public:
-	using _Mybase = std::exception;
+	using _Mybase = std::runtime_error;
 
 	explicit failed_instruction(const std::string& _Message) : _Mybase(_Message.c_str()) {}
 
