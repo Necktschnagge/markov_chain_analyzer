@@ -86,9 +86,9 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 			catch (...) { throw std::invalid_argument("Could not parse parameter."); }
 			try {
 				file.open(file_path);
-				if (!file.good()) throw 0;
 			}
 			catch (...) { throw std::invalid_argument("Bad file."); }
+			if (!file.good()) throw std::invalid_argument("Could not open file.");
 			if (g.markov_chains[id] == nullptr) throw std::logic_error("No markov chain present with given ID.");
 			g.markov_chains[id]->read_transitions_from_prism_file(file);
 			performance_log.push_back({
@@ -112,6 +112,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 				file.open(file_path);
 			}
 			catch (...) { throw std::invalid_argument("Could not parse parameter or open file"); }
+			if (!file.good()) throw std::invalid_argument("Could not open file.");
 			if (g.markov_chains[id] == nullptr) throw std::logic_error("No mc with given ID");
 			g.markov_chains[id]->read_from_gmc_file(file);
 			performance_log.push_back({
@@ -131,12 +132,13 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 			std::size_t rew_index{ 0 };
 			cli_commands::id id{ 0 };
 			std::ifstream file{};
+			file.open(file_path);
 			try {
 				id = std::stoull(items[1]); //### split try block, like some lines in code before
-				file.open(file_path);
 				rew_index = std::stoull(items[3]);
 			}
 			catch (...) { throw std::invalid_argument("Could not parse parameter or open file"); }
+			if (!file.good()) throw std::invalid_argument("Could not open file.");
 			if (g.markov_chains[id] == nullptr) throw std::logic_error("No mc with given ID");
 			g.markov_chains[id]->read_rewards_from_prism_file(file, rew_index);
 			performance_log.push_back({
@@ -156,11 +158,12 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 			std::string& file_path = items[2];
 			cli_commands::id id{ 0 };
 			std::ifstream file{};
+			file.open(file_path);
 			try {
 				id = std::stoul(items[1]); // ###split
-				file.open(file_path);
 			}
-			catch (...) { throw std::invalid_argument("Could not parse parameter or open file"); }
+			catch (...) { throw std::invalid_argument("Could not parse parameter."); }
+			if (!file.good()) throw std::invalid_argument("Could not open file.");
 			g.target_sets[id] = std::make_unique<global::set_type>(
 				std::move(int_set<global::int_type>::stointset(file, [](auto s) { return std::stoull(s); }))
 				);
@@ -188,7 +191,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 				label_id = std::stoull(items[3]);
 			}
 			catch (...) { throw std::invalid_argument("Could not parse parameter or open file"); }
-
+			if (!file.good()) throw std::invalid_argument("Could not open file.");
 			g.target_sets[id] = std::make_unique<global::set_type>(
 				std::move(int_set<global::int_type>::prismlabeltointset(file, [](auto s) { return std::stoull(s); }, label_id))
 				);
