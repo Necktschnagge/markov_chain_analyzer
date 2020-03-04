@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['value_5ftype_3c_20sparse_5fmatrix_20_3e',['value_type&lt; sparse_matrix &gt;',['../structamgcl_1_1backend_1_1value__type_3_01sparse__matrix_01_4.html',1,'amgcl::backend']]]
+  ['target_5fadjusted_5fprobability_5fmatrix',['target_adjusted_probability_matrix',['../classmarkov__chain.html#a79d21fb9e3a070f050c778c4193b6af4',1,'markov_chain::target_adjusted_probability_matrix()'],['../mc__analyzer_8h.html#a79d21fb9e3a070f050c778c4193b6af4',1,'target_adjusted_probability_matrix():&#160;mc_analyzer.h']]]
 ];
