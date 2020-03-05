@@ -46,7 +46,6 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 	auto performance_log{ nlohmann::json() };
 
 	commands.unsetf(std::ios_base::skipws); // also read whitespaces
-
 	while (commands.good())
 	{
 		// Print performance log
