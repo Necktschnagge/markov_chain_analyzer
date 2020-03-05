@@ -195,7 +195,6 @@ public:
 			if (forward_transitions[from].find(to) != forward_transitions[from].end())
 				throw std::invalid_argument("Trying to add a transition that already exists.");
 
-
 			//## cast prob here!! We need custom striung to int/double in case someone chooses custom types.
 			auto ptr{ new edge(probability, n_edge_decorations) };
 			inverse_transitions[to][from] = forward_transitions[from][to] = ptr;
@@ -225,12 +224,14 @@ public:
 		const auto input_s{ std::string(std::istream_iterator<char>(rewards),std::istream_iterator<char>()) };
 
 		// check overall file format
-		/*
-		const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) };
-		std::cout << "Check for well-formed file format: " << interprete_bool_n(valid_file_format);
-		if (!valid_file_format) throw std::invalid_argument("The file is not well-formed.");
-		*/
-
+		try {
+			const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) };
+			std::cout << "Check for well-formed file format: " << interprete_bool_n(valid_file_format);
+			if (!valid_file_format) throw std::invalid_argument("The file is not well-formed.");
+		}
+		catch (const std::runtime_error & e) {
+			std::cout << "WARNING: Could not check for well-formed file format. boost::regex throwed std::runtime_error:\n\t\t" << e.what() << "\n";
+		}
 		// find end of header line
 		const auto regx_it_prism_header_rewards{ regex_iterator(input_s.cbegin(),input_s.cend(),regxc::prism_header) };
 		const auto exists_header_line{ regx_it_prism_header_rewards != regex_iterator() };
@@ -344,9 +345,13 @@ public:
 			std::string("((") + gmc_s_irgnored_line + "|" + gmc_s_value_definition_line + ")?(" + gmc_s_new_line + "|$))*"
 		) };
 
+		try {
 		std::cout << "Check for wellformed body: " <<
-			interprete_bool_n(boost::regex_match(semantics_definition_end, test_file_string.cend(), gmc_value_definition_body)); // ### catch exception
-
+			interprete_bool_n(boost::regex_match(semantics_definition_end, test_file_string.cend(), gmc_value_definition_body));
+		}
+		catch (const std::runtime_error & e) {
+			std::cout << "WARNING: Could not check for wellformed body. boost::regex throwed std::runtime_error:\n\t\t" << e.what() << "\n";
+		}
 
 		//read all lines of body:
 		if (!empty()) throw std::logic_error("Forbidden to read transitions from file if markov chain is not empty.");
