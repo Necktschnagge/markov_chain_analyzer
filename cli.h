@@ -79,17 +79,17 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 						n_state_decoration = std::stoull(items[2]);
 						n_transition_decoration = std::stoull(items[3]);
 				}
-				catch (...) { throw failed_instruction("Could not parse parameter."); }
-				g.markov_chains[id] = std::make_unique<mc_type>(n_transition_decoration, n_state_decoration);
-				performance_log.push_back({
-						{instruction,
-							{
-								{ sc::markov_chain_id, id},
-								{ sc::number_node_decorations, n_state_decoration},
-								{ sc::number_edge_decorations, n_transition_decoration}
+					catch (...) { throw failed_instruction("Could not parse parameter."); }
+					g.markov_chains[id] = std::make_unique<mc_type>(n_transition_decoration, n_state_decoration);
+					performance_log.push_back({
+							{instruction,
+								{
+									{ sc::markov_chain_id, id},
+									{ sc::number_node_decorations, n_state_decoration},
+									{ sc::number_edge_decorations, n_transition_decoration}
+								}
 							}
-						}
-					});
+						});
 				continue;
 		}
 
