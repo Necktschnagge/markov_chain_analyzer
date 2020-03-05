@@ -376,7 +376,6 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 		if (instruction == cli_commands::DELETE_TS) {
 			if (items.size() != 2) throw failed_instruction("Wrong number of parameters.");
 			global::id id{ 0 };
-			if (items.size() != 2) throw failed_instruction("Wrong number of parameters.");
 			try {
 				id = std::stoull(items[1]);
 			}
