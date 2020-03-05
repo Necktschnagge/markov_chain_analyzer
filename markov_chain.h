@@ -146,21 +146,20 @@ public:
 		const auto input_s{ std::string(std::istream_iterator<char>(transitions),std::istream_iterator<char>()) };
 
 		// check overall file format
-		/*
-		const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) }; //### may produce runtime error -> in case the fi9le does not match -> check if chosen regexes have some kind of structure where runtime state-set of emulating NFA may explode.
-		std::cout << "Check for well-formed file format: " << interprete_bool_n(valid_file_format);
-		if (!valid_file_format) throw std::invalid_argument("The input is maleformed.");
-		*/
+		try {
+			const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) }; //### may produce runtime error -> in case the fi9le does not match -> check if chosen regexes have some kind of structure where runtime state-set of emulating NFA may explode.
+			std::cout << "Check for well-formed file format: " << interprete_bool_n(valid_file_format);
+			if (!valid_file_format) throw std::invalid_argument("The input is maleformed.");
+		}
+		catch (const std::runtime_error & e) {
+			std::cout << "WARNING: Could not check for well-formed file format. boost::regex throwed std::runtime_error:\n\t\t" << e.what() << "\n";
+		}
+
 		// find end of header line
-		std::cout << "\n" << 1;
 		const auto regx_it_prism_header_transitions{ regex_iterator(input_s.cbegin(),input_s.cend(),regxc::prism_header) };
-		std::cout << 2;
 		const auto exists_header_line{ regx_it_prism_header_transitions != regex_iterator() };
-		std::cout << 3;
 		if (!exists_header_line) throw std::logic_error("Could not find end of the header line.");
-		std::cout << 4;
 		const std::string::const_iterator transitions_header_begin{ regx_it_prism_header_transitions->operator[](0).first };
-		std::cout << 5;
 		const std::string::const_iterator transitions_header_end{ regx_it_prism_header_transitions->operator[](0).second };
 
 		// store number of states and number of transitions
@@ -196,7 +195,6 @@ public:
 			if (forward_transitions[from].find(to) != forward_transitions[from].end())
 				throw std::invalid_argument("Trying to add a transition that already exists.");
 
-			//std::cout << "read transition from " << from << " to " << to << " with p= " << probability << "\n";
 
 			//## cast prob here!! We need custom striung to int/double in case someone chooses custom types.
 			auto ptr{ new edge(probability, n_edge_decorations) };
@@ -288,7 +286,7 @@ public:
 		auto gmc_general{ regxc::gmc_general };
 
 		// Check for overall format:
-		if (!boost::regex_match(test_file_string, regxc::gmc_general))
+		if (!boost::regex_match(test_file_string, regxc::gmc_general)) // catch exception!###
 			throw std::invalid_argument("No valid GENERAL MARKOV CHAIN format");
 		std::cout << "General syntax: okay.\n";
 
@@ -347,7 +345,7 @@ public:
 		) };
 
 		std::cout << "Check for wellformed body: " <<
-			interprete_bool_n(boost::regex_match(semantics_definition_end, test_file_string.cend(), gmc_value_definition_body));
+			interprete_bool_n(boost::regex_match(semantics_definition_end, test_file_string.cend(), gmc_value_definition_body)); // ### catch exception
 
 
 		//read all lines of body:
