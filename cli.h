@@ -56,9 +56,14 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 		std::getline(commands, command);
 		std::cout << "\n\nFetched command: " << command << std::endl;
 
-		if (boost::regex_match(command, boost::regex(R"(\s*)"))) {
-			std::cout << "Recognized empty line. Skipping ..." << std::endl;
-			continue;
+		try {
+			if (boost::regex_match(command, boost::regex(R"(\s*)"))) {
+				std::cout << "Recognized empty line. Skipping ..." << std::endl;
+				continue;
+			}
+		}
+		catch (const std::runtime_error & e) {
+			std::cout << "WARNING: Could not check for empty command: boost::regex throwed std::runtime_error!\n";
 		}
 		try {
 			//parse command
