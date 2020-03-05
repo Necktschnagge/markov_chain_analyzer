@@ -287,10 +287,16 @@ public:
 		auto gmc_general{ regxc::gmc_general };
 
 		// Check for overall format:
-		if (!boost::regex_match(test_file_string, regxc::gmc_general)) // catch exception!###
+		
+		try {
+		if (!boost::regex_match(test_file_string, regxc::gmc_general))
 			throw std::invalid_argument("No valid GENERAL MARKOV CHAIN format");
-		std::cout << "General syntax: okay.\n";
-
+			else std::cout << "General syntax: okay.\n";
+		}
+		catch (const std::runtime_error & e) {
+			std::cout << "WARNING: Could not check for well-formed file format. boost::regex throwed std::runtime_error:\n\t\t" << e.what() << "\n";
+		}
+		
 		// Locate semantics defintion line:
 		const auto regx_it_semantics_definition{
 			regex_iterator(test_file_string.begin(),test_file_string.end(),regxc::gmc_semantics_definition)
