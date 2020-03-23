@@ -27,7 +27,6 @@ for ($i = 0; $i -lt $list_of_leader_sync_files.Length; $i++){
 }
 # herman:
 for ($i = 3; $i -lt 16; $i = $i + 2){
-    gc .\instructions.mca
     $instructions=@'
 reset_mc>13>2>2
 generate_herman>13>
