@@ -25,21 +25,26 @@ int main() {
 	const auto file_path_leader_sync{ [](std::size_t i) { return std::string("../measures/leader_sync/log") + std::to_string(i) + ".json"; } };
 	const auto file_path_herman{ [](std::size_t i) { return std::string("../measures/herman/log") + std::to_string(i) + ".json"; } };
 
-
-	const auto get_element_containing{ [](const nlohmann::json& j, auto string) -> nlohmann::json::const_iterator {
+	/** 
+		@param j should be a JSON list of objects.
+		@param string should be a string to search for
+		@return iterator to the first object in the list with an attribute {string} or j.cend
+	*/
+	const auto search_item_containing{ [](const nlohmann::json& j, auto string) -> nlohmann::json::const_iterator {
 		for (auto it = j.cbegin(); it != j.cend(); ++it) {
 			if (it->contains(string)) return it;
 		}
+		return j.cend();
 	} };
 
 	// zip values of interest:
 	for (std::size_t i{ 0 }; i <= 22; ++i) {
 		auto json_file{ std::ifstream(file_path_leader_sync(i)) };
 		json_file >> j;
-		auto it_print_mc = get_element_containing(j, cli_commands::PRINT_MC);
+		auto it_print_mc = search_item_containing(j, cli_commands::PRINT_MC);
 		auto size_node = it_print_mc->operator[](cli_commands::PRINT_MC)[sc::size_nodes];
 		auto size_edges = it_print_mc->operator[](cli_commands::PRINT_MC)[sc::size_edges];
-		auto it_calc_variance = get_element_containing(j, cli_commands::CALC_VARIANCE);
+		auto it_calc_variance = search_item_containing(j, cli_commands::CALC_VARIANCE);
 		auto time_total_calculation = it_calc_variance->operator[](cli_commands::CALC_VARIANCE)[sc::time_total];
 		auto time_les_calculation = it_calc_variance->operator[](cli_commands::CALC_VARIANCE)[sc::time_solve_linear_system];
 		const auto separator{ ": " };
@@ -60,13 +65,13 @@ int main() {
 	for (std::size_t i{ 3 }; i < 16; i += 2) {
 		auto json_file{ std::ifstream(file_path_herman(i)) };
 		json_file >> j;
-		auto it_print_mc = get_element_containing(j, cli_commands::PRINT_MC);
+		auto it_print_mc = search_item_containing(j, cli_commands::PRINT_MC);
 		auto size_node = it_print_mc->operator[](cli_commands::PRINT_MC)[sc::size_nodes];
 		auto size_edges = it_print_mc->operator[](cli_commands::PRINT_MC)[sc::size_edges];
-		auto it_calc_variance = get_element_containing(j, cli_commands::CALC_VARIANCE);
+		auto it_calc_variance = search_item_containing(j, cli_commands::CALC_VARIANCE);
 		auto time_total_calculation = it_calc_variance->operator[](cli_commands::CALC_VARIANCE)[sc::time_total];
 		auto time_les_calculation = it_calc_variance->operator[](cli_commands::CALC_VARIANCE)[sc::time_solve_linear_system];
-		auto it_generate_herman = get_element_containing(j, cli_commands::GENERATE_HERMAN);
+		auto it_generate_herman = search_item_containing(j, cli_commands::GENERATE_HERMAN);
 		auto herman_size = it_generate_herman->operator[](cli_commands::GENERATE_HERMAN)[sc::size];
 		const auto separator{ ": " };
 		/*
