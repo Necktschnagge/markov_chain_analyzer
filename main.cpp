@@ -6,6 +6,7 @@
 #include "cli.h"
 
 #include "nlohmann/json.hpp"
+#include "Eigen/Dense"
 
 static constexpr bool DEBUG_MODE = false;
 
@@ -20,8 +21,23 @@ struct cli_params {
 	char* json_log_param{ nullptr };
 };
 
+void foo() {
+
+	using namespace Eigen;
+	using namespace std;
+	{
+		MatrixXd m = MatrixXd::Random(3, 3);
+		m = (m + MatrixXd::Constant(3, 3, 1.2)) * 50;
+		cout << "m =" << endl << m << endl;
+		VectorXd v(3);
+		v << 1, 2, 3;
+		cout << "m * v =" << endl << m * v << endl;
+	}
+}
+
 int main(int argc, char** argv)
 {
+	foo();
 	global g{}; // contains all global data
 	cli_params params; // commandline parameters / run configuration
 	std::ifstream _Commands_from_file;
