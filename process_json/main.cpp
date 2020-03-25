@@ -19,6 +19,9 @@ int main() {
 	nlohmann::json zipped_leader_sync;
 	nlohmann::json zipped_herman;
 
+	constexpr char ae{ '\x84' };
+	constexpr char oe{ '\x94' };
+
 	const auto file_path_leader_sync{ [](std::size_t i) { return std::string("../measures/leader_sync/log") + std::to_string(i) + ".json"; } };
 	const auto file_path_herman{ [](std::size_t i) { return std::string("../measures/herman/log") + std::to_string(i) + ".json"; } };
 
@@ -85,22 +88,22 @@ int main() {
 	// print output as required for diagrams:
 	//=========================================================================
 	//=========================================================================
-	std::stringstream leader_sync;
-	leader_sync << "\n% leader_sync: size_edges @ size_nodes\n";
-	leader_sync << R"(
+	std::stringstream edges_of_nodes;
+	edges_of_nodes << "\n% Kantenzahl in Abh" << ae << "ngigkeit der Knotenzahl.\n";
+	edges_of_nodes << R"(
 \begin{figure}
-\caption{leader\_sync}
+\caption{Kantenzahl in Abh)" << ae << R"(ngigkeit der Knotenzahl}
 \label{fig-leader-sync}
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-xlabel={\#nodes},
-ylabel={\#edges},
+xlabel={Knotenzahl},
+ylabel={Kantenzahl},
 xmin=10,
-xmax=300000,
+xmax=1000000,
 xmode=log,
 ymin= 10,
-ymax=600000,
+ymax=60000000,
 ymode=log,
 legend pos=north west,
 ymajorgrids=true,
@@ -112,9 +115,23 @@ grid style=dashed,
 coordinates {
 )";
 	for (const auto& item : zipped_leader_sync) {
-		leader_sync << "(" << item[sc::size_nodes] << "," << item[sc::size_edges] << ")";
+		edges_of_nodes << "(" << item[sc::size_nodes] << "," << item[sc::size_edges] << ")";
 	}
-	leader_sync << R"(};
+	edges_of_nodes << R"(
+};
+
+\addplot[only marks,color=red!50,mark=triangle,]
+coordinates {
+)";
+	for (const auto& item : zipped_herman) {
+		edges_of_nodes << "(" << item[sc::size_nodes] << "," << item[sc::size_edges] << ")";
+	}
+	edges_of_nodes << R"(
+};
+
+\addlegendentry{leader\_sync}
+\addlegendentry{herman}
+
 \end{axis}
 \end{tikzpicture}
 \end{figure}
@@ -185,13 +202,13 @@ coordinates {
 	les_time_in_edges << "\n% time_solve_linear_system @ size_edges\n";
 	les_time_in_edges << R"(
 \begin{figure}
-\caption{Zeitaufwand in Abh)" << "\x84" << R"(ngigkeit der Kanten in der Markovkette}
+\caption{Zeitaufwand in Abh)" << "\x84" << R"(ngigkeit der Kantenzahl}
 \label{fig-in-edges}
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-xlabel={\#edges},
-ylabel={},
+xlabel={Kantenzahl},
+ylabel={Zeit zum L)" << oe << R"(sen des Gleichungssystems (ms) },
 xmin=10,
 xmax=100000000,
 xmode=log,
@@ -213,7 +230,7 @@ coordinates {
 	les_time_in_edges << R"(
 };
 
-\addplot[only marks,color=red,mark=square,name path=f]
+\addplot[only marks,color=red,mark=triangle,name path=f]
 coordinates {
 )";
 	for (const auto& item : zipped_herman) {
@@ -222,8 +239,8 @@ coordinates {
 	les_time_in_edges << R"(
 };
 
-\addlegendentry{leader\_sync: time for solving linear system (ms)}
-\addlegendentry{herman: time for solving linear system (ms)}
+\addlegendentry{leader\_sync}
+\addlegendentry{herman}
 \end{axis}
 \end{tikzpicture}
 \end{figure}
@@ -234,7 +251,7 @@ coordinates {
 	les_time_in_nodes << "\n% time_solve_linear_system @ size_nodes\n";
 	les_time_in_nodes << R"(
 \begin{figure}
-\caption{Zeitaufwand in Abh)" << "\x84" << R"(ngigkeit der Knoten in der Markovkette}
+\caption{Zeitaufwand in Abh)" << "\x84" << R"(ngigkeit der Knoten in der \mc{}}
 \label{fig-in-nodes}
 \centering
 \begin{tikzpicture}
@@ -288,7 +305,7 @@ coordinates {
 \centering
 \begin{tikzpicture}
 \begin{axis}[
-xlabel={\#nodes},
+xlabel={Knotenzahl},
 ylabel={},
 xmin=1,
 xmax=300000,
@@ -312,7 +329,7 @@ coordinates {
 	les_time_percentage << R"(
 };
 
-\addplot[only marks,color=red,mark=square,name path=f]
+\addplot[only marks,color=red,mark=triangle,name path=f]
 coordinates {
 )";
 	for (const auto& item : zipped_herman) {
@@ -323,8 +340,8 @@ coordinates {
 	les_time_percentage << R"(
 };
 
-\addlegendentry{leader\_sync: les solving time / total time in\%}
-\addlegendentry{herman: les solving time / total time in\%}
+\addlegendentry{leader\_sync (in\%)}
+\addlegendentry{herman (in\%)}
 \end{axis}
 \end{tikzpicture}
 \end{figure}
@@ -333,10 +350,10 @@ coordinates {
 
 	std::vector<std::stringstream*> figures{
 		&les_time_percentage,
-		&leader_sync,
-		&herman,
-		&les_time_in_edges,
-		&les_time_in_nodes
+		&edges_of_nodes,
+		// &herman,  // move into leader_sync
+		&les_time_in_edges // keep as it is
+		//,&les_time_in_nodes // don't print this anymore.
 	};
 	std::cout << "\n\n\n%=====================================================";
 	std::for_each(figures.cbegin(), figures.cend(), [](const auto& pss) { std::cout << pss->str(); });
