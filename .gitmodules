@@ -9,3 +9,6 @@
 [submodule "extern/prism-benchmarks"]
 	path = extern/prism-benchmarks
 	url = https://github.com/prismmodelchecker/prism-benchmarks
+[submodule "extern/Eigen"]
+	path = extern/Eigen
+	url = https://gitlab.com/libeigen/eigen.git
