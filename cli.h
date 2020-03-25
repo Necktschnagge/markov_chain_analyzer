@@ -8,6 +8,7 @@
 
 #include "commands.h"
 #include "string_constants.h"
+#include "global_data.h"
 
 #include "nlohmann/json.hpp"
 
@@ -56,6 +57,15 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 		std::cout << "\n\nFetched command: " << command << std::endl;
 
 		try {
+			if (boost::regex_match(command, boost::regex(R"(\s*)"))) {
+				std::cout << "Recognized empty line. Skipping ..." << std::endl;
+				continue;
+			}
+		}
+		catch (const std::runtime_error & e) {
+			std::cout << "WARNING: Could not check for empty command: boost::regex throwed std::runtime_error!\n";
+		}
+		try {
 			//parse command
 			std::vector<std::string> items;
 			boost::split(items, command, boost::is_any_of(split_symbol));
@@ -67,7 +77,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 			if (instruction == cli_commands::RESET_MC) {
 				if (items.size() != 4) throw failed_instruction("Wrong number of parameters.");
 				std::size_t n_state_decoration{ 0 }, n_transition_decoration{ 0 };
-				cli_commands::id id{ 0 };
+				global::id id{ 0 };
 				try {
 					id = std::stoull(items[1]);
 					n_state_decoration = std::stoull(items[2]);
@@ -90,7 +100,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 			if (instruction == cli_commands::READ_TRA) {
 				if (items.size() != 3) throw failed_instruction("Wrong number of parameters.");
 				std::string& file_path = items[2];
-				cli_commands::id id{ 0 };
+				global::id id{ 0 };
 				std::ifstream file{};
 				try {
 					id = std::stoull(items[1]);
@@ -139,7 +149,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 				if (items.size() != 4) throw failed_instruction("Wrong number of parameters.");
 				std::string& file_path = items[2];
 				std::size_t rew_index{ 0 };
-				cli_commands::id id{ 0 };
+				global::id id{ 0 };
 				std::ifstream file{};
 				file.open(file_path);
 				try {
@@ -165,7 +175,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 			if (instruction == cli_commands::READ_TARGET) {
 				if (items.size() != 3) throw failed_instruction("Wrong number of parameters.");
 				std::string& file_path = items[2];
-				cli_commands::id id{ 0 };
+				global::id id{ 0 };
 				std::ifstream file{};
 				file.open(file_path);
 				try {
@@ -191,7 +201,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 				if (items.size() != 4) throw failed_instruction("Wrong number of parameters.");
 				std::string& file_path = items[2];
 				std::size_t label_id{ 0 };
-				cli_commands::id id{ 0 };
+				global::id id{ 0 };
 				std::ifstream file{};
 				file.open(file_path);
 				try {
@@ -218,7 +228,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 			if (instruction == cli_commands::CALC_EXPECT) {
 				if (items.size() != 5) throw failed_instruction("Wrong number of parameters.");
 				std::size_t reward_index{ 0 }, destination_decoration{ 0 };
-				cli_commands::id mc_id{ 0 }, target_id{ 0 };
+				global::id mc_id{ 0 }, target_id{ 0 };
 				try {
 					mc_id = std::stoull(items[1]);
 					reward_index = std::stoull(items[2]);
@@ -239,7 +249,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 				// mc_id, reward_index, target_id, destination_decoration, expect_decoration, free_reward
 				if (items.size() != 7) throw failed_instruction("Wrong number of parameters.");
 				std::size_t expect_decoration{ 0 }, destination_decoration{ 0 }, reward_index{ 0 }, free_reward{ 0 };
-				cli_commands::id target_id{ 0 }, mc_id{ 0 };
+				global::id target_id{ 0 }, mc_id{ 0 };
 				try {
 					mc_id = std::stoull(items[1]);
 					reward_index = std::stoull(items[2]);
@@ -275,7 +285,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 					edge_decoration_1{ 0 },
 					edge_decoration_2{ 0 },
 					free_reward{ 0 };
-				cli_commands::id target_set_id{ 0 },
+				global::id target_set_id{ 0 },
 					mc_id{ 0 };
 				try {
 					mc_id = std::stoull(items[1]);
@@ -307,7 +317,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 			if (instruction == cli_commands::WRITE_DECO) {
 				if (items.size() != 3) throw failed_instruction("Wrong number of parameters.");
 				std::string& file_path = items[2];
-				cli_commands::id id{ 0 };
+				global::id id{ 0 };
 				std::ofstream file{};
 				try {
 					id = std::stoull(items[1]);
@@ -330,7 +340,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 
 			if (instruction == cli_commands::GENERATE_HERMAN) { // id mc, n, target_set_id
 				if (items.size() != 4) throw failed_instruction("Wrong number of parameters.");
-				cli_commands::id mc_id{ 0 }, target_set_id{ 0 };
+				global::id mc_id{ 0 }, target_set_id{ 0 };
 				unsigned long size{ 0 };
 				try {
 					mc_id = std::stoull(items[1]);
@@ -350,7 +360,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 
 			if (instruction == cli_commands::DELETE_MC) {
 				if (items.size() != 2) throw failed_instruction("Wrong number of parameters.");
-				cli_commands::id id{ 0 };
+				global::id id{ 0 };
 				try {
 					id = std::stoull(items[1]);
 				}
@@ -369,7 +379,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 
 			if (instruction == cli_commands::DELETE_TS) {
 				if (items.size() != 2) throw failed_instruction("Wrong number of parameters.");
-				cli_commands::id id{ 0 };
+				global::id id{ 0 };
 				try {
 					id = std::stoull(items[1]);
 				}
@@ -388,7 +398,7 @@ inline nlohmann::json cli(std::istream& commands, global& g) {
 
 			if (instruction == cli_commands::PRINT_MC) {
 				if (items.size() != 2) throw failed_instruction("Wrong number of parameters.");
-				cli_commands::id id{ 0 };
+				global::id id{ 0 };
 				try {
 					id = std::stoull(items[1]);
 				}

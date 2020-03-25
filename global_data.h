@@ -1,5 +1,7 @@
 #pragma once
 
+#include "markov_chain.h"
+
 
 struct global {
 

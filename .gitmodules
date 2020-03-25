@@ -6,3 +6,6 @@
 	path = extern/amgcl
 	url = https://github.com/ddemidov/amgcl
 	branch = master
+[submodule "extern/prism-benchmarks"]
+	path = extern/prism-benchmarks
+	url = https://github.com/prismmodelchecker/prism-benchmarks

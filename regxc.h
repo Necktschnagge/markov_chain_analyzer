@@ -16,7 +16,7 @@
 class regex_strings {
 public:
 	inline static const auto nonnegative_integer{ std::string(R"(([1-9][0-9]*|0))") };
-	inline static const auto nonnegative_float{ std::string(R"(([0-9]*\.)?[0-9]+)") };
+	inline static const auto nonnegative_float{ std::string(R"(([-+]?\d*\.?\d+)(?:[eE]([-+]?\d+))?)") };
 
 	inline static const auto spaces0{ std::string(R"(\s*)") };
 	inline static const auto spaces1{ std::string(R"(\s+)") };

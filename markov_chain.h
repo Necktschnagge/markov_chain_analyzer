@@ -146,9 +146,14 @@ public:
 		const auto input_s{ std::string(std::istream_iterator<char>(transitions),std::istream_iterator<char>()) };
 
 		// check overall file format
-		const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) };
-		std::cout << "Check for well-formed file format: " << interprete_bool_n(valid_file_format);
-		if (!valid_file_format) throw std::invalid_argument("The input is maleformed.");
+		try {
+			const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) }; //### may produce runtime error -> in case the fi9le does not match -> check if chosen regexes have some kind of structure where runtime state-set of emulating NFA may explode.
+			std::cout << "Check for well-formed file format: " << interprete_bool_n(valid_file_format);
+			if (!valid_file_format) throw std::invalid_argument("The input is maleformed.");
+		}
+		catch (const std::runtime_error & e) {
+			std::cout << "WARNING: Could not check for well-formed file format. boost::regex throwed std::runtime_error:\n\t\t" << e.what() << "\n";
+		}
 
 		// find end of header line
 		const auto regx_it_prism_header_transitions{ regex_iterator(input_s.cbegin(),input_s.cend(),regxc::prism_header) };
@@ -219,10 +224,14 @@ public:
 		const auto input_s{ std::string(std::istream_iterator<char>(rewards),std::istream_iterator<char>()) };
 
 		// check overall file format
-		const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) };
-		std::cout << "Check for well-formed file format: " << interprete_bool_n(valid_file_format);
-		if (!valid_file_format) throw std::invalid_argument("The file is not well-formed.");
-
+		try {
+			const auto valid_file_format{ boost::regex_match(input_s, regxc::prism_file_format) };
+			std::cout << "Check for well-formed file format: " << interprete_bool_n(valid_file_format);
+			if (!valid_file_format) throw std::invalid_argument("The file is not well-formed.");
+		}
+		catch (const std::runtime_error & e) {
+			std::cout << "WARNING: Could not check for well-formed file format. boost::regex throwed std::runtime_error:\n\t\t" << e.what() << "\n";
+		}
 		// find end of header line
 		const auto regx_it_prism_header_rewards{ regex_iterator(input_s.cbegin(),input_s.cend(),regxc::prism_header) };
 		const auto exists_header_line{ regx_it_prism_header_rewards != regex_iterator() };
@@ -278,10 +287,16 @@ public:
 		auto gmc_general{ regxc::gmc_general };
 
 		// Check for overall format:
+		
+		try {
 		if (!boost::regex_match(test_file_string, regxc::gmc_general))
 			throw std::invalid_argument("No valid GENERAL MARKOV CHAIN format");
-		std::cout << "General syntax: okay.\n";
-
+			else std::cout << "General syntax: okay.\n";
+		}
+		catch (const std::runtime_error & e) {
+			std::cout << "WARNING: Could not check for well-formed file format. boost::regex throwed std::runtime_error:\n\t\t" << e.what() << "\n";
+		}
+		
 		// Locate semantics defintion line:
 		const auto regx_it_semantics_definition{
 			regex_iterator(test_file_string.begin(),test_file_string.end(),regxc::gmc_semantics_definition)
@@ -336,9 +351,13 @@ public:
 			std::string("((") + gmc_s_irgnored_line + "|" + gmc_s_value_definition_line + ")?(" + gmc_s_new_line + "|$))*"
 		) };
 
+		try {
 		std::cout << "Check for wellformed body: " <<
 			interprete_bool_n(boost::regex_match(semantics_definition_end, test_file_string.cend(), gmc_value_definition_body));
-
+		}
+		catch (const std::runtime_error & e) {
+			std::cout << "WARNING: Could not check for wellformed body. boost::regex throwed std::runtime_error:\n\t\t" << e.what() << "\n";
+		}
 
 		//read all lines of body:
 		if (!empty()) throw std::logic_error("Forbidden to read transitions from file if markov chain is not empty.");
