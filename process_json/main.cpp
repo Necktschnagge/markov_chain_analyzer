@@ -346,13 +346,64 @@ coordinates {
 \end{tikzpicture}
 \end{figure}
 )";
+
+
+	//=========================================================================
+	std::stringstream total_time_in_edges;
+	total_time_in_edges << "\n% time_solve_linear_system @ size_edges\n";
+	total_time_in_edges << R"(
+\begin{figure}
+\caption{Zeitaufwand in Abh)" << "\x84" << R"(ngigkeit der Kantenzahl}
+\label{fig-in-edges}
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+xlabel={Kantenzahl},
+ylabel={Gesamtzeit zur Varianzermittlung (ms) },
+xmin=10,
+xmax=100000000,
+xmode=log,
+ymode=log,
+ymin= 0.04,
+ymax=1000000,
+legend pos=north west,
+ymajorgrids=true,
+grid style=dashed,
+]
+\path[name path=axis] (axis cs:0,0) -- (axis cs:1,0);
+
+\addplot[ only marks,color=blue,mark=square,name path=f]
+coordinates {
+)";
+	for (const auto& item : zipped_leader_sync) {
+		total_time_in_edges << "(" << item[sc::size_edges] << "," << item[sc::time_total] << ")";
+	}
+	total_time_in_edges << R"(
+};
+
+\addplot[only marks,color=red,mark=triangle,name path=f]
+coordinates {
+)";
+	for (const auto& item : zipped_herman) {
+		total_time_in_edges << "(" << item[sc::size_edges] << "," << item[sc::time_total] << ")";
+	}
+	total_time_in_edges << R"(
+};
+
+\addlegendentry{leader\_sync}
+\addlegendentry{herman}
+\end{axis}
+\end{tikzpicture}
+\end{figure}
+)";
 	
 
 	std::vector<std::stringstream*> figures{
-		&les_time_percentage,
-		&edges_of_nodes,
-		// &herman,  // move into leader_sync
-		&les_time_in_edges // keep as it is
+		&les_time_percentage
+		,&edges_of_nodes
+		// ,&herman,  // move into leader_sync
+		,&les_time_in_edges // keep as it is
+		// ,&total_time_in_edges
 		//,&les_time_in_nodes // don't print this anymore.
 	};
 	std::cout << "\n\n\n%=====================================================";
