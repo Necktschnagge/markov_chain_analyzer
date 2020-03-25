@@ -37,7 +37,8 @@ int main() {
 		return j.cend();
 	} };
 
-	// zip values of interest:
+	// Collect data of interest from the different files:
+	// leader_sync
 	for (std::size_t i{ 0 }; i <= 22; ++i) {
 		auto json_file{ std::ifstream(file_path_leader_sync(i)) };
 		json_file >> j;
@@ -47,13 +48,6 @@ int main() {
 		auto it_calc_variance = search_item_containing(j, cli_commands::CALC_VARIANCE);
 		auto time_total_calculation = it_calc_variance->operator[](cli_commands::CALC_VARIANCE)[sc::time_total];
 		auto time_les_calculation = it_calc_variance->operator[](cli_commands::CALC_VARIANCE)[sc::time_solve_linear_system];
-		const auto separator{ ": " };
-		/*
-		std::cout << sc::size_nodes << separator << size_node;
-		std::cout << sc::size_edges << separator << size_edges;
-		std::cout << sc::time_total << separator << time_total_calculation;
-		std::cout << sc::time_solve_linear_system << separator << time_les_calculation;
-		*/
 		zipped_leader_sync.push_back({
 			{sc::size_nodes, size_node},
 			{sc::size_edges, size_edges},
@@ -62,6 +56,8 @@ int main() {
 			});
 	}
 
+	// Collect data of interest from the different files:
+	// leader_sync
 	for (std::size_t i{ 3 }; i < 16; i += 2) {
 		auto json_file{ std::ifstream(file_path_herman(i)) };
 		json_file >> j;
@@ -73,13 +69,6 @@ int main() {
 		auto time_les_calculation = it_calc_variance->operator[](cli_commands::CALC_VARIANCE)[sc::time_solve_linear_system];
 		auto it_generate_herman = search_item_containing(j, cli_commands::GENERATE_HERMAN);
 		auto herman_size = it_generate_herman->operator[](cli_commands::GENERATE_HERMAN)[sc::size];
-		const auto separator{ ": " };
-		/*
-		std::cout << sc::size_nodes << separator << size_node;
-		std::cout << sc::size_edges << separator << size_edges;
-		std::cout << sc::time_total << separator << time_total_calculation;
-		std::cout << sc::time_solve_linear_system << separator << time_les_calculation;
-		*/
 		zipped_herman.push_back({
 			{sc::size, herman_size},
 			{sc::size_nodes, size_node},
@@ -90,8 +79,7 @@ int main() {
 	}
 
 
-	// print output as required for diagrams:
-	//=========================================================================
+	// generate latex code for diagrams:
 	//=========================================================================
 	std::stringstream edges_of_nodes;
 	edges_of_nodes << "\n% Kantenzahl in Abh" << ae << "ngigkeit der Knotenzahl.\n";
@@ -403,6 +391,7 @@ coordinates {
 )";
 	
 
+	// Collect all diagrams that should be printed
 	std::vector<std::stringstream*> figures{
 		&les_time_percentage
 		,&edges_of_nodes
@@ -411,7 +400,7 @@ coordinates {
 		// ,&total_time_in_edges
 		//,&les_time_in_nodes // don't print this anymore.
 	};
-	std::cout << "\n\n\n%=====================================================";
+
 	std::for_each(figures.cbegin(), figures.cend(), [](const auto& pss) { std::cout << pss->str(); });
 
 	return 0;
