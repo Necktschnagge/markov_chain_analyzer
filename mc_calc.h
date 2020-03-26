@@ -15,6 +15,7 @@
 void eigen_solve_linear_system(Eigen::SparseMatrix<double>& matrix, Eigen::VectorXd& image, Eigen::VectorXd& result) {
 	Eigen::BiCGSTAB<Eigen::SparseMatrix<double> > solver;
 	solver.compute(matrix);
+	std::cout << matrix << "\n\n";
 	if (solver.info() != Eigen::Success) {
 		// decomposition failed
 		throw 1;
@@ -120,6 +121,7 @@ nlohmann::json calc_variance(_MarkovChain& mc, std::size_t reward_index, const _
 	timestamps[7] = std::chrono::steady_clock::now();
 	auto image_vector2{ analyzer::rewarded_image_vector(target_probability_matrix, mc, free_reward_index) };
 	auto image_vector2_e{ Eigen::VectorXd(image_vector2.size(),1) };
+	for (typename decltype(image_vector)::size_type i{ 0 }; i < image_vector.size(); ++i) image_vector2_e[i] = image_vector2[i];
 	timestamps[8] = std::chrono::steady_clock::now();
 	auto result2{ solve_linear_system(target_probability_matrix_minus_one, image_vector2) };
 	Eigen::VectorXd result2_e;
