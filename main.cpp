@@ -36,10 +36,15 @@ void foo() {
 	}
 
 	// ...
-	SparseMatrix<double> A(10,10);
+	SparseMatrix<double> A(2,2);
 	A.coeffRef(0, 0) = 1;
+	A.coeffRef(0, 1) = 1;
+	A.coeffRef(1, 0) = 6;
+	A.coeffRef(1, 1) = 2;
 	// fill A
 	VectorXd b, x;
+	b[0] = 3;
+	b[1] = 10;
 	// fill b
 	// solve Ax = b
 	ConjugateGradient<SparseMatrix<double> > solver;
@@ -60,7 +65,7 @@ void foo() {
 
 int main(int argc, char** argv)
 {
-	foo();
+	//foo();
 	global g{}; // contains all global data
 	cli_params params; // commandline parameters / run configuration
 	std::ifstream _Commands_from_file;
