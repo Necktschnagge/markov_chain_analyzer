@@ -6,8 +6,6 @@
 #include "cli.h"
 
 #include "nlohmann/json.hpp"
-#include "Eigen/Dense"
-#include "Eigen/IterativeLinearSolvers"
 
 
 static constexpr bool DEBUG_MODE = false;
@@ -23,43 +21,9 @@ struct cli_params {
 	char* json_log_param{ nullptr };
 };
 
-void foo() {
-
-	using namespace Eigen;
-	using namespace std;
-	
-
-	// ...
-	SparseMatrix<double> A(2,2);
-	A.coeffRef(0, 0) = 1;
-	A.coeffRef(0, 1) = 1;
-	A.coeffRef(1, 0) = 6;
-	A.coeffRef(1, 1) = 2;
-	// fill A
-	VectorXd b(2), x;
-	b(0) = 3;
-	b(1) = 10;
-	// fill b
-	// solve Ax = b
-	BiCGSTAB<SparseMatrix<double> > solver;
-	solver.compute(A);
-	if (solver.info() != Success) {
-		// decomposition failed
-		return;
-	}
-	x = solver.solve(b);
-	if (solver.info() != Success) {
-		// solving failed
-		return;
-	}
-	// solve for another right hand side:
-	//x1 = solver.solve(b1);
-
-}
 
 int main(int argc, char** argv)
 {
-	//foo();
 	global g{}; // contains all global data
 	cli_params params; // commandline parameters / run configuration
 	std::ifstream _Commands_from_file;
