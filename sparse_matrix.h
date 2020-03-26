@@ -68,7 +68,7 @@ public:
 		auto matrix{ Eigen::SparseMatrix<double>(m, n) };
 		for (decltype(rows)::size_type m{ 0 }; m < rows.size(); ++m) 
 			for (const auto& pair : rows[m]) 
-				matrix.coeffRef(m, pair.first) = pair.second;
+				matrix.insert(m, pair.first) = pair.second;
 		return matrix;
 	}
 };

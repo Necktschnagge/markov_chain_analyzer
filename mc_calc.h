@@ -113,6 +113,7 @@ nlohmann::json calc_variance(_MarkovChain& mc, std::size_t reward_index, const _
 	Eigen::VectorXd result_e;
 	eigen_solve_linear_system(target_probability_matrix_minus_one_e, image_vector_e, result_e);
 	timestamps[5] = std::chrono::steady_clock::now();
+	std::cout << "\nprepare:" << (timestamps[4] - timestamps[0]).count() << "\nsolver:" << (timestamps[5] - timestamps[4]).count() << "\n";
 	//mc.set_decoration(result, expect_decoration_index);
 	mc.set_decoration(result_e, expect_decoration_index);
 	timestamps[6] = std::chrono::steady_clock::now();
