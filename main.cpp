@@ -7,7 +7,6 @@
 
 #include "nlohmann/json.hpp"
 
-
 static constexpr bool DEBUG_MODE = false;
 
 struct cli_params {
@@ -20,7 +19,6 @@ struct cli_params {
 	char* instructions_param{ nullptr };
 	char* json_log_param{ nullptr };
 };
-
 
 int main(int argc, char** argv)
 {
