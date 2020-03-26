@@ -2,7 +2,8 @@
 Write-Output run_measures
 Push-Location
 cd measures
-
+mkdir herman
+mkdir leader_sync
 
 # config:
 $prism_dir = "..\extern\prism-benchmarks\models\dtmcs"
