@@ -15,7 +15,6 @@
 void eigen_solve_linear_system(Eigen::SparseMatrix<double>& matrix, Eigen::VectorXd& image, Eigen::VectorXd& result) {
 	Eigen::BiCGSTAB<Eigen::SparseMatrix<double> > solver;
 	solver.compute(matrix);
-	std::cout << matrix << "\n\n";
 	if (solver.info() != Eigen::Success) {
 		// decomposition failed
 		throw 1;
