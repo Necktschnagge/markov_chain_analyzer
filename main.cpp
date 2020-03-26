@@ -7,6 +7,7 @@
 
 #include "nlohmann/json.hpp"
 #include "Eigen/Dense"
+#include "Eigen/IterativeLinearSolvers"
 
 static constexpr bool DEBUG_MODE = false;
 
@@ -33,6 +34,28 @@ void foo() {
 		v << 1, 2, 3;
 		cout << "m * v =" << endl << m * v << endl;
 	}
+
+	// ...
+	SparseMatrix<double> A(10,10);
+	A.coeffRef(0, 0) = 1;
+	// fill A
+	VectorXd b, x;
+	// fill b
+	// solve Ax = b
+	ConjugateGradient<SparseMatrix<double> > solver;
+	solver.compute(A);
+	if (solver.info() != Success) {
+		// decomposition failed
+		return;
+	}
+	x = solver.solve(b);
+	if (solver.info() != Success) {
+		// solving failed
+		return;
+	}
+	// solve for another right hand side:
+	//x1 = solver.solve(b1);
+
 }
 
 int main(int argc, char** argv)
