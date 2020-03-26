@@ -9,6 +9,7 @@
 #include "Eigen/Dense"
 #include "Eigen/IterativeLinearSolvers"
 
+
 static constexpr bool DEBUG_MODE = false;
 
 struct cli_params {
@@ -26,14 +27,7 @@ void foo() {
 
 	using namespace Eigen;
 	using namespace std;
-	{
-		MatrixXd m = MatrixXd::Random(3, 3);
-		m = (m + MatrixXd::Constant(3, 3, 1.2)) * 50;
-		cout << "m =" << endl << m << endl;
-		VectorXd v(3);
-		v << 1, 2, 3;
-		cout << "m * v =" << endl << m * v << endl;
-	}
+	
 
 	// ...
 	SparseMatrix<double> A(2,2);
@@ -42,12 +36,12 @@ void foo() {
 	A.coeffRef(1, 0) = 6;
 	A.coeffRef(1, 1) = 2;
 	// fill A
-	VectorXd b, x;
-	b[0] = 3;
-	b[1] = 10;
+	VectorXd b(2), x;
+	b(0) = 3;
+	b(1) = 10;
 	// fill b
 	// solve Ax = b
-	ConjugateGradient<SparseMatrix<double> > solver;
+	BiCGSTAB<SparseMatrix<double> > solver;
 	solver.compute(A);
 	if (solver.info() != Success) {
 		// decomposition failed
