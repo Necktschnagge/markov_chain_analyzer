@@ -49,7 +49,7 @@ nlohmann::json calc_expect(_MarkovChain& mc, std::size_t reward_index, const _In
 	timestamps[3] = std::chrono::steady_clock::now();
 	auto image_vector{ analyzer::rewarded_image_vector(target_probability_matrix, mc, reward_index) };
 	auto image_vector_e{ Eigen::VectorXd(image_vector.size(),1) };
-	for (decltype(image_vector)::size_type i{ 0 }; i < image_vector.size(); ++i) image_vector_e[i] = image_vector[i];
+	for (typename decltype(image_vector)::size_type i{ 0 }; i < image_vector.size(); ++i) image_vector_e[i] = image_vector[i];
 	timestamps[4] = std::chrono::steady_clock::now();
 	//auto result{ solve_linear_system(target_probability_matrix_minus_one, image_vector) }; //omit!
 	Eigen::VectorXd result_e;
@@ -107,7 +107,7 @@ nlohmann::json calc_variance(_MarkovChain& mc, std::size_t reward_index, const _
 	timestamps[3] = std::chrono::steady_clock::now();
 	auto image_vector{ analyzer::rewarded_image_vector(target_probability_matrix,mc,reward_index) };
 	auto image_vector_e{ Eigen::VectorXd(image_vector.size(),1) };
-	for (decltype(image_vector)::size_type i{ 0 }; i < image_vector.size(); ++i) image_vector_e[i] = image_vector[i];
+	for (typename decltype(image_vector)::size_type i{ 0 }; i < image_vector.size(); ++i) image_vector_e[i] = image_vector[i];
 	timestamps[4] = std::chrono::steady_clock::now();
 	auto result{ solve_linear_system(target_probability_matrix_minus_one, image_vector) };
 	Eigen::VectorXd result_e;
