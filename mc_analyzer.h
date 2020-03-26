@@ -8,6 +8,7 @@
 
 #include "sparse_matrix.h"
 
+#include "amgcl/solver/bicgstab.hpp"
 
 /**
 	@brief Returns a sparse matrix that contains transition probabilities such that matrix[from][to] is the probability of the transition \a from --> \a to, except for states \a from in \target_states, there the value is set to zero (i.e. no entry in sparse matrix).
@@ -119,7 +120,7 @@ std::vector<double> solve_linear_system(const sparse_matrix& M, const std::vecto
 		amgcl::coarsening::aggregation,
 		amgcl::relaxation::spai0
 		>,
-		amgcl::solver::cg<Backend>
+		amgcl::solver::bicgstab<Backend>
 	> solve(M);
 	///####check different coarsening and relaxations.
 
