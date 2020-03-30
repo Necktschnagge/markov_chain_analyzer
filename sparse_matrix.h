@@ -61,15 +61,19 @@ public:
 		for (sparse_matrix::size_t it{ 0 }; it != size_m(); ++it) rows[it][it] -= 1;
 	}
 
-	/**
-		unsafe
-	*/
+
 	Eigen::SparseMatrix<double> copy_to_eigen() {
 		auto matrix{ Eigen::SparseMatrix<double>(m, n) };
-		for (decltype(rows)::size_type m{ 0 }; m < rows.size(); ++m) 
-			for (const auto& pair : rows[m]) 
-				matrix.insert(m, pair.first) = pair.second;
+		std::vector<Eigen::Triplet<double>> triplet_list;
+		for (decltype(rows)::size_type m{ 0 }; m < rows.size(); ++m)
+			for (const auto& pair : rows[m])
+				triplet_list.push_back(Eigen::Triplet<double>(m, pair.first, pair.second));
+		matrix.setFromTriplets(triplet_list.cbegin(), triplet_list.cend());
 		return matrix;
+	}
+
+	std::vector<Eigen::Triplet<double>> copy_to_triplet_list() {
+
 	}
 };
 
