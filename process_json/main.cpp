@@ -397,7 +397,7 @@ coordinates {
 		,&edges_of_nodes
 		// ,&herman,  // move into leader_sync
 		,&les_time_in_edges // keep as it is
-		// ,&total_time_in_edges
+		,&total_time_in_edges
 		//,&les_time_in_nodes // don't print this anymore.
 	};
 
