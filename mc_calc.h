@@ -12,7 +12,7 @@
 #include "Eigen/IterativeLinearSolvers"
 
 
-void eigen_solve_linear_system( Eigen::SparseMatrix<double>& matrix, Eigen::VectorXd& image, Eigen::VectorXd& result) {
+void eigen_solve_linear_system(Eigen::SparseMatrix<double>& matrix, Eigen::VectorXd& image, Eigen::VectorXd& result) {
 	Eigen::BiCGSTAB<Eigen::SparseMatrix<double> > solver;
 	solver.compute(matrix);
 	if (solver.info() != Eigen::Success) {
@@ -27,9 +27,9 @@ void eigen_solve_linear_system( Eigen::SparseMatrix<double>& matrix, Eigen::Vect
 }
 
 
- /**
-	  Calculates expects of accumulated edge rewards along paths until reaching target_set in markov chain.
- */
+/**
+	 Calculates expects of accumulated edge rewards along paths until reaching target_set in markov chain.
+*/
 template <class _MarkovChain, class _IntegralSet>
 nlohmann::json calc_expect(_MarkovChain& mc, std::size_t reward_index, const _IntegralSet& target_set, std::size_t decoration_destination_index) {
 
@@ -38,7 +38,7 @@ nlohmann::json calc_expect(_MarkovChain& mc, std::size_t reward_index, const _In
 	constexpr unsigned COUNT_TIMESTAMPS{ 7 };
 	std::array<decltype(std::chrono::steady_clock::now()), COUNT_TIMESTAMPS> timestamps;
 
-	using matrix_type = sparse_matrix;
+	using matrix_type = sparse_matrix; ///### this is config!!! to be put outside
 
 	timestamps[0] = std::chrono::steady_clock::now();
 	auto target_probability_matrix{ analyzer_t<matrix_type>::target_adjusted_probability_matrix(mc, target_set) };
@@ -88,42 +88,31 @@ nlohmann::json calc_variance(_MarkovChain& mc, std::size_t reward_index, const _
 
 	using analyzer = mc_analyzer<typename _MarkovChain::rational_type, typename _MarkovChain::integral_type>;
 
+	using matrix_type = sparse_matrix; ///### this is config!!! to be put outside
+
 	constexpr unsigned COUNT_TIMESTAMPS{ 11 };
 	std::array<decltype(std::chrono::steady_clock::now()), COUNT_TIMESTAMPS> timestamps;
 
 	timestamps[0] = std::chrono::steady_clock::now();
-	auto target_probability_matrix{ analyzer_t<sparse_matrix>::target_adjusted_probability_matrix(mc, target_set) };
-	auto target_probability_matrix_e{ target_probability_matrix.copy_to_eigen() };
+	auto target_probability_matrix{ analyzer_t<matrix_type>::target_adjusted_probability_matrix(mc, target_set) };
 	timestamps[1] = std::chrono::steady_clock::now();
 	auto target_probability_matrix_minus_one{ target_probability_matrix };
 	timestamps[2] = std::chrono::steady_clock::now();
-	target_probability_matrix_minus_one.subtract_unity_matrix();
-	auto target_probability_matrix_minus_one_e{ target_probability_matrix_minus_one.copy_to_eigen() };
+	subtract_unity_matrix(target_probability_matrix_minus_one);
 	timestamps[3] = std::chrono::steady_clock::now();
 	auto image_vector{ analyzer::rewarded_image_vector(target_probability_matrix,mc,reward_index) };
-	auto image_vector_e{ Eigen::VectorXd(image_vector.size(),1) };
-	for (typename decltype(image_vector)::size_type i{ 0 }; i < image_vector.size(); ++i) image_vector_e[i] = image_vector[i];
 	timestamps[4] = std::chrono::steady_clock::now();
-	//auto result{ solve_linear_system(target_probability_matrix_minus_one, image_vector) };
-	Eigen::VectorXd result_e;
-	eigen_solve_linear_system(target_probability_matrix_minus_one_e, image_vector_e, result_e);
+	auto result{ solve_linear_system(target_probability_matrix_minus_one, image_vector) };
 	timestamps[5] = std::chrono::steady_clock::now();
-	std::cout << "\nprepare:" << (timestamps[4] - timestamps[0]).count() << "\nsolver:" << (timestamps[5] - timestamps[4]).count() << "\n";
-	//mc.set_decoration(result, expect_decoration_index);
-	mc.set_decoration(result_e, expect_decoration_index);
+	mc.set_decoration(result, expect_decoration_index);
 	timestamps[6] = std::chrono::steady_clock::now();
 	analyzer::calculate_variance_reward(mc, reward_index, expect_decoration_index, free_reward_index);
 	timestamps[7] = std::chrono::steady_clock::now();
 	auto image_vector2{ analyzer::rewarded_image_vector(target_probability_matrix, mc, free_reward_index) };
-	auto image_vector2_e{ Eigen::VectorXd(image_vector2.size(),1) };
-	for (typename decltype(image_vector)::size_type i{ 0 }; i < image_vector.size(); ++i) image_vector2_e[i] = image_vector2[i];
 	timestamps[8] = std::chrono::steady_clock::now();
-	//auto result2{ solve_linear_system(target_probability_matrix_minus_one, image_vector2) };
-	Eigen::VectorXd result2_e;
-	eigen_solve_linear_system(target_probability_matrix_minus_one_e, image_vector2_e, result2_e);
+	auto result2{ solve_linear_system(target_probability_matrix_minus_one, image_vector2) };
 	timestamps[9] = std::chrono::steady_clock::now();
-	//mc.set_decoration(result2, decoration_destination_index);
-	mc.set_decoration(result2_e, decoration_destination_index);
+	mc.set_decoration(result2, decoration_destination_index);
 	timestamps[10] = std::chrono::steady_clock::now();
 
 	nlohmann::json performance_log;
@@ -195,7 +184,7 @@ nlohmann::json calc_covariance(
 	mc.set_decoration(interim2, expect_decoration_index2);
 	timestamps[6] = std::chrono::steady_clock::now();
 	analyzer::calculate_covariance_reward(
-		mc, 
+		mc,
 		reward_index1,
 		reward_index2,
 		expect_decoration_index1,
@@ -226,7 +215,7 @@ nlohmann::json calc_covariance(
 		{sc::decoration_index_egde_source + _1, reward_index1 },
 		{sc::decoration_index_egde_source + _2, reward_index2 },
 		{sc::decoration_index_egde_free, free_reward_index },
-		{sc::decoration_index_node_target + sc::_expect +_1, expect_decoration_index1 },
+		{sc::decoration_index_node_target + sc::_expect + _1, expect_decoration_index1 },
 		{sc::decoration_index_node_target + sc::_expect + _2, expect_decoration_index2 },
 		{sc::decoration_index_node_target + sc::_covariance, decoration_destination_index },
 		{sc::time_create_pto_matrix, diffs[0]},
