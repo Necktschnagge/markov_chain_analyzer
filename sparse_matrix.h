@@ -16,6 +16,7 @@
 #include <amgcl/profiler.hpp>
 
 #include "Eigen/IterativeLinearSolvers"
+#include "Eigen/src/SparseCore/SparseMatrix.h"
 
 #include <vector>
 #include <unordered_map>
@@ -71,12 +72,30 @@ public:
 		matrix.setFromTriplets(triplet_list.cbegin(), triplet_list.cend());
 		return matrix;
 	}
-
-	std::vector<Eigen::Triplet<double>> copy_to_triplet_list() {
-
-	}
 };
 
+
+template <class T>
+inline std::size_t _size(const T&);
+template <>
+std::size_t _size<sparse_matrix>(const sparse_matrix& m) {
+	if (m.size_m() != m.size_n()) throw std::invalid_argument("Matrix is not quadratic.");
+	return m.size_m();
+}
+template <>
+std::size_t _size<Eigen::SparseMatrix<double>>(const Eigen::SparseMatrix<double>& m) {
+	if (m.rows() != m.cols()) throw std::invalid_argument("Matrix is not quadratic.");
+	return m.rows();
+}
+
+
+/**
+	@brief Subtracts the unity martix.
+*/
+template<class _SparseMatrix>
+inline void subtract_unity_matrix(_SparseMatrix& m) {
+	for (std::size_t it{ 0 }; it != _size(m); ++it) m(it,it) -= 1;
+}
 
 
 /* Define type traits required by amgcl for own class sparse_matrix */

@@ -418,14 +418,13 @@ public:
 
 	/**
 		@brief Assignes the values of given array structure as state decorations to the states.
-		@details source needs an operator[] takeing an \tparam _Integer for state id.
+		@details source needs an operator[] taking an \tparam _Integer for state id.
 	*/
 	template<class _Array>
 	void set_decoration(const _Array& source, std::size_t index) {
 		if (!(index < n_node_decorations)) throw std::out_of_range("Not enough decorations defined.");
 		for (auto it{ states.begin() }; it != states.end(); ++it)
 			it->second.decorations[index] = source[it->first];
-
 	}
 
 	/**
@@ -447,7 +446,7 @@ public:
 	template<class _Rationals, class _Integers, class _Set, bool>
 	friend nlohmann::json generate_herman(markov_chain<_Rationals, _Integers>& mc, const _Integers& size, std::unique_ptr<_Set>& target_set);
 
-	template <class mc_type, class set_type>
-	friend sparse_matrix target_adjusted_probability_matrix(const mc_type& mc, const set_type& target_states);
+	template <class matrix_type>
+	friend class analyzer_t;
 };
 
