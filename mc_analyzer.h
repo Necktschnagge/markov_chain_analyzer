@@ -25,7 +25,7 @@ public:
 
 template <>
 template <class mc_type, class set_type>
-inline static sparse_matrix analyzer_t<sparse_matrix>::target_adjusted_probability_matrix(const mc_type& mc, const set_type& target_states) {
+inline sparse_matrix analyzer_t<sparse_matrix>::target_adjusted_probability_matrix(const mc_type& mc, const set_type& target_states) {
 	static_assert(std::is_same<typename mc_type::integral_type, typename set_type::value_type>::value, "Value type of set must equal integral type of markov chain.");
 	auto m{ sparse_matrix(mc.size_states(), mc.size_states()) };
 	for (auto it = mc.forward_transitions.cbegin(); it != mc.forward_transitions.cend(); ++it) {
@@ -38,7 +38,7 @@ inline static sparse_matrix analyzer_t<sparse_matrix>::target_adjusted_probabili
 
 template <>
 template <class mc_type, class set_type>
-inline static Eigen::SparseMatrix<double> analyzer_t<Eigen::SparseMatrix<double>>::target_adjusted_probability_matrix(const mc_type& mc, const set_type& target_states) {
+inline Eigen::SparseMatrix<double> analyzer_t<Eigen::SparseMatrix<double>>::target_adjusted_probability_matrix(const mc_type& mc, const set_type& target_states) {
 	static_assert(std::is_same<typename mc_type::integral_type, typename set_type::value_type>::value, "Value type of set must equal integral type of markov chain.");
 	auto m{ Eigen::SparseMatrix<double>(mc.size_states(), mc.size_states()) };
 	std::vector<Eigen::Triplet<double>> triplet_list;
