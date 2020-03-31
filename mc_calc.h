@@ -8,6 +8,7 @@
 
 #include "markov_chain.h"
 #include "commands.h"
+#include "mc_analyzer.h"
 
 #include "Eigen/IterativeLinearSolvers"
 
@@ -25,6 +26,50 @@ void eigen_solve_linear_system(Eigen::SparseMatrix<double>& matrix, Eigen::Vecto
 		throw 2;
 	}
 }
+
+
+
+ /**
+	 @brief Solves linear system M * x = b using amgcl
+ */
+std::vector<double> solve_linear_system(const sparse_matrix& M, const std::vector<double>& b /*, amgcl::profiler<>* optional_profiler = nullptr*/) {
+
+	//## read the docs of AMGCL to get to know what a profiler actualy does.
+
+	//amgcl::profiler<> profiler;
+	//auto t_total = profiler.scoped_tic("total");
+
+	// Create an AMGCL solver for the problem.
+	typedef amgcl::backend::builtin<double> Backend;
+	amgcl::make_solver<
+		amgcl::amg<
+		Backend,
+		amgcl::coarsening::aggregation,
+		amgcl::relaxation::spai0
+		>,
+		amgcl::solver::cg<Backend>
+	> solve(M);
+	///####check different coarsening and relaxations.
+
+	std::cout << solve.precond() << std::endl;
+
+	//auto t_solve = profiler.scoped_tic("solve");
+	std::vector<double>  x(M.size_n(), 0.0);
+	solve(b, x);
+
+	//if (optional_profiler) *optional_profiler = profiler;
+	return x;
+}
+
+/**
+	@brief Solves linear system M * x = b using eigen
+*/
+Eigen::VectorXd solve_linear_system(Eigen::SparseMatrix<double>& M, Eigen::VectorXd& b) {
+	Eigen::VectorXd result;
+	eigen_solve_linear_system(M, b, result);
+	return result;
+}
+
 
 
 /**
