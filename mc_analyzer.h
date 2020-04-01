@@ -88,7 +88,7 @@ struct mc_analyzer {
 		if (!(reward_selector < mc.n_edge_decorations)) throw std::invalid_argument("Given markov chain has too few rewards.");
 		auto result{ std::vector<_RationalT>(_size(target_adjusted_matrix), 0) };
 		for (int k = 0; k < target_adjusted_matrix.outerSize(); ++k)
-			for (SparseMatrix<double>::InnerIterator it(target_adjusted_matrix, k); it; ++it)
+			for (Eigen::SparseMatrix<double>::InnerIterator it(target_adjusted_matrix, k); it; ++it)
 			{
 				result[it.row()] -= it.value() * mc.forward_transitions.at(it.row()).at(it.col())->decorations[reward_selector];
 			}
