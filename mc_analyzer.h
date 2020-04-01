@@ -45,7 +45,7 @@ inline Eigen::SparseMatrix<double> analyzer_t<Eigen::SparseMatrix<double>>::targ
 	for (auto it = mc.forward_transitions.cbegin(); it != mc.forward_transitions.cend(); ++it) {
 		if (target_states.find(it->first) != target_states.cend()) continue;
 		for (auto jt = it->second.cbegin(); jt != it->second.cend(); ++jt)
-			triplet_list.push_back(it->first, jt->first, jt->second->probability);
+			triplet_list.emplace_back(it->first, jt->first, jt->second->probability);
 	}
 	m.setFromTriplets(triplet_list.cbegin(), triplet_list.cend());
 	return m;
@@ -84,9 +84,11 @@ struct mc_analyzer {
 	/**
 		@brief Calculates image vector in linear system of equations for calculation of expects.
 	*/
-	static std::vector<_RationalT> rewarded_image_vector(const Eigen::SparseMatrix<double>& target_adjusted_matrix, const mc_type& mc, const std::size_t& reward_selector) {
+	static Eigen::VectorXd rewarded_image_vector(const Eigen::SparseMatrix<double>& target_adjusted_matrix, const mc_type& mc, const std::size_t& reward_selector) {
 		if (!(reward_selector < mc.n_edge_decorations)) throw std::invalid_argument("Given markov chain has too few rewards.");
-		auto result{ std::vector<_RationalT>(_size(target_adjusted_matrix), 0) };
+		const auto size{ _size(target_adjusted_matrix) };
+		auto result{ Eigen::VectorXd(size) };
+		for (decltype(_size(target_adjusted_matrix)) i{ 0 }; i < size; ++i) result[i] = 0;
 		for (int k = 0; k < target_adjusted_matrix.outerSize(); ++k)
 			for (Eigen::SparseMatrix<double>::InnerIterator it(target_adjusted_matrix, k); it; ++it)
 			{

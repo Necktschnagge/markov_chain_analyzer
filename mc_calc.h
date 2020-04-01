@@ -83,7 +83,7 @@ nlohmann::json calc_expect(_MarkovChain& mc, std::size_t reward_index, const _In
 	constexpr unsigned COUNT_TIMESTAMPS{ 7 };
 	std::array<decltype(std::chrono::steady_clock::now()), COUNT_TIMESTAMPS> timestamps;
 
-	using matrix_type = sparse_matrix; ///### this is config!!! to be put outside
+	using matrix_type = Eigen::SparseMatrix<double>; // sparse_matrix; ///### this is config!!! to be put outside
 
 	timestamps[0] = std::chrono::steady_clock::now();
 	auto target_probability_matrix{ analyzer_t<matrix_type>::target_adjusted_probability_matrix(mc, target_set) };
@@ -98,7 +98,7 @@ nlohmann::json calc_expect(_MarkovChain& mc, std::size_t reward_index, const _In
 	timestamps[5] = std::chrono::steady_clock::now();
 	mc.set_decoration(result, decoration_destination_index);
 	timestamps[6] = std::chrono::steady_clock::now();
-
+	
 	nlohmann::json performance_log;
 	static_assert(std::is_same<decltype(timestamps[1] - timestamps[0])::period, std::nano>::value, "Unit is supposed to be nanoseconds.");
 	std::array<double, COUNT_TIMESTAMPS - 1> diffs;
@@ -133,7 +133,7 @@ nlohmann::json calc_variance(_MarkovChain& mc, std::size_t reward_index, const _
 
 	using analyzer = mc_analyzer<typename _MarkovChain::rational_type, typename _MarkovChain::integral_type>;
 
-	using matrix_type = sparse_matrix; ///### this is config!!! to be put outside
+	using matrix_type = Eigen::SparseMatrix<double>; // sparse_matrix; ///### this is config!!! to be put outside
 
 	constexpr unsigned COUNT_TIMESTAMPS{ 11 };
 	std::array<decltype(std::chrono::steady_clock::now()), COUNT_TIMESTAMPS> timestamps;
