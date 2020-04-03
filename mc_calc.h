@@ -14,7 +14,7 @@
 
 
 void eigen_solve_linear_system(Eigen::SparseMatrix<double>& matrix, Eigen::VectorXd& image, Eigen::VectorXd& result) {
-	Eigen::BiCGSTAB<Eigen::SparseMatrix<double> > solver;
+	Eigen::ConjugateGradient<Eigen::SparseMatrix<double> > solver;
 	solver.compute(matrix);
 	if (solver.info() != Eigen::Success) {
 		// decomposition failed
@@ -133,8 +133,8 @@ nlohmann::json calc_variance(_MarkovChain& mc, std::size_t reward_index, const _
 
 	using analyzer = mc_analyzer<typename _MarkovChain::rational_type, typename _MarkovChain::integral_type>;
 
-	//using matrix_type = Eigen::SparseMatrix<double>; ///### this is config!!! to be put outside
-	using matrix_type =  sparse_matrix; ///### this is config!!! to be put outside
+	using matrix_type = Eigen::SparseMatrix<double>; ///### this is config!!! to be put outside
+	// using matrix_type =  sparse_matrix; ///### this is config!!! to be put outside
 
 	constexpr unsigned COUNT_TIMESTAMPS{ 11 };
 	std::array<decltype(std::chrono::steady_clock::now()), COUNT_TIMESTAMPS> timestamps;

@@ -44,8 +44,12 @@ inline Eigen::SparseMatrix<double> analyzer_t<Eigen::SparseMatrix<double>>::targ
 	std::vector<Eigen::Triplet<double>> triplet_list;
 	for (auto it = mc.forward_transitions.cbegin(); it != mc.forward_transitions.cend(); ++it) {
 		if (target_states.find(it->first) != target_states.cend()) continue;
-		for (auto jt = it->second.cbegin(); jt != it->second.cend(); ++jt)
+		bool done{ false };
+		for (auto jt = it->second.cbegin(); jt != it->second.cend(); ++jt) {
 			triplet_list.emplace_back(it->first, jt->first, jt->second->probability);
+			if (it->first == jt->first) done = true;
+		}
+		if (!done) triplet_list.emplace_back(it->first, it->first, 0.0);
 	}
 	m.setFromTriplets(triplet_list.cbegin(), triplet_list.cend());
 	return m;
@@ -86,14 +90,34 @@ struct mc_analyzer {
 	*/
 	static Eigen::VectorXd rewarded_image_vector(const Eigen::SparseMatrix<double>& target_adjusted_matrix, const mc_type& mc, const std::size_t& reward_selector) {
 		if (!(reward_selector < mc.n_edge_decorations)) throw std::invalid_argument("Given markov chain has too few rewards.");
+		const auto t1 = std::chrono::steady_clock::now();
 		const auto size{ _size(target_adjusted_matrix) };
 		auto result{ Eigen::VectorXd(size) };
 		for (decltype(_size(target_adjusted_matrix)) i{ 0 }; i < size; ++i) result[i] = 0;
+		const auto t2 = std::chrono::steady_clock::now();
+		decltype((std::chrono::steady_clock::now() - std::chrono::steady_clock::now()).count()) s1{ 0 }, s2{ 0 }, s3{ 0 };
 		for (int k = 0; k < target_adjusted_matrix.outerSize(); ++k)
 			for (Eigen::SparseMatrix<double>::InnerIterator it(target_adjusted_matrix, k); it; ++it)
 			{
-				result[it.row()] -= it.value() * mc.forward_transitions.at(it.row()).at(it.col())->decorations[reward_selector];
+				auto factor = [&]() -> double {
+					try { return mc.forward_transitions.at(it.row()).at(it.col())->decorations[reward_selector]; }
+					catch (std::out_of_range& e) { return 0.0; }
+				};
+				const auto t4 = std::chrono::steady_clock::now();
+				auto& target = result[it.row()];
+				const auto t5 = std::chrono::steady_clock::now();
+				auto& mat_val = it.value();
+				const auto t6 = std::chrono::steady_clock::now();
+				auto&& fac = factor();
+				const auto t7 = std::chrono::steady_clock::now();
+				target -= mat_val * fac;
+				s1 += (t5 - t4).count();
+				s2 += (t6 - t5).count();
+				s3 += (t7 - t6).count();
 			}
+		const auto t3 = std::chrono::steady_clock::now();
+		//std::cout << "reward_vector:  " << (t2 - t1).count() << "  :  " << (t3 - t2).count() << "\n";
+		//std::cout << "reward_vector:  " << s1 << "  :  " << s2 << "  :  " << s3 << "\n";
 		return result;
 	}
 

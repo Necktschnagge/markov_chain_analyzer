@@ -97,8 +97,28 @@ inline void subtract_unity_matrix(_SparseMatrix& m) {
 	for (std::size_t it{ 0 }; it != _size(m); ++it) m(it,it) -= 1;
 }
 template<>
-inline void subtract_unity_matrix<Eigen::SparseMatrix<double>>(Eigen::SparseMatrix<double>& m) {
-	for (std::size_t it{ 0 }; it != _size(m); ++it) m.coeffRef(it, it) -= 1;
+inline void subtract_unity_matrix<Eigen::SparseMatrix<double>>(Eigen::SparseMatrix<double>& m) {	
+	//for (std::size_t it{ 0 }; it != _size(m); ++it) m.coeffRef(it, it) -= 1;
+	decltype(std::chrono::steady_clock::now() - std::chrono::steady_clock::now()) iterate{ 0 };
+	decltype(std::chrono::steady_clock::now() - std::chrono::steady_clock::now()) pick{ 0 };
+	for (int k = 0; k < m.outerSize(); ++k) {
+		const auto t1{ std::chrono::steady_clock::now() };
+		bool done{ false };
+		for (Eigen::SparseMatrix<double>::InnerIterator it(m, k); it; ++it) {
+			//std::cout << it.row() << " " << it.col() << " " << it.valueRef() << "  :  ";
+			if (it.row() == it.col()) {
+				it.valueRef() -= 1;
+				done = true;
+			}
+			//std::cout << it.valueRef() << "\n";
+		}
+		const auto t2{ std::chrono::steady_clock::now() };
+		if (!done) m.coeffRef(k, k) = -1;
+		const auto t3{ std::chrono::steady_clock::now() };
+		iterate += (t2 - t1);
+		pick += (t3 - t2);
+	}
+	//std::cout << iterate.count() << "   :   " << pick.count() << "\n";
 }
 
 
