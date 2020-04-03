@@ -14,7 +14,7 @@
 
 
 void eigen_solve_linear_system(Eigen::SparseMatrix<double>& matrix, Eigen::VectorXd& image, Eigen::VectorXd& result) {
-	Eigen::ConjugateGradient<Eigen::SparseMatrix<double> > solver;
+	Eigen::ConjugateGradient < Eigen::SparseMatrix<double>, Eigen::Lower | Eigen::Upper > solver;
 	solver.compute(matrix);
 	if (solver.info() != Eigen::Success) {
 		// decomposition failed
