@@ -38,7 +38,8 @@ script:
     - cat ./output.decos
     - /bin/bash ./test_equality
 
-
+after_success: 
+  - bash <(curl -s https://codecov.io/bash)
    
 deploy:
     provider: pages
