@@ -31,6 +31,7 @@ add_executable(MC_Analyzer
 #FIND_PACKAGE(amgcl)
 FIND_PACKAGE( Boost 1.54.0 COMPONENTS regex REQUIRED )
 include_directories(SYSTEM extern/json/include)
+include_directories(SYSTEM extern/Eigen)
 INCLUDE_DIRECTORIES(SYSTEM ${Boost_INCLUDE_DIR} )
 include_directories(extern/amgcl)
 TARGET_LINK_LIBRARIES(MC_Analyzer LINK_PUBLIC ${Boost_LIBRARIES} )

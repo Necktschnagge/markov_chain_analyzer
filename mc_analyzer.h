@@ -8,15 +8,26 @@
 
 #include "sparse_matrix.h"
 
+#include "Eigen/src/SparseCore/SparseMatrix.h"
 
-/**
-	@brief Returns a sparse matrix that contains transition probabilities such that matrix[from][to] is the probability of the transition \a from --> \a to, except for states \a from in \target_states, there the value is set to zero (i.e. no entry in sparse matrix).
-*/
+
+template <class _MatrixType>
+class analyzer_t {
+public:
+
+	using matrix_type = _MatrixType;
+	/**
+		@brief Returns a sparse matrix that contains transition probabilities such that matrix[from][to] is the probability of the transition \a from --> \a to, except for states \a from in \target_states, there the value is set to zero (i.e. no entry in sparse matrix).
+	*/
+	template <class mc_type, class set_type>
+	inline static matrix_type target_adjusted_probability_matrix(const mc_type& mc, const set_type& target_states);
+};
+
+template <>
 template <class mc_type, class set_type>
-inline sparse_matrix target_adjusted_probability_matrix(const mc_type& mc, const set_type& target_states) {
+inline sparse_matrix analyzer_t<sparse_matrix>::target_adjusted_probability_matrix(const mc_type& mc, const set_type& target_states) {
 	static_assert(std::is_same<typename mc_type::integral_type, typename set_type::value_type>::value, "Value type of set must equal integral type of markov chain.");
 	auto m{ sparse_matrix(mc.size_states(), mc.size_states()) };
-
 	for (auto it = mc.forward_transitions.cbegin(); it != mc.forward_transitions.cend(); ++it) {
 		if (target_states.find(it->first) != target_states.cend()) continue;
 		for (auto jt = it->second.cbegin(); jt != it->second.cend(); ++jt)
@@ -25,6 +36,24 @@ inline sparse_matrix target_adjusted_probability_matrix(const mc_type& mc, const
 	return m;
 } //### could also be matrix class member function.
 
+template <>
+template <class mc_type, class set_type>
+inline Eigen::SparseMatrix<double> analyzer_t<Eigen::SparseMatrix<double>>::target_adjusted_probability_matrix(const mc_type& mc, const set_type& target_states) {
+	static_assert(std::is_same<typename mc_type::integral_type, typename set_type::value_type>::value, "Value type of set must equal integral type of markov chain.");
+	auto m{ Eigen::SparseMatrix<double>(mc.size_states(), mc.size_states()) };
+	std::vector<Eigen::Triplet<double>> triplet_list;
+	for (auto it = mc.forward_transitions.cbegin(); it != mc.forward_transitions.cend(); ++it) {
+		if (target_states.find(it->first) != target_states.cend()) continue;
+		bool done{ false };
+		for (auto jt = it->second.cbegin(); jt != it->second.cend(); ++jt) {
+			triplet_list.emplace_back(it->first, jt->first, jt->second->probability);
+			if (it->first == jt->first) done = true;
+		}
+		if (!done) triplet_list.emplace_back(it->first, it->first, 0.0);
+	}
+	m.setFromTriplets(triplet_list.cbegin(), triplet_list.cend());
+	return m;
+} //### could also be matrix class member function.
 
 /**
 	@brief Contains static functions for analyzing and calculating values from markov chains.
@@ -35,30 +64,67 @@ struct mc_analyzer {
 	using mc_type = markov_chain<_RationalT, _IntegerT>;
 	using set_type = std::unordered_set<_IntegerT>;
 
+	
 	/**
 		@brief Calculates image vector in linear system of equations for calculation of expects.
 	*/
 	static std::vector<_RationalT> rewarded_image_vector(const sparse_matrix& target_adjusted_matrix, const mc_type& mc, const std::size_t& reward_selector) {
-		if (!(reward_selector < mc.n_edge_decorations)) throw std::invalid_argument("Given markov chain has to few rewards.");
-		auto result{ std::vector<_RationalT>(target_adjusted_matrix.size_m(), 0) };
-		for (sparse_matrix::size_t state_s{ 0 }; state_s != target_adjusted_matrix.size_m(); ++state_s) {
+		if (!(reward_selector < mc.n_edge_decorations)) throw std::invalid_argument("Given markov chain has too few rewards.");
+		auto result{ std::vector<_RationalT>(_size(target_adjusted_matrix), 0) };
+		for (std::size_t state_s{ 0 }; state_s != _size(target_adjusted_matrix); ++state_s) {
 			result[state_s] = -std::accumulate(target_adjusted_matrix[state_s].cbegin(), target_adjusted_matrix[state_s].cend(), _RationalT(0.0),
 				[&](const _RationalT& val, const auto& appendee /*pointing to state "t"*/) {
 					try {
 						return val + appendee.second /*P_{-> A} */ * mc.forward_transitions.at(state_s).at(appendee.first)->decorations[reward_selector];
 					}
 					catch (const std::out_of_range&) {
-						return val;
+						return val; //## throw error here?
 					}
 				});
 		}
 		return result;
 	}
 
-	/** 
+	/**
+		@brief Calculates image vector in linear system of equations for calculation of expects.
+	*/
+	static Eigen::VectorXd rewarded_image_vector(const Eigen::SparseMatrix<double>& target_adjusted_matrix, const mc_type& mc, const std::size_t& reward_selector) {
+		if (!(reward_selector < mc.n_edge_decorations)) throw std::invalid_argument("Given markov chain has too few rewards.");
+		const auto t1 = std::chrono::steady_clock::now();
+		const auto size{ _size(target_adjusted_matrix) };
+		auto result{ Eigen::VectorXd(size) };
+		for (decltype(_size(target_adjusted_matrix)) i{ 0 }; i < size; ++i) result[i] = 0;
+		const auto t2 = std::chrono::steady_clock::now();
+		decltype((std::chrono::steady_clock::now() - std::chrono::steady_clock::now()).count()) s1{ 0 }, s2{ 0 }, s3{ 0 };
+		for (int k = 0; k < target_adjusted_matrix.outerSize(); ++k)
+			for (Eigen::SparseMatrix<double>::InnerIterator it(target_adjusted_matrix, k); it; ++it)
+			{
+				auto factor = [&]() -> double {
+					try { return mc.forward_transitions.at(it.row()).at(it.col())->decorations[reward_selector]; }
+					catch (std::out_of_range& e) { return 0.0; }
+				};
+				const auto t4 = std::chrono::steady_clock::now();
+				auto& target = result[it.row()];
+				const auto t5 = std::chrono::steady_clock::now();
+				auto& mat_val = it.value();
+				const auto t6 = std::chrono::steady_clock::now();
+				auto&& fac = factor();
+				const auto t7 = std::chrono::steady_clock::now();
+				target -= mat_val * fac;
+				s1 += (t5 - t4).count();
+				s2 += (t6 - t5).count();
+				s3 += (t7 - t6).count();
+			}
+		const auto t3 = std::chrono::steady_clock::now();
+		//std::cout << "reward_vector:  " << (t2 - t1).count() << "  :  " << (t3 - t2).count() << "\n";
+		//std::cout << "reward_vector:  " << s1 << "  :  " << s2 << "  :  " << s3 << "\n";
+		return result;
+	}
+
+	/**
 		Stores a new composed reward function for variance as edge decorations in the markoch chain mc.
 	*/
-	static void calculate_variance_reward(mc_type& mc, std::size_t index_basic_reward, std::size_t index_basic_decoration, std::size_t index_destination_reward){
+	static void calculate_variance_reward(mc_type& mc, std::size_t index_basic_reward, std::size_t index_basic_decoration, std::size_t index_destination_reward) {
 		if (!(index_basic_reward < mc.n_edge_decorations)) throw std::out_of_range("Basic reward out of range.");
 		if (!(index_destination_reward < mc.n_edge_decorations)) throw std::out_of_range("Destination reward out of range.");
 		if (!(index_basic_decoration < mc.n_node_decorations)) throw std::out_of_range("Basic decoration out of range.");
@@ -101,35 +167,5 @@ struct mc_analyzer {
 };
 
 
-/**
-	@brief Solves linear system M * x = b
-*/
-std::vector<double> solve_linear_system(const sparse_matrix& M, const std::vector<double>& b /*, amgcl::profiler<>* optional_profiler = nullptr*/ ) {
 
-	//## read the docs of AMGCL to get to know what a profiler actualy does.
-
-	//amgcl::profiler<> profiler;
-	//auto t_total = profiler.scoped_tic("total");
-
-	// Create an AMGCL solver for the problem.
-	typedef amgcl::backend::builtin<double> Backend;
-	amgcl::make_solver<
-		amgcl::amg<
-		Backend,
-		amgcl::coarsening::aggregation,
-		amgcl::relaxation::spai0
-		>,
-		amgcl::solver::cg<Backend>
-	> solve(M);
-	///####check different coarsening and relaxations.
-
-	std::cout << solve.precond() << std::endl;
-
-	//auto t_solve = profiler.scoped_tic("solve");
-	std::vector<double>  x(M.size_n(), 0.0);
-	solve(b, x);
-
-	//if (optional_profiler) *optional_profiler = profiler;
-	return x;
-}
 

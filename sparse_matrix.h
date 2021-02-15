@@ -15,6 +15,9 @@
 #include <amgcl/solver/cg.hpp>
 #include <amgcl/profiler.hpp>
 
+#include "Eigen/IterativeLinearSolvers"
+#include "Eigen/src/SparseCore/SparseMatrix.h"
+
 #include <vector>
 #include <unordered_map>
 
@@ -59,8 +62,64 @@ public:
 		for (sparse_matrix::size_t it{ 0 }; it != size_m(); ++it) rows[it][it] -= 1;
 	}
 
+
+	Eigen::SparseMatrix<double> copy_to_eigen() {
+		auto matrix{ Eigen::SparseMatrix<double>(m, n) };
+		std::vector<Eigen::Triplet<double>> triplet_list;
+		for (decltype(rows)::size_type m{ 0 }; m < rows.size(); ++m)
+			for (const auto& pair : rows[m])
+				triplet_list.push_back(Eigen::Triplet<double>(m, pair.first, pair.second));
+		matrix.setFromTriplets(triplet_list.cbegin(), triplet_list.cend());
+		return matrix;
+	}
 };
 
+
+template <class T>
+inline std::size_t _size(const T&);
+template <>
+std::size_t _size<sparse_matrix>(const sparse_matrix& m) {
+	if (m.size_m() != m.size_n()) throw std::invalid_argument("Matrix is not quadratic.");
+	return m.size_m();
+}
+template <>
+std::size_t _size<Eigen::SparseMatrix<double>>(const Eigen::SparseMatrix<double>& m) {
+	if (m.rows() != m.cols()) throw std::invalid_argument("Matrix is not quadratic.");
+	return m.rows();
+}
+
+
+/**
+	@brief Subtracts the unity martix.
+*/
+template<class _SparseMatrix>
+inline void subtract_unity_matrix(_SparseMatrix& m) {
+	for (std::size_t it{ 0 }; it != _size(m); ++it) m(it,it) -= 1;
+}
+template<>
+inline void subtract_unity_matrix<Eigen::SparseMatrix<double>>(Eigen::SparseMatrix<double>& m) {	
+	//for (std::size_t it{ 0 }; it != _size(m); ++it) m.coeffRef(it, it) -= 1;
+	decltype(std::chrono::steady_clock::now() - std::chrono::steady_clock::now()) iterate{ 0 };
+	decltype(std::chrono::steady_clock::now() - std::chrono::steady_clock::now()) pick{ 0 };
+	for (int k = 0; k < m.outerSize(); ++k) {
+		const auto t1{ std::chrono::steady_clock::now() };
+		bool done{ false };
+		for (Eigen::SparseMatrix<double>::InnerIterator it(m, k); it; ++it) {
+			//std::cout << it.row() << " " << it.col() << " " << it.valueRef() << "  :  ";
+			if (it.row() == it.col()) {
+				it.valueRef() -= 1;
+				done = true;
+			}
+			//std::cout << it.valueRef() << "\n";
+		}
+		const auto t2{ std::chrono::steady_clock::now() };
+		if (!done) m.coeffRef(k, k) = -1;
+		const auto t3{ std::chrono::steady_clock::now() };
+		iterate += (t2 - t1);
+		pick += (t3 - t2);
+	}
+	//std::cout << iterate.count() << "   :   " << pick.count() << "\n";
+}
 
 
 /* Define type traits required by amgcl for own class sparse_matrix */

@@ -8,10 +8,73 @@
 
 #include "markov_chain.h"
 #include "commands.h"
+#include "mc_analyzer.h"
+
+#include "Eigen/IterativeLinearSolvers"
+
+
+void eigen_solve_linear_system(Eigen::SparseMatrix<double>& matrix, Eigen::VectorXd& image, Eigen::VectorXd& result) {
+	Eigen::BiCGSTAB<Eigen::SparseMatrix<double> > solver;
+	solver.compute(matrix);
+	if (solver.info() != Eigen::Success) {
+		// decomposition failed
+		throw 1;
+	}
+	result = solver.solve(image);
+	if (solver.info() != Eigen::Success) {
+		// solving failed
+		throw 2;
+	}
+}
+
+
 
  /**
-	  Calculates expects of accumulated edge rewards along paths until reaching target_set in markov chain.
+	 @brief Solves linear system M * x = b using amgcl
  */
+std::vector<double> solve_linear_system(const sparse_matrix& M, const std::vector<double>& b /*, amgcl::profiler<>* optional_profiler = nullptr*/) {
+
+	//## read the docs of AMGCL to get to know what a profiler actualy does.
+
+	//amgcl::profiler<> profiler;
+	//auto t_total = profiler.scoped_tic("total");
+
+	// Create an AMGCL solver for the problem.
+	typedef amgcl::backend::builtin<double> Backend;
+	amgcl::make_solver<
+		amgcl::amg<
+		Backend,
+		amgcl::coarsening::aggregation,
+		amgcl::relaxation::spai0
+		>,
+		amgcl::solver::cg<Backend>
+	> solve(M);
+	///####check different coarsening and relaxations.
+
+	std::cout << solve.precond() << std::endl;
+
+	//auto t_solve = profiler.scoped_tic("solve");
+	std::vector<double>  x(M.size_n(), 0.0);
+	solve(b, x);
+
+	//if (optional_profiler) *optional_profiler = profiler;
+	return x;
+}
+
+/**
+	@brief Solves linear system M * x = b using eigen
+*/
+Eigen::VectorXd solve_linear_system(Eigen::SparseMatrix<double>& M, Eigen::VectorXd& b) {
+	Eigen::VectorXd result;
+	eigen_solve_linear_system(M, b, result);
+	return result;
+}
+
+
+
+/**
+	 Calculates expects of accumulated edge rewards along paths until reaching target_set in markov chain.
+*/
 template <class _MarkovChain, class _IntegralSet>
 nlohmann::json calc_expect(_MarkovChain& mc, std::size_t reward_index, const _IntegralSet& target_set, std::size_t decoration_destination_index) {
 
@@ -20,12 +83,14 @@ nlohmann::json calc_expect(_MarkovChain& mc, std::size_t reward_index, const _In
 	constexpr unsigned COUNT_TIMESTAMPS{ 7 };
 	std::array<decltype(std::chrono::steady_clock::now()), COUNT_TIMESTAMPS> timestamps;
 
+	using matrix_type = Eigen::SparseMatrix<double>; // sparse_matrix; ///### this is config!!! to be put outside
+
 	timestamps[0] = std::chrono::steady_clock::now();
-	auto target_probability_matrix{ target_adjusted_probability_matrix(mc, target_set) };
+	auto target_probability_matrix{ analyzer_t<matrix_type>::target_adjusted_probability_matrix(mc, target_set) };
 	timestamps[1] = std::chrono::steady_clock::now();
 	auto target_probability_matrix_minus_one{ target_probability_matrix };
 	timestamps[2] = std::chrono::steady_clock::now();
-	target_probability_matrix_minus_one.subtract_unity_matrix();
+	subtract_unity_matrix(target_probability_matrix_minus_one);
 	timestamps[3] = std::chrono::steady_clock::now();
 	auto image_vector{ analyzer::rewarded_image_vector(target_probability_matrix, mc, reward_index) };
 	timestamps[4] = std::chrono::steady_clock::now();
@@ -33,7 +98,7 @@ nlohmann::json calc_expect(_MarkovChain& mc, std::size_t reward_index, const _In
 	timestamps[5] = std::chrono::steady_clock::now();
 	mc.set_decoration(result, decoration_destination_index);
 	timestamps[6] = std::chrono::steady_clock::now();
-
+	
 	nlohmann::json performance_log;
 	static_assert(std::is_same<decltype(timestamps[1] - timestamps[0])::period, std::nano>::value, "Unit is supposed to be nanoseconds.");
 	std::array<double, COUNT_TIMESTAMPS - 1> diffs;
@@ -68,15 +133,18 @@ nlohmann::json calc_variance(_MarkovChain& mc, std::size_t reward_index, const _
 
 	using analyzer = mc_analyzer<typename _MarkovChain::rational_type, typename _MarkovChain::integral_type>;
 
+	using matrix_type = Eigen::SparseMatrix<double>; ///### this is config!!! to be put outside
+	// using matrix_type =  sparse_matrix; ///### this is config!!! to be put outside
+
 	constexpr unsigned COUNT_TIMESTAMPS{ 11 };
 	std::array<decltype(std::chrono::steady_clock::now()), COUNT_TIMESTAMPS> timestamps;
 
 	timestamps[0] = std::chrono::steady_clock::now();
-	auto target_probability_matrix{ target_adjusted_probability_matrix(mc, target_set) };
+	auto target_probability_matrix{ analyzer_t<matrix_type>::target_adjusted_probability_matrix(mc, target_set) };
 	timestamps[1] = std::chrono::steady_clock::now();
 	auto target_probability_matrix_minus_one{ target_probability_matrix };
 	timestamps[2] = std::chrono::steady_clock::now();
-	target_probability_matrix_minus_one.subtract_unity_matrix();
+	subtract_unity_matrix(target_probability_matrix_minus_one);
 	timestamps[3] = std::chrono::steady_clock::now();
 	auto image_vector{ analyzer::rewarded_image_vector(target_probability_matrix,mc,reward_index) };
 	timestamps[4] = std::chrono::steady_clock::now();
@@ -146,7 +214,7 @@ nlohmann::json calc_covariance(
 	std::array<decltype(std::chrono::steady_clock::now()), COUNT_TIMESTAMPS> timestamps;
 
 	timestamps[0] = std::chrono::steady_clock::now();
-	auto target_probability_matrix{ target_adjusted_probability_matrix(mc, target_set) };
+	auto target_probability_matrix{ analyzer_t<sparse_matrix>::target_adjusted_probability_matrix(mc, target_set) };
 	timestamps[1] = std::chrono::steady_clock::now();
 	auto target_probability_matrix_minus_one{ target_probability_matrix };
 	timestamps[2] = std::chrono::steady_clock::now();
@@ -162,7 +230,7 @@ nlohmann::json calc_covariance(
 	mc.set_decoration(interim2, expect_decoration_index2);
 	timestamps[6] = std::chrono::steady_clock::now();
 	analyzer::calculate_covariance_reward(
-		mc, 
+		mc,
 		reward_index1,
 		reward_index2,
 		expect_decoration_index1,
@@ -193,7 +261,7 @@ nlohmann::json calc_covariance(
 		{sc::decoration_index_egde_source + _1, reward_index1 },
 		{sc::decoration_index_egde_source + _2, reward_index2 },
 		{sc::decoration_index_egde_free, free_reward_index },
-		{sc::decoration_index_node_target + sc::_expect +_1, expect_decoration_index1 },
+		{sc::decoration_index_node_target + sc::_expect + _1, expect_decoration_index1 },
 		{sc::decoration_index_node_target + sc::_expect + _2, expect_decoration_index2 },
 		{sc::decoration_index_node_target + sc::_covariance, decoration_destination_index },
 		{sc::time_create_pto_matrix, diffs[0]},
